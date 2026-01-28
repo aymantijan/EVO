@@ -1,0 +1,2038 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% csrf_token %}
+
+{% block title %}Mon Profil - Gamification Life{% endblock %}
+
+{% block content %}
+<div class="container profile-container">
+
+    <!-- COVER SECTION -->
+    <div class="profile-cover-container">
+        <div class="profile-cover" id="profile-cover" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 250px; background-size: cover; background-position: center; position: relative; border-radius: 8px; margin-bottom: -100px; overflow: hidden;">
+            <button class="btn-edit-cover" onclick="openCoverModal()" style="position: absolute; bottom: 20px; right: 20px; background: rgba(33, 128, 141, 1); color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); transition: all 0.3s; z-index: 10;">
+                <i class="fas fa-camera"></i> Modifier Couverture
+            </button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <!-- Header avec Avatar et Carte Info -->
+    <div class="profile-header" style="background: transparent; box-shadow: none; border: none; position: relative; z-index: 5; display: flex; justify-content: space-between; align-items: flex-start;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+            <!-- Avatar -->
+            <div class="profile-avatar-section">
+                <div class="profile-avatar" id="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <button class="btn-upload-avatar" onclick="document.getElementById('avatar-input').click()" title="Changer la photo">
+                    <i class="fas fa-camera"></i>
+                </button>
+                <input type="file" id="avatar-input" accept="image/*" style="display: none;" onchange="uploadAvatar(event)">
+            </div>
+
+            <!-- Carte avec Info Utilisateur (Nom + Niveau) -->
+            <div class="profile-info-card" style="background: rgba(33, 128, 141, 1); padding: 5px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3); min-width: 200px;">
+                <h2 id="profile-username" style="color: white; margin: 0 0 8px 0; font-size: 1.5rem; font-weight: bold;">Chargement...</h2>
+                <p class="profile-level" id="profile-level-text" style="color: rgba(255, 255, 255, 0.9); margin: 0; font-size: 1.1rem; font-weight: 500;">Level 1</p>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" id="edit-profile-btn" style="position: relative; margin-top: 80px;">
+            <i class="fas fa-edit"></i> Modifier le Profil
+        </button>
+    </div>
+
+
+    <!-- Stats Grid - AVEC LOCALSTORAGE SKILLS -->
+    <div class="stats-grid">
+        <!-- XP & Level -->
+        <div class="stat-card stat-card-xl">
+            <div class="stat-icon xp"><i class="fas fa-star"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">XP Total</span>
+                <span class="stat-value" id="profile-xp">0</span>
+            </div>
+        </div>
+
+        <div class="stat-card stat-card-xl">
+            <div class="stat-icon level"><i class="fas fa-crown"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">Niveau</span>
+                <span class="stat-value" id="profile-level">1</span>
+                <span class="stat-detail" id="level-progress"></span>
+            </div>
+        </div>
+
+        <!-- HP Traits -->
+        <div class="stat-card stat-card-xl">
+            <div class="stat-icon hp"><i class="fas fa-heart"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">HP Global</span>
+                <span class="stat-value" id="profile-hp">0</span>
+                <span class="stat-detail" id="hp-breakdown"></span>
+            </div>
+        </div>
+
+
+
+        <!-- COMPÉTENCES - DEPUIS LOCALSTORAGE -->
+        <div class="stat-card">
+            <div class="stat-icon skills"><i class="fas fa-brain"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">Compétences</span>
+                <span class="stat-value" id="profile-skills">0</span>
+            </div>
+        </div>
+
+        <!-- DOMAINES - DEPUIS LOCALSTORAGE -->
+        <div class="stat-card">
+            <div class="stat-icon domains"><i class="fas fa-compass"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">Domaines</span>
+                <span class="stat-value" id="domains-count-skills">0</span>
+            </div>
+        </div>
+
+        <!-- CATÉGORIES - DEPUIS LOCALSTORAGE -->
+        <div class="stat-card">
+            <div class="stat-icon categories"><i class="fas fa-list"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">Catégories</span>
+                <span class="stat-value" id="categories-count-skills">0</span>
+            </div>
+        </div>
+
+        <!-- Challenges -->
+        <div class="stat-card">
+            <div class="stat-icon challenges"><i class="fas fa-tasks"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">Challenges Quotidien</span>
+                <span class="stat-value" id="challenges-daily-count">0</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon evaluations"><i class="fas fa-robot"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">Évaluations IA</span>
+                <span class="stat-value" id="evaluations-ia-count">0</span>
+            </div>
+        </div>
+
+        <!-- Traits Actifs -->
+        <div class="stat-card">
+            <div class="stat-icon traits"><i class="fas fa-sparkles"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">Traits Actifs</span>
+                <span class="stat-value" id="profile-traits-active">0</span>
+            </div>
+        </div>
+
+        <!-- ARTEFACTS - 6 Cards -->
+        <div class="stat-card artifacts-stat">
+            <div class="stat-icon artifacts"><i class="fas fa-book"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">📖 Livres Lus</span>
+                <span class="stat-value" id="profile-books">0</span>
+            </div>
+        </div>
+
+        <div class="stat-card artifacts-stat">
+            <div class="stat-icon artifacts"><i class="fas fa-newspaper"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">📰 Articles</span>
+                <span class="stat-value" id="profile-articles">0</span>
+            </div>
+        </div>
+
+        <div class="stat-card artifacts-stat">
+            <div class="stat-icon artifacts"><i class="fas fa-code"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">🔧 Projets</span>
+                <span class="stat-value" id="profile-projects">0</span>
+            </div>
+        </div>
+
+        <div class="stat-card artifacts-stat">
+            <div class="stat-icon artifacts"><i class="fas fa-graduation-cap"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">🎓 Cours</span>
+                <span class="stat-value" id="profile-courses">0</span>
+            </div>
+        </div>
+
+        <div class="stat-card artifacts-stat">
+            <div class="stat-icon artifacts"><i class="fas fa-handshake"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">🤝 Contributions</span>
+                <span class="stat-value" id="profile-social">0</span>
+            </div>
+        </div>
+
+        <div class="stat-card artifacts-stat">
+            <div class="stat-icon artifacts"><i class="fas fa-network-wired"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">🌐 Networking</span>
+                <span class="stat-value" id="profile-network">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SKILLS SECTION - DEPUIS LOCALSTORAGE -->
+    <div class="profile-section">
+        <div class="section-header">
+            <h2><i class="fas fa-graduation-cap"></i> Compétences Acquises</h2>
+            <span class="section-count" id="skills-count">0</span>
+        </div>
+
+        <div class="skills-summary">
+            <div class="skill-metric">
+                <span class="skill-metric-label">Total</span>
+                <span class="skill-metric-value" id="skills-total">0</span>
+            </div>
+            <div class="skill-metric">
+                <span class="skill-metric-label">Domaines</span>
+                <span class="skill-metric-value" id="skills-domains">0</span>
+            </div>
+            <div class="skill-metric">
+                <span class="skill-metric-label">Catégories</span>
+                <span class="skill-metric-value" id="skills-categories">0</span>
+            </div>
+        </div>
+
+        <div id="skills-container" style="margin-top: 20px;">
+            <p class="empty-state">Aucune compétence acquise pour le moment</p>
+        </div>
+    </div>
+
+    <!-- CHALLENGES SECTION -->
+    <div class="profile-section">
+        <div class="section-header">
+            <h2><i class="fas fa-tasks"></i> Activités Récentes - Challenges</h2>
+        </div>
+
+        <div class="challenges-overview">
+            <!-- Quotidien -->
+            <div class="challenge-block">
+                <div class="challenge-title">
+                    <i class="fas fa-calendar-day"></i> Quotidien
+                    <span class="challenge-badge" id="daily-badge">0</span>
+                </div>
+                <div class="challenge-stats">
+                    <div class="challenge-stat">
+                        <span class="label">Dernière activité</span>
+                        <span class="value" id="daily-last">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IA Evaluations -->
+            <div class="challenge-block">
+                <div class="challenge-title">
+                    <i class="fas fa-robot"></i> Évaluateur IA
+                    <span class="challenge-badge" id="ia-badge">0</span>
+                </div>
+                <div class="challenge-stats">
+                    <div class="challenge-stat">
+                        <span class="label">Évaluations complétées</span>
+                        <span class="value" id="ia-evaluations">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Artefacts Summary -->
+        <div class="artefacts-summary">
+            <h3 style="margin-bottom: 16px; color: var(--text-primary);">📦 Artefacts Détectés</h3>
+            <div class="artefacts-grid">
+                <div class="artefact-summary-card">
+                    <span class="artefact-emoji">📖</span>
+                    <span class="artefact-label">Livres Lus</span>
+                    <span class="artefact-count" id="artefact-books-count">0</span>
+                </div>
+                <div class="artefact-summary-card">
+                    <span class="artefact-emoji">📰</span>
+                    <span class="artefact-label">Articles</span>
+                    <span class="artefact-count" id="artefact-articles-count">0</span>
+                </div>
+                <div class="artefact-summary-card">
+                    <span class="artefact-emoji">🔧</span>
+                    <span class="artefact-label">Projets</span>
+                    <span class="artefact-count" id="artefact-projects-count">0</span>
+                </div>
+                <div class="artefact-summary-card">
+                    <span class="artefact-emoji">🎓</span>
+                    <span class="artefact-label">Cours</span>
+                    <span class="artefact-count" id="artefact-courses-count">0</span>
+                </div>
+                <div class="artefact-summary-card">
+                    <span class="artefact-emoji">🤝</span>
+                    <span class="artefact-label">Contributions</span>
+                    <span class="artefact-count" id="artefact-social-count">0</span>
+                </div>
+                <div class="artefact-summary-card">
+                    <span class="artefact-emoji">🌐</span>
+                    <span class="artefact-label">Networking</span>
+                    <span class="artefact-count" id="artefact-network-count">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Traits de Personnalité -->
+    <div class="profile-section">
+        <div class="section-header">
+            <h2><i class="fas fa-sparkles"></i> Traits de Personnalité (76 Traits)</h2>
+            <span class="section-count" id="traits-count">0</span>
+        </div>
+        <div class="traits-categories-grid" id="traits-grid">
+            <p class="empty-state">Chargement des traits...</p>
+        </div>
+    </div>
+
+    <!-- User Details -->
+    <div class="profile-section">
+        <div class="section-header">
+            <h2><i class="fas fa-info-circle"></i> Informations Personnelles</h2>
+        </div>
+        <div class="details-grid">
+            <div class="detail-item">
+                <span class="detail-label">Nom d'utilisateur</span>
+                <span class="detail-value" id="detail-username-span">-</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Email</span>
+                <span class="detail-value" id="detail-email-span">-</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Rejoint le</span>
+                <span class="detail-value" id="detail-joined-span">-</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Dernière activité</span>
+                <span class="detail-value" id="detail-last-activity-span">-</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal d'édition PROFIL -->
+<div class="modal" id="edit-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Modifier mon Profil</h2>
+            <button class="modal-close" id="close-modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="edit-profile-form">
+                <div class="form-group">
+                    <label for="edit-username" class="form-label">Nom d'utilisateur</label>
+                    <input type="text" id="edit-username" class="form-control" placeholder="Votre nom d'utilisateur">
+                </div>
+                <div class="form-group">
+                    <label for="edit-email" class="form-label">Email</label>
+                    <input type="email" id="edit-email" class="form-control" placeholder="Votre email">
+                </div>
+                <div class="form-group">
+                    <label for="edit-bio" class="form-label">Bio</label>
+                    <textarea id="edit-bio" class="form-control" placeholder="Décrivez-vous..." rows="4"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancel-modal">Annuler</button>
+            <button class="btn btn-primary" id="save-profile">
+                <i class="fas fa-save"></i> Enregistrer
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal COUVERTURE -->
+<div class="modal" id="cover-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Modifier la Couverture</h2>
+            <button class="modal-close" id="close-cover-modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="cover-options">
+                <!-- UPLOAD IMAGE -->
+                <div class="cover-option" style="margin-bottom: 20px;">
+                    <h4 style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: var(--text-primary);">
+                        <i class="fas fa-image"></i> Télécharger une Image
+                    </h4>
+                    <button type="button" class="btn btn-primary" onclick="document.getElementById('cover-image-input').click()">
+                        <i class="fas fa-folder-open"></i> Choisir une Image
+                    </button>
+                    <input type="file" id="cover-image-input" accept="image/*" style="display: none;" onchange="uploadCoverImage(event)">
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 8px;">Format JPG, PNG | Max 5MB</p>
+                </div>
+
+                <div style="text-align: center; color: var(--text-secondary); margin: 16px 0; position: relative;">
+                    <span style="position: relative; z-index: 2; padding: 0 8px; background: var(--bg-primary);">OU</span>
+                    <div style="position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--color-border); z-index: 1;"></div>
+                </div>
+
+                <!-- COLOR PICKER -->
+                <div class="cover-option">
+                    <h4 style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: var(--text-primary);">
+                        <i class="fas fa-palette"></i> Choisir une Couleur
+                    </h4>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px;">
+                        <div onclick="changeCoverColor('#667eea')" style="background: #667eea; width: 100%; aspect-ratio: 1; border-radius: 6px; cursor: pointer; border: 3px solid transparent; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.borderColor='var(--color-primary)'" onmouseout="this.style.transform='scale(1)'; this.style.borderColor='transparent'"></div>
+                        <div onclick="changeCoverColor('#764ba2')" style="background: #764ba2; width: 100%; aspect-ratio: 1; border-radius: 6px; cursor: pointer; border: 3px solid transparent; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.borderColor='var(--color-primary)'" onmouseout="this.style.transform='scale(1)'; this.style.borderColor='transparent'"></div>
+                        <div onclick="changeCoverColor('#f093fb')" style="background: #f093fb; width: 100%; aspect-ratio: 1; border-radius: 6px; cursor: pointer; border: 3px solid transparent; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.borderColor='var(--color-primary)'" onmouseout="this.style.transform='scale(1)'; this.style.borderColor='transparent'"></div>
+                        <div onclick="changeCoverColor('#4facfe')" style="background: #4facfe; width: 100%; aspect-ratio: 1; border-radius: 6px; cursor: pointer; border: 3px solid transparent; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.borderColor='var(--color-primary)'" onmouseout="this.style.transform='scale(1)'; this.style.borderColor='transparent'"></div>
+                        <div onclick="changeCoverColor('#00f2fe')" style="background: #00f2fe; width: 100%; aspect-ratio: 1; border-radius: 6px; cursor: pointer; border: 3px solid transparent; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.borderColor='var(--color-primary)'" onmouseout="this.style.transform='scale(1)'; this.style.borderColor='transparent'"></div>
+                        <div onclick="changeCoverColor('#43e97b')" style="background: #43e97b; width: 100%; aspect-ratio: 1; border-radius: 6px; cursor: pointer; border: 3px solid transparent; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.borderColor='var(--color-primary)'" onmouseout="this.style.transform='scale(1)'; this.style.borderColor='transparent'"></div>
+                        <div onclick="changeCoverColor('#fa709a')" style="background: #fa709a; width: 100%; aspect-ratio: 1; border-radius: 6px; cursor: pointer; border: 3px solid transparent; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.borderColor='var(--color-primary)'" onmouseout="this.style.transform='scale(1)'; this.style.borderColor='transparent'"></div>
+                        <div onclick="changeCoverColor('#30cfd0')" style="background: #30cfd0; width: 100%; aspect-ratio: 1; border-radius: 6px; cursor: pointer; border: 3px solid transparent; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.borderColor='var(--color-primary)'" onmouseout="this.style.transform='scale(1)'; this.style.borderColor='transparent'"></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <label for="custom-color-input" style="font-size: 0.9rem; color: var(--text-secondary); white-space: nowrap;">Couleur personnalisée</label>
+                        <input type="color" id="custom-color-input" value="#667eea" onchange="changeCoverColor(this.value)" style="width: 80px; height: 40px; cursor: pointer; border: 1px solid var(--color-border); border-radius: 6px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="close-cover-btn">Fermer</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    #profile-cover img {
+        image-orientation: from-image;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    #profile-cover {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cover-btn {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        z-index: 10;
+    }
+
+    #coverSection,
+    .cover-section {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    #coverSection img,
+    .cover-section img {
+        image-orientation: from-image;
+        object-fit: cover;
+        object-position: center;
+    }
+    img {
+        image-orientation: from-image;
+    }
+
+    .profile-avatar,
+    #profileImage,
+    .cover-image,
+    .preview-image {
+        image-orientation: from-image;
+        object-fit: cover;
+    }
+    /* ===== PROFIL STYLES ===== */
+    .profile-container {
+        max-width: 100%;
+        padding: var(--space-20);
+        margin: 0 auto;
+    }
+
+    .profile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--space-32);
+        border-radius: var(--radius-lg);
+        gap: var(--space-24);
+    }
+
+    .profile-avatar-section {
+        display: flex;
+        align-items: center;
+        gap: var(--space-20);
+        position: relative;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: var(--color-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        box-shadow: var(--shadow-lg);
+        color: white;
+        background-size: cover;
+        background-position: center;
+        flex-shrink: 0;
+        border: 4px solid var(--bg-primary);
+    }
+
+    .btn-upload-avatar {
+        position: absolute;
+        bottom: 0;
+        right: -15px;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: var(--color-primary);
+        color: white;
+        border: 3px solid var(--bg-primary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        transition: all var(--transition);
+        box-shadow: 0 4px 12px rgba(26, 188, 156, 0.3);
+    }
+
+    .btn-upload-avatar:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 24px rgba(26, 188, 156, 0.4);
+    }
+
+    .profile-info-basic h1 {
+        font-size: var(--font-size-4xl);
+        margin: 0;
+        color: var(--text-primary);
+    }
+
+    .profile-level {
+        color: var(--text-secondary);
+        font-size: var(--font-size-xl);
+        margin: var(--space-8) 0 0 0;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--space-16);
+        margin-bottom: var(--space-32);
+    }
+
+    .stat-card {
+        display: flex;
+        align-items: center;
+        gap: var(--space-16);
+        background: var(--bg-primary);
+        padding: var(--space-20);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--color-card-border);
+        box-shadow: var(--shadow-sm);
+        transition: all var(--transition);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--color-primary);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .stat-icon.xp { background: rgba(255, 193, 7, 0.15); color: #ffc107; }
+    .stat-icon.level { background: rgba(76, 175, 80, 0.15); color: #4caf50; }
+    .stat-icon.hp { background: rgba(244, 67, 54, 0.15); color: #f44336; }
+    .stat-icon.streak { background: rgba(255, 107, 53, 0.15); color: #ff6b35; }
+    .stat-icon.skills { background: rgba(100, 150, 200, 0.15); color: #6496c8; }
+    .stat-icon.domains { background: rgba(150, 100, 200, 0.15); color: #9664c8; }
+    .stat-icon.categories { background: rgba(100, 200, 150, 0.15); color: #64c896; }
+    .stat-icon.challenges { background: rgba(100, 200, 200, 0.15); color: #64c8c8; }
+    .stat-icon.evaluations { background: rgba(200, 100, 200, 0.15); color: #c864c8; }
+    .stat-icon.traits { background: rgba(255, 182, 193, 0.2); color: #ff69b4; }
+    .stat-icon.artifacts { background: rgba(102, 205, 170, 0.15); color: #3cb371; }
+
+    .stat-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+        flex: 1;
+    }
+
+    .stat-label {
+        font-size: var(--font-size-xs);
+        color: var(--text-secondary);
+        font-weight: var(--font-weight-medium);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+        font-size: var(--font-size-2xl);
+        font-weight: var(--font-weight-bold);
+        color: var(--text-primary);
+    }
+
+    .stat-detail {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin-top: 4px;
+    }
+
+    .profile-section {
+        background: var(--bg-primary);
+        padding: var(--space-24);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--color-card-border);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: var(--space-32);
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: var(--space-20);
+        border-bottom: 2px solid var(--color-primary);
+        padding-bottom: var(--space-16);
+    }
+
+    .section-header h2 {
+        display: flex;
+        align-items: center;
+        gap: var(--space-10);
+        margin: 0;
+        color: var(--color-primary);
+        font-size: var(--font-size-2xl);
+    }
+
+    .section-count {
+        background: var(--color-primary);
+        color: white;
+        padding: var(--space-4) var(--space-12);
+        border-radius: var(--radius-full);
+        font-weight: var(--font-weight-bold);
+        font-size: var(--font-size-sm);
+    }
+
+    /* ===== SKILLS SECTION ===== */
+
+    .skills-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+        padding: 12px;
+        background: var(--bg-secondary);
+        border-radius: 8px;
+    }
+
+    .skill-metric {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .skill-metric-label {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+    }
+
+    .skill-metric-value {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--color-primary);
+    }
+
+    .skill-card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+    }
+
+    .skill-card-item {
+        background: white;
+        border: 1px solid var(--color-card-border);
+        border-radius: 8px;
+        padding: 16px;
+        transition: all 0.3s ease;
+        border-left: 3px solid var(--color-primary);
+    }
+
+    .skill-card-item:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+        border-color: var(--color-primary);
+    }
+
+    .skill-card-name {
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    .skill-card-meta {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .skill-card-domain {
+        background: rgba(6, 182, 212, 0.1);
+        color: var(--color-primary);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+
+    .skill-card-category {
+        background: rgba(150, 100, 200, 0.1);
+        color: #9664c8;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+        margin-top: 6px;
+    }
+
+    .skill-card-date {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin-top: 8px;
+        border-top: 1px solid var(--color-card-border);
+        padding-top: 8px;
+    }
+
+    /* ===== CHALLENGES SECTION ===== */
+
+    .challenges-overview {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .challenge-block {
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.05), rgba(6, 182, 212, 0.02));
+        border: 1px solid rgba(6, 182, 212, 0.2);
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .challenge-block:hover {
+        border-color: var(--color-primary);
+        box-shadow: 0 4px 12px rgba(6, 182, 212, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .challenge-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .challenge-badge {
+        background: var(--color-primary);
+        color: white;
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: bold;
+        margin-left: auto;
+    }
+
+    .challenge-stats {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .challenge-stat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background: var(--bg-primary);
+        border-radius: 8px;
+        border-left: 3px solid var(--color-primary);
+    }
+
+    .challenge-stat .label {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+    }
+
+    .challenge-stat .value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--color-primary);
+    }
+
+    /* ===== ARTEFACTS SUMMARY ===== */
+
+    .artefacts-summary {
+        background: linear-gradient(135deg, rgba(76, 175, 80, 0.05), rgba(102, 205, 170, 0.05));
+        border: 1px solid rgba(76, 175, 80, 0.2);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 24px;
+    }
+
+    .artefacts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+    }
+
+    .artefact-summary-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--color-card-border);
+        border-radius: 8px;
+        padding: 12px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .artefact-summary-card:hover {
+        border-color: #4caf50;
+        box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .artefact-emoji {
+        font-size: 1.75rem;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .artefact-label {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+    }
+
+    .artefact-count {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #4caf50;
+    }
+
+    /* ===== TRAITS SECTION ===== */
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-16);
+    }
+
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-8);
+    }
+
+    .detail-label {
+        font-size: var(--font-size-sm);
+        color: var(--text-secondary);
+        font-weight: var(--font-weight-semibold);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+        font-size: var(--font-size-base);
+        color: var(--text-primary);
+        padding: var(--space-8) var(--space-12);
+        background: var(--color-secondary);
+        border-radius: var(--radius-base);
+        border-left: 3px solid var(--color-primary);
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 3000;
+    }
+
+    .modal.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn var(--duration-normal) var(--ease-standard);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .modal-content {
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        animation: slideUp var(--duration-normal) var(--ease-standard);
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--space-20);
+        border-bottom: 1px solid var(--color-card-border);
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        color: var(--text-primary);
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: var(--font-size-2xl);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: color var(--duration-fast) var(--ease-standard);
+    }
+
+    .modal-close:hover {
+        color: var(--color-error);
+    }
+
+    .modal-body {
+        padding: var(--space-20);
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--space-12);
+        padding: var(--space-20);
+        border-top: 1px solid var(--color-card-border);
+    }
+
+    .form-group {
+        margin-bottom: var(--space-16);
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: var(--space-8);
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-primary);
+        font-size: var(--font-size-sm);
+    }
+
+    .form-control {
+        width: 100%;
+        padding: var(--space-10) var(--space-12);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-base);
+        background: var(--color-secondary);
+        color: var(--text-primary);
+        font-family: var(--font-family-base);
+        font-size: var(--font-size-base);
+        transition: border-color var(--duration-fast) var(--ease-standard);
+        box-sizing: border-box;
+        resize: vertical;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.1);
+    }
+
+    .traits-categories-grid {
+        display: grid;
+        gap: var(--space-20);
+    }
+
+    .trait-category-section {
+        margin-bottom: 32px;
+        background: var(--bg-primary);
+        border: 1px solid var(--color-card-border);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .trait-category-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid var(--color-primary);
+    }
+
+    .trait-category-title h3 {
+        margin: 0;
+        color: var(--color-primary);
+        font-size: var(--font-size-xl);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .trait-category-emoji {
+        font-size: 1.5rem;
+    }
+
+    .traits-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+    }
+
+    .trait-item {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: 16px;
+        transition: all var(--transition);
+    }
+
+    .trait-item:hover {
+        border-color: var(--color-primary);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+
+    .trait-item.trait-active {
+        background: linear-gradient(135deg, var(--color-secondary), var(--color-surface));
+        border-left: 3px solid var(--color-primary);
+    }
+
+    .trait-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .trait-item-name {
+        font-weight: var(--font-weight-bold);
+        color: var(--text-primary);
+        font-size: var(--font-size-sm);
+    }
+
+    .trait-item-hp {
+        background: var(--color-secondary);
+        color: var(--color-primary);
+        padding: 4px 10px;
+        border-radius: var(--radius-base);
+        font-weight: var(--font-weight-bold);
+        font-size: var(--font-size-xs);
+        min-width: 50px;
+        text-align: center;
+    }
+
+    .trait-item-bar {
+        width: 100%;
+        height: 6px;
+        background: var(--color-border);
+        border-radius: var(--radius-full);
+        overflow: hidden;
+        margin-bottom: 8px;
+    }
+
+    .trait-item-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
+        border-radius: var(--radius-full);
+        transition: width 0.6s var(--ease-standard);
+    }
+
+    .trait-status {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin-top: 8px;
+        text-align: center;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-secondary);
+    }
+
+    @media (max-width: 768px) {
+        .profile-header {
+            flex-direction: column;
+            gap: var(--space-20);
+            text-align: center;
+            padding: var(--space-20);
+        }
+
+        .profile-avatar-section {
+            flex-direction: column;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .challenges-overview {
+            grid-template-columns: 1fr;
+        }
+
+        .artefacts-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .traits-list {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+
+        .skill-card-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .profile-container {
+            padding: var(--space-16);
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            font-size: 2.5rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: var(--space-12);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+        }
+
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .challenges-overview {
+            grid-template-columns: 1fr;
+        }
+
+        .artefacts-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .traits-list {
+            grid-template-columns: 1fr;
+        }
+
+        .skill-card-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ==================== CSRF TOKEN HELPER ====================
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+    console.log('🔑 CSRF Token:', csrftoken ? '✅ Présent' : '❌ Manquant');
+
+    // ==================== LOCALSTORAGE SKILLS FUNCTIONS ====================
+    // ⚠️ DEPRECATED: Ces fonctions ne sont plus utilisées.
+    // Les données de compétences sont maintenant chargées via l'API dans loadProfileData()
+
+    const STORAGE_KEY = 'evolutionSystem';
+
+    function getSystemData() {
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (!stored) return { competence: {} };
+            return JSON.parse(stored);
+        } catch (e) {
+            console.error('Erreur accès localStorage:', e);
+            return { competence: {} };
+        }
+    }
+
+    function getCompetences() {
+        const systemData = getSystemData();
+        return systemData.competence || {};
+    }
+
+    // ⚠️ DEPRECATED: Cette fonction n'est plus appelée
+    function loadSkillsFromLocalStorage() {
+        console.log('📚 Chargement des compétences depuis localStorage...');
+
+        const competences = getCompetences();
+        const skills = Object.values(competences);
+
+        console.log('✅ Compétences chargées:', skills);
+
+        const totalSkills = skills.length;
+        const uniqueDomains = new Set(skills.map(s => s.domain));
+        const uniqueCategories = new Set(skills.map(s => s.category));
+
+        // ✅ VÉRIFICATION NULL AVANT ACCÈS
+        const profileSkills = document.getElementById('profile-skills');
+        const domainsCountSkills = document.getElementById('domains-count-skills');
+        const categoriesCountSkills = document.getElementById('categories-count-skills');
+        const skillsCount = document.getElementById('skills-count');
+        const skillsTotal = document.getElementById('skills-total');
+        const skillsDomains = document.getElementById('skills-domains');
+        const skillsCategories = document.getElementById('skills-categories');
+
+        if (profileSkills) profileSkills.textContent = totalSkills;
+        if (domainsCountSkills) domainsCountSkills.textContent = uniqueDomains.size;
+        if (categoriesCountSkills) categoriesCountSkills.textContent = uniqueCategories.size;
+        if (skillsCount) skillsCount.textContent = totalSkills;
+        if (skillsTotal) skillsTotal.textContent = totalSkills;
+        if (skillsDomains) skillsDomains.textContent = uniqueDomains.size;
+        if (skillsCategories) skillsCategories.textContent = uniqueCategories.size;
+
+        renderSkillsCards(skills);
+    }
+
+    function renderSkillsCards(skills) {
+        const container = document.getElementById('skills-container');
+        if (!container) return; // ✅ VÉRIFICATION NULL
+
+        if (skills.length === 0) {
+            container.innerHTML = '<p class="empty-state">Aucune compétence acquise pour le moment</p>';
+            return;
+        }
+
+        let html = '<div class="skill-card-grid">';
+
+        skills.forEach((skill, idx) => {
+            html += `
+                <div class="skill-card-item">
+                    <div class="skill-card-name">✓ ${skill.skill}</div>
+                    <div class="skill-card-meta">
+                        <span class="skill-card-domain">${skill.domain}</span>
+                    </div>
+                    <div class="skill-card-category">${skill.categoryName || skill.category}</div>
+                    <div class="skill-card-date">Acquise le ${skill.acquiredDate}</div>
+                </div>
+            `;
+        });
+
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    // ==================== TRAITS COMPLETS (76 TRAITS) ====================
+
+    const TRAIT_CATEGORIES_COMPLETE = {
+        cognitive: {
+            name: 'Traits Cognitifs',
+            emoji: '🧠',
+            traits: [
+                { name: 'Pensée Analytique', key: 'analyticalthinking' },
+                { name: 'Pensée Logique', key: 'logicalthinking' },
+                { name: 'Pensée Critique', key: 'criticalthinking' },
+                { name: 'Pensée Stratégique', key: 'strategicthinking' },
+                { name: 'Pensée Systémique', key: 'systemicthinking' },
+                { name: 'Pensée Abstraite', key: 'abstractthinking' },
+                { name: 'Pensée Intuitive', key: 'intuitivethinking' },
+                { name: 'Créativité Intellectuelle', key: 'intellectualcreativity' },
+                { name: 'Curiosité Intellectuelle', key: 'intellectualcuriosity' },
+                { name: 'Vision Long Terme', key: 'longtermvision' },
+                { name: 'Flexibilité Mentale', key: 'mentalflexibility' },
+                { name: 'Capacité d\'Apprentissage', key: 'learningcapacity' },
+                { name: 'Lucidité', key: 'lucidity' },
+                { name: 'Esprit de Synthèse', key: 'syntheticsense' },
+                { name: 'Rigidité Cognitive', key: 'cognitivrigidity', negative: true }
+            ]
+        },
+        emotional: {
+            name: 'Traits Émotionnels',
+            emoji: '💜',
+            traits: [
+                { name: 'Stabilité Émotionnelle', key: 'emotionalstability' },
+                { name: 'Résilience', key: 'resilience' },
+                { name: 'Sang-Froid', key: 'composure' },
+                { name: 'Sensibilité Émotionnelle', key: 'emotionalsensitivity' },
+                { name: 'Maîtrise de Soi', key: 'selfcontrol' },
+                { name: 'Tolérance au Stress', key: 'stresstolerance' },
+                { name: 'Vulnérabilité Émotionnelle', key: 'emotionalvulnerability' },
+                { name: 'Stoïcisme', key: 'stoicism' },
+                { name: 'Détachement Émotionnel', key: 'emotionaldetachment' },
+                { name: 'Instabilité Émotionnelle', key: 'emotionalinstability', negative: true },
+                { name: 'Anxiété', key: 'anxiety', negative: true },
+                { name: 'Irritabilité', key: 'irritability', negative: true },
+                { name: 'Impulsivité Émotionnelle', key: 'emotionalimpulsivity', negative: true }
+            ]
+        },
+        behavioral: {
+            name: 'Traits Comportementaux',
+            emoji: '⚡',
+            traits: [
+                { name: 'Discipline', key: 'discipline' },
+                { name: 'Autocontrôle', key: 'selfcontrol' },
+                { name: 'Persévérance', key: 'perseverance' },
+                { name: 'Rigueur', key: 'rigor' },
+                { name: 'Organisation', key: 'organization' },
+                { name: 'Fiabilité', key: 'reliability' },
+                { name: 'Sens du Devoir', key: 'dutyfulness' },
+                { name: 'Responsabilité', key: 'responsibility' },
+                { name: 'Prudence', key: 'prudence' },
+                { name: 'Gestion du Temps', key: 'timemanagement' },
+                { name: 'Capacité d\'Exécution', key: 'executioncapacity' }
+            ]
+        },
+        social: {
+            name: 'Traits Sociaux',
+            emoji: '👥',
+            traits: [
+                { name: 'Sociabilité', key: 'sociability' },
+                { name: 'Assertivité', key: 'assertiveness' },
+                { name: 'Charisme', key: 'charisma' },
+                { name: 'Influence', key: 'influence' },
+                { name: 'Diplomatie', key: 'diplomacy' },
+                { name: 'Coopération', key: 'cooperation' },
+                { name: 'Empathie Relationnelle', key: 'relationalempathy' },
+                { name: 'Compétitivité', key: 'competitiveness' },
+                { name: 'Individualisme', key: 'individualism' },
+                { name: 'Dominance Sociale', key: 'socialdominance' },
+                { name: 'Dominance Inverse', key: 'inversesocialdominance' },
+                { name: 'Confiance Sociale', key: 'socialtrust' },
+                { name: 'Aliénation Sociale', key: 'socialalienation', negative: true },
+                { name: 'Soumission Excessive', key: 'excessivesubmission', negative: true },
+                { name: 'Passivité Sociale', key: 'socialpassivity', negative: true }
+            ]
+        },
+        moral: {
+            name: 'Traits Moraux',
+            emoji: '⚖️',
+            traits: [
+                { name: 'Intégrité Intellectuelle', key: 'intellectualintegrity' },
+                { name: 'Loyauté', key: 'loyalty' },
+                { name: 'Honneur', key: 'honor' }
+            ]
+        },
+        learning: {
+            name: 'Traits d\'Apprentissage',
+            emoji: '📚',
+            traits: [
+                { name: 'Apprentissage', key: 'learning' },
+                { name: 'Capacité d\'Apprentissage', key: 'learningability' },
+                { name: 'Expertise Reconnue', key: 'recognizedexpertise' },
+                { name: 'Polyvalence', key: 'versatility' }
+            ]
+        },
+        achievement: {
+            name: 'Traits d\'Accomplissement',
+            emoji: '🏆',
+            traits: [
+                { name: 'Accomplissement', key: 'accomplishment' },
+                { name: 'Détermination', key: 'determination' },
+                { name: 'Ambition', key: 'ambition' },
+                { name: 'Innovation', key: 'innovation' }
+            ]
+        },
+        existential: {
+            name: 'Traits Existentiels',
+            emoji: '✨',
+            traits: [
+                { name: 'Individualité Forte', key: 'strongindividuality' },
+                { name: 'Conscience de Soi', key: 'selfawareness' },
+                { name: 'Croissance Personnelle', key: 'personalgrowth' },
+                { name: 'Sens & Purpose', key: 'senseofpurpose' }
+            ]
+        },
+        leadership: {
+            name: 'Traits de Leadership',
+            emoji: '👑',
+            traits: [
+                { name: 'Leadership Naturel', key: 'naturalleadership' },
+                { name: 'Vision Stratégique', key: 'strategicvision' },
+                { name: 'Mentorat', key: 'mentoring' },
+                { name: 'Créativité Organisationnelle', key: 'organizationalcreativity' }
+            ]
+        },
+        affective: {
+            name: 'Traits Affectifs',
+            emoji: '💝',
+            traits: [
+                { name: 'Empathie Émotionnelle', key: 'emotionalempathy' },
+                { name: 'Compassion', key: 'compassion' },
+                { name: 'Fierté', key: 'pride' }
+            ]
+        }
+    };
+
+    function renderTraitsCategoriesComplete(traitsHP) {
+        const traitsGrid = document.getElementById('traits-grid');
+        if (!traitsGrid) return;
+
+        console.log('🎯 Rendu des traits complets:', traitsHP);
+        traitsGrid.innerHTML = '';
+
+        let totalTraits = 0;
+
+        Object.entries(TRAIT_CATEGORIES_COMPLETE).forEach(([key, category]) => {
+            const categorySection = document.createElement('div');
+            categorySection.className = 'trait-category-section';
+
+            let traitsHTML = '';
+
+            category.traits.forEach(trait => {
+                let hp = 0;
+                if (traitsHP[trait.name] !== undefined) {
+                    hp = parseInt(traitsHP[trait.name]) || 0;
+                } else if (traitsHP[trait.key] !== undefined) {
+                    hp = parseInt(traitsHP[trait.key]) || 0;
+                }
+
+                const percentage = Math.min(Math.abs(hp) / 100 * 100, 100);
+                const hasHP = hp !== 0;
+
+                traitsHTML += `
+                    <div class="trait-item ${hasHP ? 'trait-active' : ''}">
+                        <div class="trait-item-header">
+                            <span class="trait-item-name">${trait.name}</span>
+                            <span class="trait-item-hp">${hp >= 0 ? '+' : ''}${hp} HP</span>
+                        </div>
+                        <div class="trait-item-bar">
+                            <div class="trait-item-bar-fill" style="width: ${percentage}%"></div>
+                        </div>
+                        <div class="trait-status">
+                            ${hasHP ? percentage.toFixed(0) + '%' : 'Non découvert'}
+                        </div>
+                    </div>
+                `;
+
+                totalTraits++;
+            });
+
+            categorySection.innerHTML = `
+                <div class="trait-category-title">
+                    <span class="trait-category-emoji">${category.emoji}</span>
+                    <h3>${category.name}</h3>
+                </div>
+                <div class="traits-list">
+                    ${traitsHTML}
+                </div>
+            `;
+
+            traitsGrid.appendChild(categorySection);
+        });
+
+        const traitsCount = document.getElementById('traits-count');
+        if (traitsCount) traitsCount.textContent = totalTraits;
+
+        console.log(`✅ Total traits rendus: ${totalTraits}`);
+    }
+
+    // ==================== ✅ LOAD PROFILE IMAGES FROM DATABASE ====================
+
+    async function loadProfileImages() {
+        try {
+            console.log('📸 Chargement des images de profil...');
+
+            const response = await fetch('/api/profile/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                console.warn('⚠️ Erreur chargement images:', response.status);
+                return;
+            }
+
+            const data = await response.json();
+            console.log('✅ Données profil reçues:', data);
+
+            // ✅ CHARGER L'IMAGE DE PROFIL
+            if (data.profile_image_url) {
+                const profileAvatar = document.getElementById('profile-avatar');
+                if (profileAvatar) {
+                    profileAvatar.style.backgroundImage = `url(${data.profile_image_url})`;
+                    profileAvatar.innerHTML = '';
+                    console.log('✅ Image de profil chargée');
+                }
+            }
+
+            // ✅ CHARGER L'IMAGE DE COUVERTURE
+            if (data.cover_image_url) {
+                const profileCover = document.getElementById('profile-cover');
+                if (profileCover) {
+                    profileCover.innerHTML = `
+                        <img src="${data.cover_image_url}"
+                             alt="Couverture"
+                             style="width: 100%; height: 100%; object-fit: cover; image-orientation: from-image;">
+                        <button class="cover-btn" onclick="openCoverModal()" s>📸 Modifier la Couverture</button>
+                    `;
+                    console.log('✅ Image de couverture chargée avec orientation correcte');
+                }
+            }
+
+        } catch (error) {
+            console.error('❌ Erreur chargement images:', error);
+        }
+    }
+
+    // ==================== LOAD PROFILE DATA ====================
+
+    async function loadProfileData() {
+        try {
+            console.log('📥 Chargement du profil depuis /api/get-user-data/...');
+
+            const response = await fetch('/api/get-user-data/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                console.warn(`⚠️ Erreur serveur: ${response.status}`);
+                loadDefaultProfileData();
+                return;
+            }
+
+            const data = await response.json();
+            console.log('✅ Données reçues:', data);
+
+            if (!data) {
+                loadDefaultProfileData();
+                return;
+            }
+
+            populateProfileUI(data);
+
+        } catch (error) {
+            console.error('❌ Erreur lors du chargement du profil:', error);
+            loadDefaultProfileData();
+        }
+    }
+
+    function loadDefaultProfileData() {
+        console.log('⚠️ Utilisation des valeurs par défaut');
+
+        // ✅ VÉRIFICATION NULL POUR TOUS LES ÉLÉMENTS
+        const elements = {
+            'profile-xp': '0',
+            'profile-level': '1',
+            'profile-hp': '0',
+            'profile-streak': '0',
+            'profile-traits-active': '0',
+            'profile-skills': '0',
+            'domains-count-skills': '0',
+            'categories-count-skills': '0',
+            'profile-books': '0',
+            'profile-articles': '0',
+            'profile-projects': '0',
+            'profile-courses': '0',
+            'profile-social': '0',
+            'profile-network': '0',
+            'artefact-articles-count': '0',
+            'artefact-projects-count': '0',
+            'artefact-courses-count': '0',
+            'artefact-social-count': '0',
+            'artefact-network-count': '0'
+        };
+
+        Object.entries(elements).forEach(([id, value]) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        });
+
+        renderTraitsCategoriesComplete({});
+    }
+
+    function populateProfileUI(data) {
+        const {
+            user = {},
+            level = 1,
+            totalXP = 0,
+            traitsHP = {},
+            evaluations = [],
+            detections = {},
+            acquired_skills = [],
+            explored_domains = [],
+            discovered_categories = []
+        } = data;
+
+        const username = user.username || 'Utilisateur';
+        const email = user.email || '-';
+        const totalHP = Object.values(traitsHP).reduce((sum, hp) => sum + (parseInt(hp) || 0), 0);
+        const traitsActivCount = Object.keys(traitsHP).length;
+
+        // Calculate skills statistics
+        const totalSkills = acquired_skills.length || 0;
+        const totalDomains = explored_domains.length || 0;
+        const totalCategories = discovered_categories.length || 0;
+
+        console.log(`Mise à jour: XP=${totalXP}, Level=${level}, HP=${totalHP}, Skills=${totalSkills}, Domains=${totalDomains}, Categories=${totalCategories}`);
+
+        // ✅ VÉRIFICATION NULL POUR CHAQUE ÉLÉMENT
+        const elements = {
+            'profile-username': username,
+            'profile-level-text': `Level ${level}`,
+            'profile-xp': totalXP || 0,
+            'profile-level': level || 1,
+            'profile-hp': totalHP,
+            'profile-traits-active': traitsActivCount,
+            'profile-skills': totalSkills,
+            'domains-count-skills': totalDomains,
+            'categories-count-skills': totalCategories,
+            'skills-count': totalSkills,
+            'skills-total': totalSkills,
+            'skills-domains': totalDomains,
+            'skills-categories': totalCategories,
+            'challenges-daily-count': evaluations.length || 0,
+            'evaluations-ia-count': evaluations.length || 0,
+            'profile-books': detections.booksRead || 0,
+            'profile-articles': detections.academicArticles || 0,
+            'profile-projects': detections.projectsWorked || 0,
+            'profile-courses': detections.onlineCourses || 0,
+            'profile-social': detections.socialContributions || 0,
+            'profile-network': detections.networkingEvents || 0,
+            'artefact-books-count': detections.booksRead || 0,
+            'artefact-articles-count': detections.academicArticles || 0,
+            'artefact-projects-count': detections.projectsWorked || 0,
+            'artefact-courses-count': detections.onlineCourses || 0,
+            'artefact-social-count': detections.socialContributions || 0,
+            'artefact-network-count': detections.networkingEvents || 0,
+            'detail-username-span': username,
+            'detail-email-span': email
+        };
+
+        Object.entries(elements).forEach(([id, value]) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        });
+
+        // Render skills cards with enriched data
+        renderSkillsCardsFromAPI(acquired_skills);
+
+        // Render challenges/activities data
+        renderChallengesData(evaluations, traitsHP);
+
+        renderTraitsCategoriesComplete(traitsHP);
+
+        console.log('✅ Profil mis à jour avec succès');
+    }
+
+    // Function to render challenges and activities data
+    function renderChallengesData(evaluations, traitsHP) {
+        // Process evaluations data
+        const totalEvaluations = evaluations.length || 0;
+        const traitsDetected = Object.keys(traitsHP).length || 0;
+
+        // Calculate total XP and HP from evaluations
+        let totalXPFromEval = 0;
+        let totalHPFromEval = 0;
+        let lastActivity = '-';
+
+        if (evaluations && evaluations.length > 0) {
+            evaluations.forEach(eval => {
+                totalXPFromEval += eval.xpGained || 0;
+                totalHPFromEval += eval.hpGained || 0;
+            });
+
+            // Get last activity date (assuming evaluations are sorted)
+            const lastEval = evaluations[evaluations.length - 1];
+            if (lastEval && lastEval.date) {
+                lastActivity = new Date(lastEval.date).toLocaleDateString('fr-FR');
+            }
+        }
+
+        // Update Daily Challenges section (assuming daily challenges use evaluations data)
+        const dailyElements = {
+            'daily-badge': totalEvaluations,
+            'daily-activities': `${totalEvaluations}/10`,
+            'daily-hp': totalHPFromEval,
+            'daily-last': lastActivity
+        };
+
+        Object.entries(dailyElements).forEach(([id, value]) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        });
+
+        // Update IA Evaluations section
+        const iaElements = {
+            'ia-badge': totalEvaluations,
+            'ia-evaluations': totalEvaluations,
+            'ia-total': totalXPFromEval + totalHPFromEval,
+            'ia-traits': traitsDetected
+        };
+
+        Object.entries(iaElements).forEach(([id, value]) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        });
+
+        console.log(`✅ Challenges mis à jour: ${totalEvaluations} évaluations, ${traitsDetected} traits`);
+    }
+
+    // Function to render skills from API data (simple string array)
+    function renderSkillsCardsFromAPI(skillNames) {
+        const container = document.getElementById('skills-container');
+        if (!container) return;
+
+        if (!skillNames || skillNames.length === 0) {
+            container.innerHTML = '<p class="empty-state">Aucune compétence acquise pour le moment</p>';
+            return;
+        }
+
+        let html = '<div class="skill-card-grid">';
+
+        skillNames.forEach((skillName) => {
+            html += `
+                <div class="skill-card-item">
+                    <div class="skill-card-name">✓ ${skillName}</div>
+                </div>
+            `;
+        });
+
+        html += '</div>';
+        container.innerHTML = html;
+
+        console.log(`✅ ${skillNames.length} compétences affichées`);
+    }
+
+    // ==================== MODAL HANDLING ====================
+
+    const editBtn = document.getElementById('edit-profile-btn');
+    const modal = document.getElementById('edit-modal');
+    const closeBtn = document.getElementById('close-modal');
+    const cancelBtn = document.getElementById('cancel-modal');
+
+    if (editBtn) editBtn.addEventListener('click', () => modal?.classList.add('active'));
+    if (closeBtn) closeBtn.addEventListener('click', () => modal?.classList.remove('active'));
+    if (cancelBtn) cancelBtn.addEventListener('click', () => modal?.classList.remove('active'));
+
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        });
+    }
+
+    // ==================== ✅ AVATAR & COVER - UPLOAD AVEC CSRF ====================
+
+    function uploadAvatar(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // ✅ PREVIEW INSTANT
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const avatarEl = document.getElementById('profile-avatar');
+            if (avatarEl) {
+                avatarEl.style.backgroundImage = `url(${e.target.result})`;
+                avatarEl.innerHTML = '';
+            }
+        };
+        reader.readAsDataURL(file);
+
+        // ✅ UPLOAD EN BDD AVEC CSRF
+        uploadProfileImageToServer(file);
+    }
+
+    function uploadCoverImage(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // ✅ PREVIEW INSTANT
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const coverEl = document.getElementById('profile-cover');
+            if (coverEl) {
+                coverEl.style.backgroundImage = `url(${e.target.result})`;
+                closeCoverModal();
+            }
+        };
+        reader.readAsDataURL(file);
+
+        // ✅ UPLOAD EN BDD AVEC CSRF
+        uploadCoverImageToServer(file);
+        event.target.value = '';
+    }
+
+    // ✅ UPLOAD AVATAR AU SERVEUR AVEC CSRF TOKEN
+    function uploadProfileImageToServer(file) {
+        const formData = new FormData();
+        formData.append('image', file);
+
+        console.log('📤 Upload image de profil...', file.name);
+        console.log('🔑 CSRF Token:', csrftoken ? '✅ Présent' : '❌ Manquant');
+
+        fetch('/api/upload-profile-image/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            credentials: 'include'
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+
+            if (response.status === 403) {
+                throw new Error('❌ 403 Forbidden - CSRF Token invalide');
+            }
+            if (response.status === 401) {
+                throw new Error('❌ 401 Unauthorized - Non connecté');
+            }
+
+            return response.text();
+        })
+        .then(text => {
+            console.log('Response text:', text);
+            const data = JSON.parse(text);
+
+            if (data.success) {
+                console.log('✅ Image de profil sauvegardée');
+                showNotification('Image de profil sauvegardée', 'success');
+            } else {
+                throw new Error(data.error || 'Erreur inconnue');
+            }
+        })
+        .catch(error => {
+            console.error('❌ Erreur upload:', error);
+            showNotification('Erreur: ' + error.message, 'error');
+        });
+    }
+
+    // ✅ UPLOAD COUVERTURE AU SERVEUR AVEC CSRF TOKEN
+    function uploadCoverImageToServer(file) {
+        const formData = new FormData();
+        formData.append('image', file);
+
+        console.log('📤 Upload image de couverture...', file.name);
+        console.log('🔑 CSRF Token:', csrftoken ? '✅ Présent' : '❌ Manquant');
+
+        fetch('/api/upload-cover-image/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            credentials: 'include'
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+
+            if (response.status === 403) {
+                throw new Error('❌ 403 Forbidden - CSRF Token invalide');
+            }
+            if (response.status === 401) {
+                throw new Error('❌ 401 Unauthorized - Non connecté');
+            }
+
+            return response.text();
+        })
+        .then(text => {
+            console.log('Response text:', text);
+            const data = JSON.parse(text);
+
+            if (data.success) {
+                console.log('✅ Image de couverture sauvegardée');
+                showNotification('Image de couverture sauvegardée', 'success');
+            } else {
+                throw new Error(data.error || 'Erreur inconnue');
+            }
+        })
+        .catch(error => {
+            console.error('❌ Erreur upload:', error);
+            showNotification('Erreur: ' + error.message, 'error');
+        });
+    }
+
+    function changeCoverColor(color) {
+        const profileCover = document.getElementById('profile-cover');
+        if (profileCover) {
+            profileCover.style.backgroundImage = 'none';
+            profileCover.style.background = color;
+        }
+    }
+
+    function openCoverModal() {
+        const coverModal = document.getElementById('cover-modal');
+        if (coverModal) coverModal.classList.add('active');
+    }
+
+    function closeCoverModal() {
+        const coverModal = document.getElementById('cover-modal');
+        if (coverModal) coverModal.classList.remove('active');
+    }
+
+    // ==================== NOTIFICATION HELPER ====================
+
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: ${type === 'success' ? '#10b981' : '#ef4444'};
+            color: white;
+            border-radius: 8px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease-in-out;
+        `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease-in-out';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    // ==================== EVENT LISTENERS ====================
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const closeCoverModalBtn = document.getElementById('close-cover-modal');
+        const closeCoverBtn = document.getElementById('close-cover-btn');
+        const coverModal = document.getElementById('cover-modal');
+
+        if (closeCoverModalBtn) closeCoverModalBtn.addEventListener('click', closeCoverModal);
+        if (closeCoverBtn) closeCoverBtn.addEventListener('click', closeCoverModal);
+        if (coverModal) {
+            coverModal.addEventListener('click', (e) => {
+                if (e.target.id === 'cover-modal') closeCoverModal();
+            });
+        }
+
+        console.log('🚀 Initialisation du profil...');
+        loadProfileImages();
+        loadProfileData();
+
+        console.log('✅ Profil script initialisé!');
+    });
+
+    // Listen for localStorage changes from other tabs/windows
+    window.addEventListener('storage', (e) => {
+        if (e.key === STORAGE_KEY) {
+            console.log('📚 Changement détecté dans localStorage, rechargement du profil...');
+            loadProfileData();
+        }
+    });
+
+</script>
+
+
+<style>
+    /* Amélioration responsive pour la carte d'info utilisateur */
+    @media (max-width: 768px) {
+        .profile-header {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 20px;
+        }
+
+        .profile-header > div:first-child {
+            width: 100%;
+            align-items: center;
+        }
+
+        .profile-info-card {
+            width: 100% !important;
+            max-width: 300px !important;
+        }
+
+        #edit-profile-btn {
+            margin-top: 0 !important;
+            width: 100%;
+            max-width: 300px;
+        }
+    }
+</style>
+
+{% endblock %}

@@ -1,0 +1,1630 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Challenges Quotidien & IA - Vision 2052{% endblock %}
+
+{% block extra_css %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    :root {
+        --primary-color: #06b6d4;
+        --primary-hover: #0891b2;
+        --success-color: #10b981;
+        --danger-color: #ef4444;
+        --warning-color: #f59e0b;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f9fafb;
+        --text-primary: #111827;
+        --text-secondary: #6b7280;
+        --border-color: #e5e7eb;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .vision-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+    }
+
+    .vision-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .vision-header h1 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+
+    .vision-subtitle {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        opacity: 0.8;
+    }
+
+    .vision-stats-overview {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .vision-stat-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 200ms ease;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .vision-stat-card:hover {
+        border-color: rgba(33, 128, 141, 1);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+
+    .vision-stat-value {
+        font-size: 2.25rem;
+        font-weight: 800;
+        color: rgba(33, 128, 141, 1);
+        margin-bottom: 0.5rem;
+    }
+
+    .vision-stat-label {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .vision-tabs {
+        display: flex;
+        gap: 0;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid var(--border-color);
+        overflow-x: auto;
+    }
+
+    .vision-tabs::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .vision-tabs::-webkit-scrollbar-thumb {
+        background: rgba(33, 128, 141, 1);
+        border-radius: 2px;
+    }
+
+    .vision-tab-btn {
+        padding: 1rem 1.75rem;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        border-bottom: 3px solid transparent;
+        transition: all 200ms ease;
+        margin-bottom: -2px;
+        white-space: nowrap;
+    }
+
+    .vision-tab-btn:hover {
+        color: var(--text-primary);
+        background: rgba(6, 182, 212, 0.05);
+    }
+
+    .vision-tab-btn.active {
+        color: rgba(33, 128, 141, 1);
+        border-bottom-color: rgba(33, 128, 141, 1);
+    }
+
+    .vision-tab-content {
+        display: none;
+        animation: fadeIn 300ms ease;
+    }
+
+    .vision-tab-content.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .vision-daily-table {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .vision-task-row {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+        display: grid;
+        grid-template-columns: 60px 180px 1fr auto;
+        gap: 1rem;
+        align-items: center;
+        transition: all 200ms ease;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .vision-task-row:hover {
+        border-color: rgba(33, 128, 141, 1);
+        box-shadow: var(--shadow-md);
+        background: rgba(6, 182, 212, 0.02);
+    }
+
+    .vision-task-emoji {
+        font-size: 2rem;
+        text-align: center;
+    }
+
+    .vision-task-name {
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--text-primary);
+    }
+
+    .vision-task-inputs {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .vision-task-input,
+    .vision-task-select {
+        padding: 0.6rem 0.875rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-family: inherit;
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        transition: all 150ms ease;
+    }
+
+    .vision-task-input:focus,
+    .vision-task-select:focus {
+        outline: none;
+        border-color: rgba(33, 128, 141, 1);
+        box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+        background-color: rgba(6, 182, 212, 0.02);
+    }
+
+    .vision-task-input {
+        width: 90px;
+    }
+
+    .vision-task-select {
+        min-width: 150px;
+    }
+
+    .time-input-group {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+
+    .hp-calc-display {
+        font-size: 0.85rem;
+        color: var(--success-color);
+        font-weight: 700;
+        padding: 0.5rem 1rem;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 0.5rem;
+        min-width: 110px;
+        text-align: center;
+    }
+
+    .hp-calc-display.negative {
+        color: var(--danger-color);
+        background: rgba(239, 68, 68, 0.1);
+    }
+
+    .quotidien-action-bar {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .ia-section {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        padding: 2rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .ia-section h3 {
+        font-size: 1.25rem;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .ia-section-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .ia-textarea {
+        width: 100%;
+        min-height: 180px;
+        padding: 1rem;
+        border: 1.5px solid var(--border-color);
+        border-radius: 0.75rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        resize: vertical;
+        margin-bottom: 1.5rem;
+        transition: all 150ms ease;
+        background: var(--bg-secondary);
+    }
+
+    .ia-textarea::placeholder {
+        color: var(--text-secondary);
+        opacity: 0.6;
+    }
+
+    .ia-textarea:focus {
+        outline: none;
+        border-color: rgba(33, 128, 141, 1);
+        box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1);
+        background: var(--bg-primary);
+    }
+
+    .ia-action-bar {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+    }
+
+    .ia-results {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        display: none;
+        max-height: 1200px;
+        overflow-y: auto;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .ia-results.active {
+        display: block;
+        animation: slideDown 300ms ease;
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .ia-result-section {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .ia-result-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .ia-result-title {
+        font-weight: 700;
+        color: rgba(33, 128, 141, 1);
+        margin-bottom: 1rem;
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .xp-hp-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .xp-hp-card {
+        background: var(--bg-primary);
+        border: 2px solid var(--border-color);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .xp-hp-card.xp {
+        border-color: #fbbf24;
+    }
+
+    .xp-hp-card.hp {
+        border-color: var(--success-color);
+    }
+
+    .xp-hp-label {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .xp-hp-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.25rem;
+    }
+
+    .xp-hp-card.xp .xp-hp-value {
+        color: #fbbf24;
+    }
+
+    .xp-hp-card.hp .xp-hp-value {
+        color: var(--success-color);
+    }
+
+    .xp-hp-breakdown {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .detections-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .detection-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        padding: 1rem;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .detection-emoji {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .detection-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .detection-value {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: rgba(33, 128, 141, 1);
+    }
+
+    .trait-detection-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1rem;
+    }
+
+    .trait-detection-item {
+        background: var(--bg-primary);
+        border: 1px solid rgba(6, 182, 212, 0.3);
+        border-left: 3px solid rgba(33, 128, 141, 1);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        font-size: 0.9rem;
+        transition: all 150ms ease;
+    }
+
+    .trait-detection-item:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+        border-color: rgba(33, 128, 141, 1);
+    }
+
+    .trait-detection-item.negative {
+        border-left-color: var(--danger-color);
+        border-color: rgba(239, 68, 68, 0.3);
+        background: rgba(239, 68, 68, 0.05);
+    }
+
+    .trait-detection-item.negative:hover {
+        border-color: var(--danger-color);
+    }
+
+    .trait-name {
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.4rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .trait-detection-item.negative .trait-name {
+        color: var(--danger-color);
+    }
+
+    .trait-values {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+    }
+
+    .trait-value {
+        background: rgba(6, 182, 212, 0.1);
+        padding: 0.35rem 0.75rem;
+        border-radius: 0.35rem;
+        font-weight: 600;
+    }
+
+    .trait-value.xp {
+        background: rgba(251, 191, 36, 0.1);
+        color: #fbbf24;
+    }
+
+    .trait-value.hp {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+    }
+
+    .vision-btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 200ms ease;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .vision-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .vision-btn-primary {
+        background: rgba(33, 128, 141, 1);
+        color: white;
+    }
+
+    .vision-btn-primary:hover:not(:disabled) {
+        background: var(--primary-hover);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+
+    .vision-btn-success {
+        background: var(--success-color);
+        color: white;
+    }
+
+    .vision-btn-success:hover:not(:disabled) {
+        background: #059669;
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+
+    .vision-btn-secondary {
+        background: var(--bg-secondary);
+        color: rgba(33, 128, 141, 1);
+        border: 1.5px solid var(--border-color);
+    }
+
+    .vision-btn-secondary:hover:not(:disabled) {
+        border-color: rgba(33, 128, 141, 1);
+        background: rgba(6, 182, 212, 0.05);
+    }
+
+    .loading {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--text-secondary);
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 32px;
+        height: 32px;
+        border: 4px solid rgba(6, 182, 212, 0.2);
+        border-top-color: rgba(33, 128, 141, 1);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .alert-message {
+        padding: 1rem 1.25rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+        display: none;
+        align-items: center;
+        gap: 0.75rem;
+        animation: slideDown 300ms ease;
+    }
+
+    .alert-message.show {
+        display: flex;
+    }
+
+    .alert-message.success {
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: var(--success-color);
+    }
+
+    .alert-message.error {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: var(--danger-color);
+    }
+
+    .alert-message.info {
+        background: rgba(6, 182, 212, 0.1);
+        border: 1px solid rgba(6, 182, 212, 0.3);
+        color: rgba(33, 128, 141, 1);
+    }
+
+    @media (max-width: 1024px) {
+        .vision-task-row {
+            grid-template-columns: 50px 150px 1fr;
+        }
+
+        .vision-stats-overview {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .trait-detection-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+    }
+
+    @media (max-width: 768px) {
+        .vision-container {
+            padding: 1.5rem 1rem;
+        }
+
+        .vision-header h1 {
+            font-size: 1.75rem;
+        }
+
+        .vision-task-row {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .vision-task-emoji {
+            font-size: 1.5rem;
+        }
+
+        .vision-task-inputs {
+            width: 100%;
+        }
+
+        .vision-stats-overview {
+            grid-template-columns: 1fr;
+        }
+
+        .ia-section {
+            padding: 1.5rem 1rem;
+        }
+
+        .trait-detection-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .vision-btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .ia-action-bar {
+            flex-direction: column;
+        }
+
+        .vision-tabs {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+
+        .xp-hp-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .detections-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .vision-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .vision-stat-card {
+            padding: 1rem;
+        }
+
+        .vision-stat-value {
+            font-size: 1.75rem;
+        }
+
+        .ia-textarea {
+            min-height: 140px;
+        }
+
+        .vision-task-row {
+            padding: 1rem;
+        }
+
+        .detections-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="vision-container">
+    <!-- HEADER -->
+    <div class="vision-header">
+        <h1>🎯 Challenges Quotidien & Évaluateur IA</h1>
+        <p class="vision-subtitle">Quotidien: 10 activités HP traits | IA: Détection XP + HP + Artefacts</p>
+    </div>
+
+    <!-- STATS OVERVIEW -->
+<div class="vision-stats-overview">
+    <div class="vision-stat-card">
+        <div class="vision-stat-value" data-stat="xp">0</div>
+        <div class="vision-stat-label">Total XP</div>
+    </div>
+    <div class="vision-stat-card">
+        <div class="vision-stat-value" data-stat="hp">0</div>
+        <div class="vision-stat-label">Total HP</div>
+    </div>
+    <div class="vision-stat-card">
+        <div class="vision-stat-value" data-stat="traits">0</div>
+        <div class="vision-stat-label">Traits Actifs</div>
+    </div>
+    <div class="vision-stat-card">
+        <div class="vision-stat-value" data-stat="level">1</div>
+        <div class="vision-stat-label">Niveau</div>
+    </div>
+</div>
+
+
+    <!-- TABS -->
+    <div class="vision-tabs">
+        <button class="vision-tab-btn active" onclick="switchTab(event, 'daily')">
+            📊 Quotidien (10 Activités)
+        </button>
+        <button class="vision-tab-btn" onclick="switchTab(event, 'ia')">
+            🤖 Évaluateur IA (76 Traits + Artefacts)
+        </button>
+    </div>
+
+    <!-- TAB 1: QUOTIDIEN -->
+    <div id="daily" class="vision-tab-content active">
+        <div style="margin-bottom: 1.5rem;">
+            <p class="vision-subtitle">Enregistrez vos activités quotidiennes pour gagner des HP et développer vos traits de personnalité.</p>
+        </div>
+
+        <div class="vision-daily-table" id="dailyTasksTable"></div>
+
+        <div class="quotidien-action-bar">
+            <button class="vision-btn vision-btn-primary" onclick="submitDaily()">
+                💾 Enregistrer Activités
+            </button>
+            <button class="vision-btn vision-btn-secondary" onclick="clearAllDaily()">
+                🔄 Réinitialiser
+            </button>
+        </div>
+
+        <div id="dailyAlert" class="alert-message"></div>
+    </div>
+
+    <!-- TAB 2: ÉVALUATEUR IA -->
+    <div id="ia" class="vision-tab-content">
+        <div class="ia-section">
+            <h3>🤖 Évaluateur IA - Détection Complète</h3>
+            <p class="ia-section-subtitle">
+                Décrivez en détail votre activité. Le système détectera automatiquement:
+                <br>✓ XP complet | ✓ 76 Traits HP | ✓ 6 Artefacts
+            </p>
+
+            <textarea
+                class="ia-textarea"
+                id="iaDescription"
+                placeholder="Exemple: Jai mené une analyse de 2000 réponses de sondage, créé 15 dashboards Excel avec des pivot tables complexes, identifié 8 segments de consommateurs. Jai lu 3 articles académiques sur le comportement des consommateurs et suivi un cours en ligne sur data analysis. Jai présenté les résultats et contribué à un projet GitHub open-source...">
+            </textarea>
+
+            <div class="ia-action-bar">
+                <button class="vision-btn vision-btn-primary" onclick="evaluateWithIA()" style="flex: 1;">
+                    🚀 Analyser & Détecter
+                </button>
+                <button class="vision-btn vision-btn-secondary" onclick="clearIAForm()">
+                    🗑️ Effacer
+                </button>
+            </div>
+
+            <div id="iaAlert" class="alert-message"></div>
+            <div id="iaResults" class="ia-results"></div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ==================== LOAD USER STATS ====================
+
+async function loadUserStats() {
+    try {
+        const response = await fetch('/api/get-user-data/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            credentials: 'include'
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+
+        // ✅ CALCULER totalHP en additionnant tous les traits HP
+        let totalHP = 0;
+        if (data.traitsHP) {
+            Object.values(data.traitsHP).forEach(hp => {
+                totalHP += hp;
+            });
+        }
+
+        // Mettre à jour les stats en haut de page
+        const xpEl = document.querySelector('[data-stat="xp"]');
+        const hpEl = document.querySelector('[data-stat="hp"]');
+        const traitsEl = document.querySelector('[data-stat="traits"]');
+        const levelEl = document.querySelector('[data-stat="level"]');
+
+        if (xpEl) xpEl.textContent = data.totalXP || 0;
+        if (hpEl) hpEl.textContent = totalHP;  // ✅ UTILISE LE TOTAL CALCULÉ
+        if (traitsEl) traitsEl.textContent = Object.keys(data.traitsHP || {}).length;
+        if (levelEl) levelEl.textContent = data.level || 1;
+
+    } catch (error) {
+        console.error('Erreur chargement stats:', error);
+    }
+}
+
+
+// ==================== INIT ====================
+
+document.addEventListener('DOMContentLoaded', function() {
+    renderDailyTasks();
+    loadUserStats();  // ✅ CHARGER LES STATS AU DÉMARRAGE
+});
+
+// ==================== TRAITS COMPLETS - 76 TRAITS ====================
+
+const TRAITS_COMPLETS = {
+  cognitive: [
+    { name: "Pense Analytique", key: "analyticThinking", hpBase: 50, xpBase: 40 },
+    { name: "Pense Logique", key: "logicalThinking", hpBase: 60, xpBase: 35 },
+    { name: "Pense Critique", key: "criticalThinking", hpBase: 80, xpBase: 50 },
+    { name: "Pense Stratégique", key: "strategicThinking", hpBase: 150, xpBase: 75 },
+    { name: "Pense Systémique", key: "systemicThinking", hpBase: 150, xpBase: 70 },
+    { name: "Pense Abstraite", key: "abstractThinking", hpBase: 80, xpBase: 45 },
+    { name: "Pense Intuitive", key: "intuitiveThinking", hpBase: 80, xpBase: 40 },
+    { name: "Créativité Intellectuelle", key: "intellectualCreativity", hpBase: 100, xpBase: 80 },
+    { name: "Curiosité Intellectuelle", key: "intellectualCuriosity", hpBase: 20, xpBase: 30 },
+    { name: "Vision Long Terme", key: "longTermVision", hpBase: 100, xpBase: 60 },
+    { name: "Flexibilité Mentale", key: "mentalFlexibility", hpBase: 80, xpBase: 50 },
+    { name: "Rigidité Cognitive", key: "cognitiveRigidity", hpBase: -150, xpBase: -30, negative: true },
+    { name: "Capacité d'Apprentissage", key: "learningCapacity", hpBase: 100, xpBase: 60 },
+    { name: "Lucidité", key: "lucidity", hpBase: 80, xpBase: 45 },
+    { name: "Esprit de Synthèse", key: "syntheticMind", hpBase: 100, xpBase: 55 }
+  ],
+  emotional: [
+    { name: "Stabilité Émotionnelle", key: "emotionalStability", hpBase: 80, xpBase: 40 },
+    { name: "Instabilité Émotionnelle", key: "emotionalInstability", hpBase: -100, xpBase: -20, negative: true },
+    { name: "Résilience", key: "resilience", hpBase: 200, xpBase: 100 },
+    { name: "Sang-Froid", key: "composure", hpBase: 150, xpBase: 80 },
+    { name: "Sensibilité Émotionnelle", key: "emotionalSensitivity", hpBase: 50, xpBase: 30 },
+    { name: "Impulsivité Émotionnelle", key: "emotionalImpulsivity", hpBase: -80, xpBase: -15, negative: true },
+    { name: "Maîtrise de Soi", key: "selfMastery", hpBase: 80, xpBase: 50 },
+    { name: "Tolérance au Stress", key: "stressTolerance", hpBase: 80, xpBase: 50 },
+    { name: "Vulnérabilité Émotionnelle", key: "emotionalVulnerability", hpBase: 100, xpBase: 45 },
+    { name: "Stoïcisme", key: "stoicism", hpBase: 80, xpBase: 40 },
+    { name: "Détachement Émotionnel", key: "emotionalDetachment", hpBase: 80, xpBase: 35 },
+    { name: "Anxiété", key: "anxiety", hpBase: -80, xpBase: -15, negative: true },
+    { name: "Irritabilité", key: "irritability", hpBase: -100, xpBase: -20, negative: true }
+  ],
+  behavioral: [
+    { name: "Discipline", key: "discipline", hpBase: 30, xpBase: 35 },
+    { name: "Autocontrôle", key: "selfControl", hpBase: 40, xpBase: 30 },
+    { name: "Persévérance", key: "perseverance", hpBase: 100, xpBase: 70 },
+    { name: "Rigueur", key: "rigor", hpBase: 60, xpBase: 45 },
+    { name: "Organisation", key: "organization", hpBase: 100, xpBase: 55 },
+    { name: "Fiabilité", key: "reliability", hpBase: 80, xpBase: 50 },
+    { name: "Sens du Devoir", key: "senseOfDuty", hpBase: 80, xpBase: 45 },
+    { name: "Responsabilité", key: "accountability", hpBase: 100, xpBase: 60 },
+    { name: "Prudence", key: "prudence", hpBase: 50, xpBase: 35 },
+    { name: "Gestion du Temps", key: "timeManagement", hpBase: 80, xpBase: 45 },
+    { name: "Capacité d'Exécution", key: "executionCapacity", hpBase: 100, xpBase: 75 }
+  ],
+  social: [
+    { name: "Sociabilité", key: "sociability", hpBase: 50, xpBase: 40 },
+    { name: "Assertivité", key: "assertiveness", hpBase: 80, xpBase: 50 },
+    { name: "Charisme", key: "charisma", hpBase: 100, xpBase: 70 },
+    { name: "Influence", key: "influence", hpBase: 100, xpBase: 80 },
+    { name: "Diplomatique", key: "diplomacy", hpBase: 100, xpBase: 60 },
+    { name: "Coopération", key: "cooperation", hpBase: 80, xpBase: 50 },
+    { name: "Empathie Relationnelle", key: "relationalEmpathy", hpBase: 80, xpBase: 50 },
+    { name: "Compétitivité", key: "competitiveness", hpBase: 80, xpBase: 60 },
+    { name: "Individualisme", key: "individualism", hpBase: 100, xpBase: 55 },
+    { name: "Dominance Sociale", key: "socialDominance", hpBase: 80, xpBase: 60 },
+    { name: "Dominance Inverse", key: "inverseSocialDominance", hpBase: 100, xpBase: 50 },
+    { name: "Aliénation Sociale", key: "socialAlienation", hpBase: -100, xpBase: -25, negative: true },
+    { name: "Soumission Excessive", key: "excessiveSubmission", hpBase: -80, xpBase: -20, negative: true },
+    { name: "Passivité Sociale", key: "socialPassivity", hpBase: -60, xpBase: -15, negative: true },
+    { name: "Confiance Sociale", key: "socialTrust", hpBase: 100, xpBase: 60 }
+  ],
+  moral: [
+    { name: "Intégrité Intellectuelle", key: "intellectualIntegrity", hpBase: 26, xpBase: 40 },
+    { name: "Loyauté", key: "loyalty", hpBase: 100, xpBase: 60 },
+    { name: "Honneur", key: "honor", hpBase: 150, xpBase: 80 }
+  ],
+  learning: [
+    { name: "Apprentissage", key: "learning", hpBase: 20, xpBase: 40 },
+    { name: "Capacité d'Apprentissage", key: "learningAbility", hpBase: 100, xpBase: 80 },
+    { name: "Expertise Reconnue", key: "recognizedExpertise", hpBase: 200, xpBase: 150 },
+    { name: "Polyvalence", key: "versatility", hpBase: 300, xpBase: 120 }
+  ],
+  achievement: [
+    { name: "Accomplissement", key: "accomplishment", hpBase: 40, xpBase: 60 },
+    { name: "Détermination", key: "determination", hpBase: 30, xpBase: 50 },
+    { name: "Ambition", key: "ambition", hpBase: 50, xpBase: 70 },
+    { name: "Innovation", key: "innovation", hpBase: 100, xpBase: 120 }
+  ],
+  existential: [
+    { name: "Individualité Forte", key: "strongIndividuality", hpBase: 120, xpBase: 70 },
+    { name: "Conscience de Soi", key: "selfAwareness", hpBase: 80, xpBase: 60 },
+    { name: "Croissance Personnelle", key: "personalGrowth", hpBase: 100, xpBase: 80 },
+    { name: "Sens & Purpose", key: "senseOfPurpose", hpBase: 150, xpBase: 100 }
+  ],
+  leadership: [
+    { name: "Leadership Naturel", key: "naturalLeadership", hpBase: 100, xpBase: 90 },
+    { name: "Vision Stratégique", key: "strategicVision", hpBase: 150, xpBase: 100 },
+    { name: "Mentorat", key: "mentoring", hpBase: 100, xpBase: 100 },
+    { name: "Créativité Organisationnelle", key: "organizationalCreativity", hpBase: 150, xpBase: 110 }
+  ],
+  affective: [
+    { name: "Empathie Émotionnelle", key: "emotionalEmpathy", hpBase: 80, xpBase: 50 },
+    { name: "Compassion", key: "compassion", hpBase: 100, xpBase: 70 },
+    { name: "Fierté", key: "pride", hpBase: 80, xpBase: 50 }
+  ]
+};
+
+// ==================== ARTEFACTS KEYWORDS ====================
+
+const ARTEFACTS_KEYWORDS = {
+  booksRead: ["livre", "bouquin", "lu", "reading", "book"],
+  academicArticles: ["article", "academic", "journal", "paper", "recherche", "étude"],
+  projectsWorked: ["projet", "project", "github", "code", "développé", "créé"],
+  onlineCourses: ["cours", "course", "formation", "training", "udemy", "coursera", "mooc"],
+  socialContributions: ["contribution", "social", "community", "bénévolat", "aide", "support"],
+  networkingEvents: ["networking", "événement", "conférence", "meetup", "forum"]
+};
+
+// ==================== TRAIT DETECTION KEYWORDS ====================
+
+const TRAIT_DETECTION_KEYWORDS = {
+  analyticThinking: ["analyse", "données", "pattern", "dashboard", "pivot", "segmenter"],
+  logicalThinking: ["logique", "argument", "raisonnement", "coherent"],
+  criticalThinking: ["question", "critique", "challenge", "contredire"],
+  strategicThinking: ["stratégie", "plan", "roadmap", "objectif"],
+  systemicThinking: ["système", "architecture", "interconnexion"],
+  abstractThinking: ["concept", "théorie", "abstrait", "framework"],
+  intuitiveThinking: ["intuition", "instinct", "insight"],
+  intellectualCreativity: ["créative", "innovation", "idée originale"],
+  intellectualCuriosity: ["livre", "article", "exploration"],
+  longTermVision: ["5 ans", "10 ans", "legacy"],
+  mentalFlexibility: ["pivot", "adapter", "changement"],
+  cognitiveRigidity: ["refuser", "blocage", "résistance"],
+  learningCapacity: ["certification", "skill", "maîtrise"],
+  lucidity: ["auto-évaluation", "360", "feedback"],
+  syntheticMind: ["résumé", "synthèse", "documentation"],
+  emotionalStability: ["calme", "serein", "composé"],
+  emotionalInstability: ["fluctuation", "instable"],
+  resilience: ["rebond", "surmont", "adversité"],
+  composure: ["pression", "crise", "sang-froid"],
+  emotionalSensitivity: ["empathie", "émotion"],
+  emotionalImpulsivity: ["impulsif", "regretté"],
+  selfMastery: ["contrôle", "discipline"],
+  stressTolerance: ["stress", "deadline"],
+  emotionalVulnerability: ["vulnérable", "fragilité"],
+  stoicism: ["stoïque", "acceptation"],
+  emotionalDetachment: ["détachement", "objectif"],
+  anxiety: ["anxiété", "peur"],
+  irritability: ["colère", "irritable"],
+  discipline: ["routine", "objectif"],
+  selfControl: ["contrôle", "impulse"],
+  perseverance: ["obstacle", "persistent"],
+  rigor: ["détail", "standard", "qualité"],
+  organization: ["système", "structure"],
+  reliability: ["promesse", "deadline", "fiable"],
+  senseOfDuty: ["devoir", "responsabilité"],
+  accountability: ["erreur", "correction"],
+  prudence: ["risque", "prévention"],
+  timeManagement: ["temps", "calendrier"],
+  executionCapacity: ["projet livré", "exécution"],
+  sociability: ["social", "interaction", "networking"],
+  assertiveness: ["limite", "frontalement"],
+  charisma: ["captive", "inspirant"],
+  influence: ["convaincu", "rallie"],
+  diplomacy: ["conflit", "tactful"],
+  cooperation: ["collaboratif", "synergy"],
+  relationalEmpathy: ["soutien", "émotion"],
+  competitiveness: ["compétition", "gagner"],
+  individualism: ["unconventional", "unique"],
+  socialDominance: ["leadership", "autorité"],
+  inverseSocialDominance: ["modestie", "humble"],
+  socialAlienation: ["isolement"],
+  excessiveSubmission: ["soumis", "passif"],
+  socialPassivity: ["retrait"],
+  socialTrust: ["confiance", "loyauté"],
+  intellectualIntegrity: ["transparence", "intégrité"],
+  loyalty: ["loyal", "défendre"],
+  honor: ["honneur", "dignité"],
+  learning: ["livre lu", "article"],
+  learningAbility: ["certification", "compétence"],
+  recognizedExpertise: ["expert", "spécialiste"],
+  versatility: ["multidisciplinaire", "polyvalent"],
+  accomplishment: ["accomplissement", "réussite"],
+  determination: ["challenge", "impossible"],
+  ambition: ["objectif majeur"],
+  innovation: ["première", "produit lancé"],
+  strongIndividuality: ["unique", "personnel"],
+  selfAwareness: ["introspection", "shadow"],
+  personalGrowth: ["transformation", "croissance"],
+  senseOfPurpose: ["mission", "legacy"],
+  naturalLeadership: ["leadership", "équipe suit"],
+  strategicVision: ["vision", "plan ambitieux"],
+  mentoring: ["mentor", "développé"],
+  organizationalCreativity: ["culture", "processus innovant"],
+  emotionalEmpathy: ["émotion validée", "support"],
+  compassion: ["aide", "souffrance"],
+  pride: ["fierté", "accompli"]
+};
+
+// ==================== ACTIVITY BAREME ====================
+
+const ACTIVITY_BAREME_HP = {
+    1: {
+        name: 'Sommeil/Repos',
+        emoji: '😴',
+        traits: [{ name: 'Résilience', hp: 120 }, { name: 'Stabilité Émotionnelle', hp: 80 }],
+        formula: (hours) => Math.floor(120 * hours + Math.max(0, (hours - 7) * 20))
+    },
+    2: {
+        name: 'Sieste',
+        emoji: '⏱️',
+        traits: [{ name: 'Résilience', hp: 30 }],
+        formula: (minutes) => Math.floor((minutes / 60) * 50)
+    },
+    3: {
+        name: 'Focus École',
+        emoji: '🎯',
+        traits: [{ name: 'Discipline', hp: 80 }, { name: 'Capacité d\'Apprentissage', hp: 60 }],
+        formula: (hours) => Math.floor(150 * hours)
+    },
+    4: {
+        name: 'Retard École/Travail',
+        emoji: '⏰',
+        traits: [{ name: 'Responsabilité', hp: -60 }, { name: 'Fiabilité', hp: -50 }],
+        options: ['1 fois', '2 fois', '3+ fois'],
+        hpPerQuality: { '1 fois': -50, '2 fois': -100, '3+ fois': -180 }
+    },
+    5: {
+        name: 'Lecture',
+        emoji: '📖',
+        traits: [{ name: 'Curiosité Intellectuelle', hp: 60 }, { name: 'Capacité d\'Apprentissage', hp: 50 }],
+        options: ['Roman', 'Éducation', 'Philosophie', 'Développement personnel'],
+        formula: (hours, genre) => {
+            const baseRate = { 'Roman': 40, 'Éducation': 100, 'Philosophie': 80, 'Développement personnel': 70 };
+            return Math.floor(baseRate[genre] * hours);
+        }
+    },
+    6: {
+        name: 'Sport/Exercice',
+        emoji: '🏃',
+        traits: [{ name: 'Discipline', hp: 80 }, { name: 'Résilience', hp: 50 }],
+        options: ['Musculation', 'Cardio', 'Football', 'Basketball', 'Volley', 'Course', 'Natation', 'Tennis'],
+        formula: (hours, type) => {
+            const intensity = { 'Musculation': 1.3, 'Cardio': 1.2, 'Football': 1.4, 'Basketball': 1.4, 'Volley': 1.2, 'Course': 1.3, 'Natation': 1.3, 'Tennis': 1.3 };
+            return Math.floor(100 * hours * (intensity[type] || 1.0));
+        }
+    },
+    7: {
+        name: 'Repas sain',
+        emoji: '🍽️',
+        traits: [{ name: 'Discipline', hp: 50 }],
+        options: ['Excellent', 'Bon', 'Moyen', 'Mauvais'],
+        hpPerQuality: { 'Excellent': 150, 'Bon': 100, 'Moyen': 60, 'Mauvais': 20 }
+    },
+    8: {
+        name: 'Social',
+        emoji: '👥',
+        traits: [{ name: 'Empathie', hp: 80 }, { name: 'Sociabilité', hp: 70 }],
+        options: ['Amis', 'Amour', 'Famille', 'Collègues', 'Communauté'],
+        formula: (hours, type) => {
+            const values = { 'Amis': 80, 'Amour': 110, 'Famille': 100, 'Collègues': 90, 'Communauté': 75 };
+            return Math.floor((values[type] || 80) * hours);
+        }
+    },
+    9: {
+        name: 'Développement Personnel',
+        emoji: '🧘',
+        traits: [{ name: 'Flexibilité Mentale', hp: 70 }, { name: 'Croissance Personnelle', hp: 90 }],
+        options: ['Méditation', 'Journal', 'Coaching', 'Formation', 'Mentorat'],
+        formula: (hours, type) => {
+            const depth = { 'Méditation': 1.2, 'Journal': 1.3, 'Coaching': 1.5, 'Formation': 1.4, 'Mentorat': 1.6 };
+            return Math.floor(120 * hours * (depth[type] || 1.0));
+        }
+    },
+    10: {
+        name: 'Contributions',
+        emoji: '🤝',
+        traits: [{ name: 'Altruisme', hp: 100 }, { name: 'Sens du Devoir', hp: 80 }],
+        options: ['Bénévolat', 'Open-Source', 'Mentorat', 'Aide Communauté'],
+        formula: (hours, type) => {
+            const values = { 'Bénévolat': 100, 'Open-Source': 110, 'Mentorat': 130, 'Aide Communauté': 90 };
+            return Math.floor((values[type] || 100) * hours);
+        }
+    }
+};
+
+// ==================== XP BAREME ====================
+
+const XP_BAREME = {
+  apprentissage_leger: 20,
+  apprentissage_standard: 40,
+  apprentissage_approfondi: 80,
+  apprentissage_expert: 150,
+  travail_junior: 100,
+  travail_standard: 200,
+  travail_senior: 400,
+  projet_simple: 100,
+  projet_complexe: 300,
+  projet_strategique: 500,
+  social_contribution: 75,
+  social_networking: 120,
+  innovation_minor: 100,
+  innovation_major: 300
+};
+
+function calculateXPScore(description) {
+  const descLower = description.toLowerCase();
+  let xpScore = 0;
+
+  if (descLower.includes("analyse") || descLower.includes("données")) {
+    xpScore += XP_BAREME.apprentissage_approfondi;
+  }
+  if (descLower.includes("2000") || descLower.includes("complex")) {
+    xpScore += XP_BAREME.apprentissage_expert;
+  }
+  if (descLower.includes("projet") || descLower.includes("livr")) {
+    xpScore += XP_BAREME.projet_complexe;
+  }
+  if (descLower.includes("dashboards") || descLower.includes("pivot")) {
+    xpScore += XP_BAREME.apprentissage_approfondi;
+  }
+  if (descLower.includes("innovation") || descLower.includes("créative")) {
+    xpScore += XP_BAREME.innovation_major;
+  }
+  if (descLower.includes("présenté") || descLower.includes("professeur")) {
+    xpScore += XP_BAREME.social_contribution;
+  }
+
+  const wordCount = description.split(" ").length;
+  if (wordCount > 200) xpScore += 50;
+  if (wordCount > 300) xpScore += 50;
+
+  return Math.min(xpScore, 500);
+}
+
+function detectArtefacts(description) {
+  const artefacts = {
+    booksRead: 0,
+    academicArticles: 0,
+    projectsWorked: 0,
+    onlineCourses: 0,
+    socialContributions: 0,
+    networkingEvents: 0
+  };
+
+  const descLower = description.toLowerCase();
+
+  Object.entries(ARTEFACTS_KEYWORDS).forEach(([artefact, keywords]) => {
+    keywords.forEach(keyword => {
+      if (descLower.includes(keyword.toLowerCase())) {
+        artefacts[artefact]++;
+      }
+    });
+  });
+
+  return artefacts;
+}
+
+function detectTraitsFromDescription(description) {
+  const detectedTraits = [];
+  const descLower = description.toLowerCase();
+
+  const allTraits = [];
+  Object.values(TRAITS_COMPLETS).forEach(category => {
+    allTraits.push(...category);
+  });
+
+  allTraits.forEach(trait => {
+    const keywordsList = TRAIT_DETECTION_KEYWORDS[trait.key] || [];
+    const found = keywordsList.some(keyword => descLower.includes(keyword.toLowerCase()));
+
+    if (found) {
+      detectedTraits.push({
+        name: trait.name,
+        key: trait.key,
+        hpAwarded: trait.hpBase,
+        xpAwarded: trait.xpBase,
+        negative: trait.negative || false
+      });
+    }
+  });
+
+  return detectedTraits;
+}
+
+// ==================== TAB SWITCHING ====================
+
+function switchTab(event, tabName) {
+    document.querySelectorAll('.vision-tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.vision-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    document.getElementById(tabName).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+
+// ==================== QUOTIDIEN FUNCTIONS ====================
+
+function renderDailyTasks() {
+    const table = document.getElementById('dailyTasksTable');
+    if (!table) return;
+    table.innerHTML = '';
+
+    Object.entries(ACTIVITY_BAREME_HP).forEach(([id, activity]) => {
+        const row = document.createElement('div');
+        row.className = 'vision-task-row';
+
+        let inputsHtml = '';
+
+        if (activity.formula && !activity.hpPerQuality) {
+            const options = activity.options ? activity.options.map(opt => `<option value="${opt}">${opt}</option>`).join('') : '';
+
+            if (options) {
+                inputsHtml = `
+                    <div class="time-input-group">
+                        <select class="vision-task-select" id="activity${id}_select" onchange="updateActivityPreview(${id})">
+                            <option value="">Sélectionner...</option>
+                            ${options}
+                        </select>
+                        <input type="number" class="vision-task-input" id="activity${id}_duration" placeholder="0h" min="0" step="0.5" onchange="updateActivityPreview(${id})">
+                        <span>h</span>
+                    </div>
+                    <div class="hp-calc-display" id="preview${id}">+0 HP</div>
+                `;
+            } else {
+                inputsHtml = `
+                    <div class="time-input-group">
+                        <input type="number" class="vision-task-input" id="activity${id}_duration" placeholder="Heures" min="0" step="0.5" onchange="updateActivityPreview(${id})">
+                        <span>h</span>
+                    </div>
+                    <div class="hp-calc-display" id="preview${id}">+0 HP</div>
+                `;
+            }
+        } else if (activity.hpPerQuality) {
+            const options = activity.options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+            inputsHtml = `
+                <div class="time-input-group">
+                    <select class="vision-task-select" id="activity${id}_select" onchange="updateActivityPreview(${id})">
+                        <option value="">Sélectionner...</option>
+                        ${options}
+                    </select>
+                </div>
+                <div class="hp-calc-display" id="preview${id}">+0 HP</div>
+            `;
+        }
+
+        row.innerHTML = `
+            <div class="vision-task-emoji">${activity.emoji}</div>
+            <div class="vision-task-name">${activity.name}</div>
+            <div class="vision-task-inputs">${inputsHtml}</div>
+        `;
+
+        table.appendChild(row);
+    });
+}
+
+function updateActivityPreview(id) {
+    const activity = ACTIVITY_BAREME_HP[id];
+    let hp = 0;
+
+    if (activity.formula && !activity.hpPerQuality) {
+        const select = document.getElementById(`activity${id}_select`)?.value;
+        const duration = parseFloat(document.getElementById(`activity${id}_duration`).value) || 0;
+
+        if (duration > 0) {
+            if (select) {
+                hp = activity.formula(duration, select);
+            } else if (!activity.options) {
+                hp = activity.formula(duration);
+            }
+        }
+    } else if (activity.hpPerQuality) {
+        const select = document.getElementById(`activity${id}_select`)?.value;
+        if (select) {
+            hp = activity.hpPerQuality[select] || 0;
+        }
+    }
+
+    const displayElement = document.getElementById(`preview${id}`);
+    if (displayElement) {
+        const displayHP = hp >= 0 ? `+${Math.floor(hp)} HP` : `${Math.floor(hp)} HP`;
+        displayElement.textContent = displayHP;
+        displayElement.classList.toggle('negative', hp < 0);
+    }
+}
+
+// ✅ UTILISE ENDPOINT: api/save-daily-activity/
+async function submitDaily() {
+    const activities_data = [];
+    let totalHPGained = 0;
+
+    Object.entries(ACTIVITY_BAREME_HP).forEach(([id, activity]) => {
+        let hp = 0;
+        let shouldAdd = false;
+        let details = {};
+
+        if (activity.formula && !activity.hpPerQuality) {
+            const select = document.getElementById(`activity${id}_select`)?.value;
+            const duration = parseFloat(document.getElementById(`activity${id}_duration`).value);
+
+            if (duration && duration > 0) {
+                if (select) {
+                    hp = activity.formula(duration, select);
+                    details = { type: select, duration: duration };
+                } else if (!activity.options) {
+                    hp = activity.formula(duration);
+                    details = { duration: duration };
+                }
+                shouldAdd = duration > 0;
+            }
+        } else if (activity.hpPerQuality) {
+            const select = document.getElementById(`activity${id}_select`).value;
+            if (select) {
+                hp = activity.hpPerQuality[select] || 0;
+                details = { quality: select };
+                shouldAdd = true;
+            }
+        }
+
+        if (shouldAdd) {
+            activities_data.push({
+                id: parseInt(id),
+                name: activity.name,
+                hp: Math.floor(hp),
+                traits: activity.traits || [],
+                details: details
+            });
+            totalHPGained += hp;
+        }
+    });
+
+    if (activities_data.length === 0) {
+        showAlert('dailyAlert', 'Complétez au moins une activité', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/save-daily-activity/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                activities: activities_data,
+                totalHP: Math.floor(totalHPGained)
+            })
+        });
+
+        if (response.ok) {
+            showAlert('dailyAlert', `✅ ${activities_data.length} activité(s) enregistrée(s) | Total: ${totalHPGained > 0 ? '+' : ''}${Math.floor(totalHPGained)} HP`, 'success');
+            renderDailyTasks();
+        } else {
+            showAlert('dailyAlert', 'Erreur lors de l\'enregistrement', 'error');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showAlert('dailyAlert', 'Impossible de communiquer avec le serveur', 'error');
+    }
+}
+
+function clearAllDaily() {
+    Object.keys(ACTIVITY_BAREME_HP).forEach(id => {
+        const selectEl = document.getElementById(`activity${id}_select`);
+        const durationEl = document.getElementById(`activity${id}_duration`);
+        if (selectEl) selectEl.value = '';
+        if (durationEl) durationEl.value = '';
+        updateActivityPreview(id);
+    });
+    showAlert('dailyAlert', '🔄 Activités réinitialisées', 'info');
+}
+
+// ==================== IA FUNCTIONS ====================
+
+// ✅ ÉTAPE 1: Appelle api/evaluate-activity/
+async function evaluateWithIA() {
+    const description = document.getElementById('iaDescription').value.trim();
+
+    if (!description || description.length < 50) {
+        showAlert('iaAlert', 'Décrivez votre activité en au moins 50 caractères', 'error');
+        return;
+    }
+
+    const resultsDiv = document.getElementById('iaResults');
+    resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Analyse en cours...</p></div>';
+    resultsDiv.classList.add('active');
+
+    try {
+        const evalResponse = await fetch('/api/evaluate-activity/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            credentials: 'include',
+            body: JSON.stringify({ description: description })
+        });
+
+        if (!evalResponse.ok) {
+            resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: #999;">⚠️ Erreur lors de l\'analyse</div>';
+            return;
+        }
+
+        const evalData = await evalResponse.json();
+
+        if (!evalData.success) {
+            showAlert('iaAlert', evalData.error || 'Erreur lors de l\'analyse', 'error');
+            resultsDiv.classList.remove('active');
+            return;
+        }
+
+        // ✅ Stocker la réponse DIRECTEMENT de l'API
+        window.currentIAEvaluation = {
+            xpTotal: evalData.total_xp || 0,
+            qualityScore: 0.8,  // Le serveur ne le retourne pas, mets une valeur par défaut
+            feedback: 'Activité analysée avec succès',  // Idem
+            traits: Object.entries(evalData.traits_hp || {}).map(([name, hp]) => ({
+                name: name,
+                hp_amount: hp,
+                relevance: 'Détecté par l\'IA'
+            })),
+            detections: evalData.detections || {},
+            description: description,
+            evaluation_id: evalData.evaluation_id
+        };
+
+        const data = window.currentIAEvaluation;
+        let totalHP = 0;
+
+        data.traits.forEach(trait => {
+            totalHP += trait.hp_amount || 0;
+        });
+
+        let html = `
+        <div class="ia-result-section">
+            <div class="ia-result-title">🎯 Résultats Complets</div>
+            <div class="xp-hp-grid">
+                <div class="xp-hp-card xp">
+                    <div class="xp-hp-label">XP Global</div>
+                    <div class="xp-hp-value">${data.xpTotal}</div>
+                </div>
+                <div class="xp-hp-card hp">
+                    <div class="xp-hp-label">HP Traits</div>
+                    <div class="xp-hp-value">${totalHP >= 0 ? '+' : ''}${totalHP}</div>
+                </div>
+                <div class="xp-hp-card xp">
+                    <div class="xp-hp-label">Qualité</div>
+                    <div class="xp-hp-value">${(data.qualityScore * 100).toFixed(0)}%</div>
+                </div>
+            </div>
+
+            <div style="background: rgba(6, 182, 212, 0.05); padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; border-left: 3px solid rgba(33, 128, 141, 1);">
+                <div style="font-weight: 600; color: rgba(33, 128, 141, 1); margin-bottom: 0.5rem;">💬 Feedback IA</div>
+                <div style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">${data.feedback}</div>
+            </div>
+
+            <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                <div class="ia-result-title">📦 Artefacts Détectés</div>
+                <div class="detections-grid">
+                    <div class="detection-card"><div class="detection-emoji">📖</div><div class="detection-label">Livres</div><div class="detection-value">${data.detections.booksRead || 0}</div></div>
+                    <div class="detection-card"><div class="detection-emoji">📰</div><div class="detection-label">Articles</div><div class="detection-value">${data.detections.academicArticles || 0}</div></div>
+                    <div class="detection-card"><div class="detection-emoji">🔧</div><div class="detection-label">Projets</div><div class="detection-value">${data.detections.projectsWorked || 0}</div></div>
+                    <div class="detection-card"><div class="detection-emoji">🎓</div><div class="detection-label">Cours</div><div class="detection-value">${data.detections.onlineCourses || 0}</div></div>
+                    <div class="detection-card"><div class="detection-emoji">🤝</div><div class="detection-label">Contributions</div><div class="detection-value">${data.detections.socialContributions || 0}</div></div>
+                    <div class="detection-card"><div class="detection-emoji">🌐</div><div class="detection-label">Networking</div><div class="detection-value">${data.detections.networkingEvents || 0}</div></div>
+                </div>
+            </div>
+        </div>`;
+
+        if (data.traits && data.traits.length > 0) {
+            html += `<div class="ia-result-section"><div class="ia-result-title">✨ Traits Détectés (${data.traits.length})</div><div class="trait-detection-grid">`;
+            data.traits.forEach(trait => {
+                const isNegative = trait.name.includes('Négatif') || trait.hp_amount < 0;
+                html += `<div class="trait-detection-item${isNegative ? ' negative' : ''}">
+                    <div class="trait-name">${isNegative ? '⚠️' : '✓'} ${trait.name}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.4rem;">${trait.relevance || ''}</div>
+                    <div class="trait-values">
+                        <span class="trait-value hp">${trait.hp_amount >= 0 ? '+' : ''}${trait.hp_amount || 0}</span>
+                    </div>
+                </div>`;
+            });
+            html += `</div></div>`;
+        }
+
+        html += `<div class="ia-result-section">
+            <button class="vision-btn vision-btn-success" onclick="saveIAEvaluation()">
+                💾 Enregistrer l'Évaluation
+            </button>
+        </div>`;
+
+        resultsDiv.innerHTML = html;
+
+    } catch (error) {
+        console.error('Erreur:', error);
+        resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: #999;">❌ Impossible de communiquer avec le serveur</div>';
+    }
+}
+
+// ✅ ÉTAPE 2: Appelle api/confirm-evaluation/
+async function saveIAEvaluation() {
+    const data = window.currentIAEvaluation;
+    if (!data) {
+        showAlert('iaAlert', 'Aucune évaluation en attente', 'error');
+        return;
+    }
+
+    try {
+        const confirmResponse = await fetch('/api/confirm-evaluation/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                description: data.description,
+                xp_amount: data.xpTotal,
+                quality_score: data.qualityScore,
+                feedback: data.feedback,
+                personality_traits: data.traits,
+                detections: data.detections
+            })
+        });
+
+        if (confirmResponse.ok) {
+            const result = await confirmResponse.json();
+            let totalHP = 0;
+            data.traits.forEach(t => totalHP += t.hp_amount || 0);
+            showAlert('iaAlert', `✅ Évaluation enregistrée | XP: ${data.xpTotal} | HP: ${totalHP >= 0 ? '+' : ''}${totalHP}`, 'success');
+            clearIAForm();
+        } else {
+            showAlert('iaAlert', 'Erreur lors de l\'enregistrement', 'error');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showAlert('iaAlert', 'Impossible de communiquer avec le serveur', 'error');
+    }
+}
+
+function clearIAForm() {
+    document.getElementById('iaDescription').value = '';
+    document.getElementById('iaResults').classList.remove('active');
+    window.currentIAEvaluation = null;
+}
+
+// ==================== HELPERS ====================
+
+function showAlert(elementId, message, type) {
+    const alertEl = document.getElementById(elementId);
+    if (!alertEl) return;
+
+    alertEl.innerHTML = message;
+    alertEl.className = `alert-message show ${type}`;
+
+    setTimeout(() => {
+        alertEl.classList.remove('show');
+    }, 5000);
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// ==================== INIT ====================
+
+document.addEventListener('DOMContentLoaded', function() {
+    renderDailyTasks();
+});
+</script>
+{% endblock %}

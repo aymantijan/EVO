@@ -1,0 +1,423 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="login-wrapper">
+    <div class="login-container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <span class="logo-icon">⚡</span>
+            <h1>EVPE - Gamification Life</h1>
+            <p>Connectez-vous pour continuer votre apprentissage</p>
+        </div>
+
+        <!-- Messages Section -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success">
+                    <span class="success-icon">✓</span>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Form Section -->
+        <form method="POST" class="form-section" novalidate>
+            {% csrf_token %}
+
+            <!-- Non-Field Errors -->
+            {% if form.non_field_errors %}
+                <div class="alert alert-error">
+                    <span class="error-icon">✕</span>
+                    <ul>
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <!-- Username Field -->
+            <div class="form-group">
+                <label for="id_username">
+                    👤 Nom d'utilisateur
+                </label>
+                <input
+                    type="text"
+                    id="id_username"
+                    name="username"
+                    placeholder="Entrez votre nom d'utilisateur"
+                    value="{{ form.username.value|default:'' }}"
+                    autocomplete="username"
+                    required
+                >
+                {% if form.username.errors %}
+                    <ul class="field-errors">
+                        {% for error in form.username.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <!-- Password Field -->
+            <div class="form-group">
+                <label for="id_password">
+                    🔐 Mot de passe
+                </label>
+                <input
+                    type="password"
+                    id="id_password"
+                    name="password"
+                    placeholder="Entrez votre mot de passe"
+                    autocomplete="current-password"
+                    required
+                >
+                {% if form.password.errors %}
+                    <ul class="field-errors">
+                        {% for error in form.password.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                <p class="help-text">
+                    🔒 Votre mot de passe est sécurisé et chiffré
+                </p>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn">
+                Se Connecter
+            </button>
+        </form>
+
+        <!-- Admin Section -->
+        <div class="divider">
+            <span>Si vous n'avez pas de compte</span>
+        </div>
+
+        <div class="admin-section">
+            <p>Créer un nouveau compte</p>
+            <a href="/register/" class="admin-btn">
+                Créer un compte
+            </a>
+            <p style="margin-top: 12px; font-size: 12px; color: #bbb;">
+                Let the fun begin
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, white 0%, wheat 100%);
+    }
+    .login-wrapper {
+        width: 100%;
+        max-width: 420px;
+        margin: 0 auto;
+    }
+
+    .login-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+        padding: 50px 40px;
+        animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .logo-section {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .logo-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    .logo-section h1 {
+        font-size: 28px;
+        color: #333;
+        margin-bottom: 8px;
+        font-weight: 700;
+    }
+
+    .logo-section p {
+        color: #999;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+    }
+
+    .alert {
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        animation: slideDown 0.4s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert-error {
+        background: #fee;
+        border: 1px solid #fcc;
+        color: #c33;
+        border-left: 4px solid #c33;
+    }
+
+    .alert-success {
+        background: #efe;
+        border: 1px solid #cfc;
+        color: #3c3;
+        border-left: 4px solid #3c3;
+    }
+
+    .alert ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .alert li {
+        margin-bottom: 6px;
+    }
+
+    .alert li:last-child {
+        margin-bottom: 0;
+    }
+
+    .form-group {
+        margin-bottom: 22px;
+    }
+
+    .form-group:last-of-type {
+        margin-bottom: 10px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="email"] {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        font-family: inherit;
+        background: #fafafa;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    input[type="email"]:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    input[type="text"]::placeholder,
+    input[type="password"]::placeholder,
+    input[type="email"]::placeholder {
+        color: #bbb;
+    }
+
+    .field-errors {
+        margin-top: 6px;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .field-errors li {
+        color: #c33;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 14px;
+        background: rgba(33, 128, 141, 1);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(29,115,126);
+    }
+
+    .submit-btn:active {
+        transform: translateY(-1px);
+    }
+
+    .submit-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .divider {
+        margin: 30px 0;
+        position: relative;
+        text-align: center;
+    }
+
+    .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #e0e0e0;
+    }
+
+    .divider span {
+        background: white;
+        padding: 0 10px;
+        color: #999;
+        font-size: 13px;
+        position: relative;
+    }
+
+    .admin-section {
+        padding: 20px;
+        background: #f8f9ff;
+        border-radius: 10px;
+        border: 1px solid #e8ebf5;
+        text-align: center;
+    }
+
+    .admin-section p {
+        color: #666;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .admin-btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background: rgba(33, 128, 141, 1);
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .admin-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(29,115,126);
+    }
+
+    .help-text {
+        margin-top: 8px;
+        font-size: 12px;
+        color: #999;
+    }
+
+    .error-icon {
+        display: inline-block;
+        color: #c33;
+        margin-right: 6px;
+    }
+
+    .success-icon {
+        display: inline-block;
+        color: #3c3;
+        margin-right: 6px;
+    }
+
+    @media (max-width: 480px) {
+        .login-container {
+            padding: 40px 25px;
+        }
+
+        .logo-section h1 {
+            font-size: 24px;
+        }
+
+        .logo-icon {
+            font-size: 40px;
+        }
+
+        .submit-btn {
+            font-size: 14px;
+            padding: 12px;
+        }
+
+        .admin-section {
+            margin-top: 20px;
+        }
+    }
+</style>
+
+<script>
+    // Disable submit button during submission
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Connexion en cours...';
+        });
+    }
+
+    // Clear password field on page load for security
+    window.addEventListener('load', function() {
+        const passwordInput = document.getElementById('id_password');
+        if (passwordInput) {
+            passwordInput.value = '';
+        }
+    });
+</script>
+{% endblock %}

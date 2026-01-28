@@ -1,0 +1,837 @@
+{% extends 'base.html' %}
+
+{% block title %}Ressources - Gamification Life{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <!-- HEADER -->
+    <div class="header">
+        <h1>📚 Ressources d'Apprentissage</h1>
+        <div>Accédez à des ressources adaptées à votre niveau de progression</div>
+
+        <!-- GALAXY & LEVEL INFO -->
+        <div class="galaxy-info">
+            <div class="galaxy-badge" id="galaxyBadge">
+                <span class="galaxy-emoji">🌟</span>
+                <div>
+                    <div class="galaxy-name">Étoile du Matin</div>
+                    <div class="galaxy-level">Niveau <span id="headerLevel">1</span>/100</div>
+                </div>
+            </div>
+            <div class="progress-info">
+                <div class="overall-level">Niveau Global: <span id="globalLevel">1</span>/1000</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar" style="width: 0.1%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESSOURCES DISPONIBLES -->
+    <div class="card">
+        <div class="section-title">📖 Livres Accessibles</div>
+        <div class="tabs">
+            <div class="tab active" onclick="filterBooks('all', 'Livre', event)">Tous</div>
+            <div class="tab" onclick="filterBooks('Finance', 'Livre', event)">💰 Finance</div>
+            <div class="tab" onclick="filterBooks('Business', 'Livre', event)">💼 Business</div>
+            <div class="tab" onclick="filterBooks('Mindset', 'Livre', event)">🧠 Mindset</div>
+            <div class="tab" onclick="filterBooks('Tech', 'Livre', event)">💻 Tech</div>
+            <div class="tab" onclick="filterBooks('Entrepreneuriat', 'Livre', event)">🚀 Entrepreneuriat</div>
+            <div class="tab" onclick="filterBooks('Philosophie', 'Livre', event)">🤔 Philosophie</div>
+        </div>
+        <div id="availableBooks" class="items-grid"></div>
+        <div id="noAvailableBooks" class="empty-state" style="display:none;">
+            <div style="font-size: 48px; margin-bottom: 16px;">📖</div>
+            <div style="font-size: 18px;">Aucun livre accessible</div>
+            <div style="font-size: 14px; color: var(--text-tertiary); margin-top: 8px;">Augmentez votre niveau pour débloquer plus de ressources</div>
+        </div>
+    </div>
+
+    <!-- ARTICLES SCIENTIFIQUES -->
+    <div class="card">
+        <div class="section-title">📰 Articles Scientifiques</div>
+        <div id="availableArticles" class="items-grid"></div>
+        <div id="noArticles" class="empty-state" style="display:none;">
+            <div style="font-size: 36px; margin-bottom: 10px;">📰</div>
+            <div>Aucun article accessible</div>
+            <div style="font-size: 13px; color: var(--text-tertiary); margin-top: 8px;">Articles à partir du niveau 50</div>
+        </div>
+    </div>
+
+    <!-- FILMS & SÉRIES -->
+    <div class="card">
+        <div class="section-title">🎬 Films & Séries à Découvrir</div>
+        <div id="availableMovies" class="items-grid"></div>
+        <div id="noMovies" class="empty-state" style="display:none;">
+            <div style="font-size: 36px; margin-bottom: 10px;">🎬</div>
+            <div>Aucun film déverrouillé</div>
+            <div style="font-size: 13px; color: var(--text-tertiary); margin-top: 8px;">Films disponibles à partir du niveau 30</div>
+        </div>
+    </div>
+
+    <!-- PODCASTS & RÉSEAUX -->
+    <div class="card">
+        <div class="section-title">🎙️ Podcasts & Contenu Audio</div>
+        <div id="availablePodcasts" class="items-grid"></div>
+        <div id="noPodcasts" class="empty-state" style="display:none;">
+            <div style="font-size: 36px; margin-bottom: 10px;">🎙️</div>
+            <div>Aucun podcast accessible</div>
+            <div style="font-size: 13px; color: var(--text-tertiary); margin-top: 8px;">Podcasts à partir du niveau 20</div>
+        </div>
+    </div>
+
+    <!-- MENTORS À SUIVRE -->
+    <div class="card">
+        <div class="section-title">👨‍🏫 Mentors à Suivre</div>
+        <div id="availableMentors" class="items-grid"></div>
+        <div id="noMentors" class="empty-state" style="display:none;">
+            <div style="font-size: 36px; margin-bottom: 10px;">👨‍🏫</div>
+            <div>Aucun mentor accessible</div>
+            <div style="font-size: 13px; color: var(--text-tertiary); margin-top: 8px;">Mentors à partir du niveau 75</div>
+        </div>
+    </div>
+
+    <!-- RESSOURCES VERROUILLÉES -->
+    <div class="card">
+        <div class="section-title">🔒 Ressources Verrouillées</div>
+        <div class="locked-info">
+            <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
+                Vous avez accès à <span id="unlockedCount">0</span> ressources sur <span id="totalCount">0</span>
+            </div>
+            <div class="unlock-progress">
+                <div class="unlock-bar">
+                    <div class="unlock-fill" id="unlockFill" style="width: 0%"></div>
+                </div>
+                <div style="text-align: center; font-size: 13px; color: var(--text-tertiary); margin-top: 8px;">
+                    Débloquez plus de ressources en progressant de niveau
+                </div>
+            </div>
+        </div>
+        <div id="lockedResources" class="items-grid" style="margin-top: 20px;"></div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary: #3b82f6;
+        --primary-dark: #1e40af;
+        --secondary: #10b981;
+        --accent: #f59e0b;
+        --danger: #ef4444;
+        --success: #10b981;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f9fafb;
+        --bg-tertiary: #f3f4f6;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --text-tertiary: #9ca3af;
+        --border-color: #e5e7eb;
+        --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    /* ========== HEADER ========== */
+    .header {
+        background: rgba(33, 128, 141, 1);
+        color: white;
+        padding: 40px;
+        border-radius: 16px;
+        margin-bottom: 40px;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .header h1 {
+        font-size: 36px;
+        margin-bottom: 8px;
+        font-weight: 700;
+        color: white;
+    }
+
+    .header > div:nth-child(2) {
+        font-size: 16px;
+        opacity: 0.9;
+        margin-bottom: 24px;
+    }
+
+    /* ========== GALAXY INFO ========== */
+    .galaxy-info {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 20px;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .galaxy-badge {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 12px 16px;
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .galaxy-emoji {
+        font-size: 32px;
+    }
+
+    .galaxy-name {
+        font-size: 16px;
+        font-weight: 600;
+        opacity: 0.95;
+    }
+
+    .galaxy-level {
+        font-size: 13px;
+        opacity: 0.85;
+        margin-top: 4px;
+    }
+
+    .progress-info {
+        flex: 1;
+    }
+
+    .overall-level {
+        font-size: 14px;
+        margin-bottom: 8px;
+        opacity: 0.9;
+    }
+
+    .progress-bar {
+        height: 8px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #10b981, #06b6d4);
+        border-radius: 10px;
+        transition: width 0.6s ease;
+    }
+
+    /* ========== CARD ========== */
+    .card {
+        background: var(--bg-primary);
+        border-radius: 12px;
+        padding: 32px;
+        margin-bottom: 32px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+    }
+
+    .section-title {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        color: var(--text-primary);
+    }
+
+    /* ========== TABS ========== */
+    .tabs {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        overflow-x: auto;
+        padding-bottom: 12px;
+        flex-wrap: wrap;
+    }
+
+    .tab {
+        padding: 10px 16px;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .tab:hover {
+        background: var(--bg-secondary);
+        border-color: rgba(33, 128, 141, 1);
+        color: rgba(33, 128, 141, 1);
+    }
+
+    .tab.active {
+        background: rgba(33, 128, 141, 1);
+        color: white;
+        border-color: rgba(33, 128, 141, 1);
+    }
+
+    /* ========== ITEMS GRID ========== */
+    .items-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+    }
+
+    .item-card {
+        background: var(--bg-tertiary);
+        border: 2px solid transparent;
+        border-radius: 10px;
+        padding: 14px;
+        transition: all 0.3s ease;
+        position: relative;
+        cursor: pointer;
+    }
+
+    .item-card:hover {
+        border-color: rgba(33, 128, 141, 1);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(59, 130, 246, 0.15);
+    }
+
+    .item-card.checked {
+        background: linear-gradient(135deg, #10b98120 0%, #06b6d420 100%);
+        border-color: var(--secondary);
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.25), inset 0 0 12px rgba(16, 185, 129, 0.1);
+    }
+
+    .item-card.locked {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .item-card.locked:hover {
+        transform: none;
+        border-color: transparent;
+    }
+
+    /* ========== CHECKBOX ========== */
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        margin-bottom: 10px;
+    }
+
+    .checkbox-input {
+        display: none;
+    }
+
+    .checkbox-custom {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border-color);
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .checkbox-input:checked + .checkbox-custom {
+        background: var(--secondary);
+        border-color: var(--secondary);
+        box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+    }
+
+    .checkbox-input:checked + .checkbox-custom::after {
+        content: '✓';
+        color: white;
+        font-weight: bold;
+        font-size: 12px;
+    }
+
+    /* ========== ITEM CONTENT ========== */
+    .item-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+    }
+
+    .item-author {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+
+    .item-desc {
+        font-size: 12px;
+        color: var(--text-tertiary);
+        line-height: 1.4;
+        margin-bottom: 10px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .item-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 11px;
+        color: var(--text-secondary);
+        border-top: 1px solid var(--border-color);
+        padding-top: 8px;
+    }
+
+    .badge {
+        background: rgba(33, 128, 141, 1);
+        color: white;
+        padding: 3px 8px;
+        border-radius: 5px;
+        font-weight: 600;
+        font-size: 10px;
+    }
+
+    /* ========== LOCK BADGE ========== */
+    .lock-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: var(--danger);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 5px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    /* ========== EMPTY STATE ========== */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-secondary);
+    }
+
+    /* ========== LOCKED INFO ========== */
+    .locked-info {
+        background: var(--bg-secondary);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid var(--border-color);
+    }
+
+    .unlock-progress {
+        width: 100%;
+    }
+
+    .unlock-bar {
+        height: 12px;
+        background: var(--bg-tertiary);
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+
+    .unlock-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--secondary), var(--accent));
+        transition: width 0.6s ease;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+        .container {
+            padding: 20px 12px;
+        }
+
+        .header {
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .galaxy-info {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .card {
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+
+        .items-grid {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .tabs {
+            gap: 8px;
+        }
+
+        .tab {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+    }
+</style>
+
+<script>
+    const STORAGE_KEY = 'evolutionSystem';
+    let userData = null;
+    let allResources = [];
+    let filterGenre = 'all';
+    let filterType = 'Livre';
+
+    // ==================== GALAXY SYSTEM ====================
+    const GALAXIES = {
+        1: { name: '🌟 Étoile du Matin', emoji: '🌟', color: '#10b981', min: 1, max: 100 },
+        2: { name: '💫 Andromède', emoji: '💫', color: '#06b6d4', min: 101, max: 200 },
+        3: { name: '⭐ Voie Lactée', emoji: '⭐', color: '#f59e0b', min: 201, max: 300 },
+        4: { name: '🌌 Sombrero', emoji: '🌌', color: '#ec4899', min: 301, max: 400 },
+        5: { name: '🪐 Spirale du Cygne', emoji: '🪐', color: '#8b5cf6', min: 401, max: 500 },
+        6: { name: '🔴 Nébuleuse du Crabe', emoji: '🔴', color: '#ef4444', min: 501, max: 600 },
+        7: { name: '🔵 Galaxie d\'Orion', emoji: '🔵', color: '#3b82f6', min: 601, max: 700 },
+        8: { name: '💎 Trésor Cosmique', emoji: '💎', color: '#14b8a6', min: 701, max: 800 },
+        9: { name: '🌠 Paradis Stellaire', emoji: '🌠', color: '#f97316', min: 801, max: 900 },
+        10: { name: '👑 Univers Suprême', emoji: '👑', color: '#6366f1', min: 901, max: 1000 },
+    };
+
+    function getGalaxyByLevel(level) {
+        for (let i = 1; i <= 10; i++) {
+            const g = GALAXIES[i];
+            if (level >= g.min && level <= g.max) return g;
+        }
+        return GALAXIES[1];
+    }
+
+    function getLevelInGalaxy(level) {
+        return ((level - 1) % 100) + 1;
+    }
+
+    // ==================== LOAD CHALLENGE DATA ====================
+    async function loadChallengeData() {
+        try {
+            const response = await fetch('/api/get-user-data/');
+            if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
+
+            const data = await response.json();
+            return {
+                totalXP: data.totalXP || 0,
+                traitsHP: data.traitsHP || {},
+                evaluations: data.evaluations || [],
+                validatedDates: data.validatedDates || [],
+                calendar: data.calendar || {}
+            };
+        } catch (error) {
+            console.error('Erreur:', error);
+            return { totalXP: 0, traitsHP: {}, evaluations: [], validatedDates: [], calendar: {} };
+        }
+    }
+
+    // ==================== GET PROFILE DATA ====================
+    async function getProfileData() {
+        const sessionData = await loadChallengeData();
+
+        if (typeof apiClient !== 'undefined') {
+            try {
+                const response = await apiClient.getProfile();
+                return {
+                    level: response.data.level || 1,
+                    total_xp: response.data.total_xp || sessionData.totalXP
+                };
+            } catch (e) {
+                console.error('Erreur profil:', e);
+            }
+        }
+        return { level: 1, total_xp: sessionData.totalXP };
+    }
+
+    // ==================== LOAD RESOURCES FROM DB ====================
+    async function loadResources() {
+        try {
+            console.log('📡 Chargement des ressources depuis /api/resources/');
+            const response = await fetch('/api/resources/');
+
+            console.log('🔍 Réponse HTTP:', response.status, response.statusText);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ Réponse d\'erreur:', errorText);
+                throw new Error(`Erreur API: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('✅ JSON reçu:', data);
+
+            if (data.success) {
+                // Les ressources sont groupées par type dans data.resources
+                allResources = [];
+
+                // Aplatit les ressources de tous les types
+                Object.keys(data.resources).forEach(type => {
+                    if (Array.isArray(data.resources[type])) {
+                        allResources = allResources.concat(data.resources[type]);
+                    }
+                });
+
+                console.log('✅ Ressources chargées:', allResources.length);
+                console.log('📊 Total par type:', {
+                    'Livre': data.resources['Livre']?.length || 0,
+                    'Article': data.resources['Article']?.length || 0,
+                    'FilmSérie': data.resources['FilmSérie']?.length || 0,
+                    'Podcast': data.resources['Podcast']?.length || 0,
+                    'Mentor': data.resources['Mentor']?.length || 0
+                });
+            } else {
+                console.error('❌ Erreur API:', data.error);
+                alert('Erreur: ' + data.error);
+            }
+        } catch (error) {
+            console.error('❌ Erreur chargement ressources:', error);
+            alert('Erreur: Impossible de charger les ressources. Vérifiez que Django est en cours d\'exécution.');
+        }
+    }
+
+    // ==================== UPDATE HEADER ====================
+    async function updateHeader() {
+        const data = await getProfileData();
+        const level = data.level || 1;
+        const galaxy = getGalaxyByLevel(level);
+        const levelInGalaxy = getLevelInGalaxy(level);
+
+        document.getElementById('globalLevel').textContent = level;
+        document.getElementById('headerLevel').textContent = levelInGalaxy;
+        document.getElementById('progressBar').style.width = (level / 1000) * 100 + '%';
+
+        const badge = document.getElementById('galaxyBadge');
+        badge.querySelector('.galaxy-emoji').textContent = galaxy.emoji;
+        badge.querySelector('.galaxy-name').textContent = galaxy.name;
+    }
+
+    // ==================== TOGGLE ITEM ====================
+    function toggleItem(id) {
+        if (!userData) userData = getEmptyUserData();
+        if (userData.checkedItems.has(id)) {
+            userData.checkedItems.delete(id);
+        } else {
+            userData.checkedItems.add(id);
+        }
+        saveUserData(userData);
+    }
+
+    // ==================== RENDER RESOURCES ====================
+    async function renderResources() {
+        await updateHeader();
+        const data = await getProfileData();
+        const userLevel = data.level || 1;
+
+        if (!userData) userData = getEmptyUserData();
+
+        // Livres
+        let availableBooks = allResources.filter(r => r.type === 'Livre' && r.niveau <= userLevel);
+        let lockedBooks = allResources.filter(r => r.type === 'Livre' && r.niveau > userLevel);
+
+        if (filterGenre !== 'all') {
+            availableBooks = availableBooks.filter(b => b.domaine === filterGenre);
+        }
+
+        renderBooks(availableBooks);
+
+        // Articles
+        const availableArticles = allResources.filter(r => r.type === 'Article' && r.niveau <= userLevel);
+        renderItems(availableArticles, 'availableArticles', 'noArticles');
+
+        // Films
+        const availableMovies = allResources.filter(r => r.type === 'FilmSérie' && r.niveau <= userLevel);
+        renderItems(availableMovies, 'availableMovies', 'noMovies');
+
+        // Podcasts
+        const availablePodcasts = allResources.filter(r => r.type === 'Podcast' && r.niveau <= userLevel);
+        renderItems(availablePodcasts, 'availablePodcasts', 'noPodcasts');
+
+        // Mentors
+        const availableMentors = allResources.filter(r => r.type === 'Mentor' && r.niveau <= userLevel);
+        renderItems(availableMentors, 'availableMentors', 'noMentors');
+
+        // Ressources verrouillées
+        const locked = allResources.filter(r => r.niveau > userLevel);
+        const unlocked = allResources.filter(r => r.niveau <= userLevel);
+
+        document.getElementById('unlockedCount').textContent = unlocked.length;
+        document.getElementById('totalCount').textContent = allResources.length;
+
+        if (allResources.length > 0) {
+            const percentage = (unlocked.length / allResources.length) * 100;
+            document.getElementById('unlockFill').style.width = percentage + '%';
+        }
+
+        renderLockedResources(locked);
+    }
+
+    // ==================== RENDER BOOKS ====================
+    function renderBooks(books) {
+        const grid = document.getElementById('availableBooks');
+        const empty = document.getElementById('noAvailableBooks');
+
+        if (books.length === 0) {
+            grid.style.display = 'none';
+            empty.style.display = 'block';
+        } else {
+            grid.style.display = 'grid';
+            empty.style.display = 'none';
+
+            grid.innerHTML = books.map((b, idx) => {
+                const itemId = `book-${b.id}`;
+                const isChecked = userData.checkedItems.has(itemId);
+                const galaxy = getGalaxyByLevel(b.niveau);
+                return `
+                    <div class="item-card ${isChecked ? 'checked' : ''}">
+                        <div class="checkbox-container">
+                            <input type="checkbox" class="checkbox-input" id="${itemId}" ${isChecked ? 'checked' : ''} onchange="toggleItem('${itemId}')">
+                            <label for="${itemId}" class="checkbox-custom"></label>
+                        </div>
+                        <div class="item-title">${b.titre || 'Sans titre'}</div>
+                        <div class="item-author">${b.auteur || 'Auteur inconnu'}</div>
+                        <div class="item-desc">${b.description || 'Aucune description'}</div>
+                        <div class="item-footer">
+                            <span class="badge" style="background: ${galaxy.color};">Niv. ${b.niveau}</span>
+                            <span>${b.domaine}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+
+    // ==================== RENDER ITEMS ====================
+    function renderItems(items, gridId, emptyId) {
+        const grid = document.getElementById(gridId);
+        const empty = document.getElementById(emptyId);
+
+        if (items.length === 0) {
+            grid.style.display = 'none';
+            empty.style.display = 'block';
+        } else {
+            grid.style.display = 'grid';
+            empty.style.display = 'none';
+
+            grid.innerHTML = items.map((item, idx) => {
+                const itemId = `item-${item.id}`;
+                const isChecked = userData.checkedItems.has(itemId);
+                const galaxy = getGalaxyByLevel(item.niveau);
+                return `
+                    <div class="item-card ${isChecked ? 'checked' : ''}">
+                        <div class="checkbox-container">
+                            <input type="checkbox" class="checkbox-input" id="${itemId}" ${isChecked ? 'checked' : ''} onchange="toggleItem('${itemId}')">
+                            <label for="${itemId}" class="checkbox-custom"></label>
+                        </div>
+                        <div class="item-title">${item.titre || 'Sans titre'}</div>
+                        <div class="item-author">${item.auteur || 'Source inconnue'}</div>
+                        <div class="item-desc">${item.description || 'Aucune description'}</div>
+                        <div class="item-footer">
+                            <span class="badge" style="background: ${galaxy.color};">Niv. ${item.niveau}</span>
+                            <span>${item.domaine}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+
+    // ==================== RENDER LOCKED RESOURCES ====================
+    function renderLockedResources(items) {
+        const container = document.getElementById('lockedResources');
+
+        if (items.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-secondary); grid-column: 1 / -1;"><div style="font-size: 48px; margin-bottom: 16px;">🎉</div><div style="font-size: 18px; font-weight: 600;">Bravo !</div><p style="margin-top: 8px;">Vous avez déverrouillé toutes les ressources disponibles !</p></div>';
+            return;
+        }
+
+        container.innerHTML = items.map(item => {
+            const galaxy = getGalaxyByLevel(item.niveau);
+            return `
+                <div class="item-card locked">
+                    <div class="lock-badge" style="background: ${galaxy.color};">🔒 Niv. ${item.niveau}</div>
+                    <div class="item-title">${item.titre || 'Sans titre'}</div>
+                    <div class="item-author">${item.auteur || 'Source inconnue'}</div>
+                    <div class="item-desc">${item.description || 'Aucune description'}</div>
+                    <div class="item-footer">
+                        <span>${galaxy.name}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ==================== FILTER TYPE ====================
+    function filterBooks(domaine, type, event) {
+        event.target.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        filterGenre = domaine;
+        renderResources();
+    }
+
+    // ==================== USER DATA ====================
+    function getEmptyUserData() {
+        return {
+            name: 'Utilisateur',
+            level: 1,
+            checkedItems: new Set()
+        };
+    }
+
+    function saveUserData(data) {
+        try {
+            const toSave = {
+                ...data,
+                checkedItems: Array.from(data.checkedItems)
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+            return true;
+        } catch (e) {
+            console.error('Erreur save:', e);
+            return false;
+        }
+    }
+
+    // ==================== INITIALIZE ====================
+    async function initialize() {
+        console.log('🚀 Initialisation de la page Actions...');
+        userData = getEmptyUserData();
+        await loadResources();
+        await renderResources();
+        console.log('✅ Page Actions chargée!');
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initialize);
+    } else {
+        initialize();
+    }
+</script>
+
+{% endblock %}

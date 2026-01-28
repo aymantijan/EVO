@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="settings-container">
+    <h1>⚙️ Settings</h1>
+
+    <form id="settings-form" class="settings-form">
+        <div class="form-group">
+            <label>Bio</label>
+            <textarea name="bio" id="settings-bio"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Theme</label>
+            <select name="theme" id="settings-theme">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Timezone</label>
+            <input type="text" name="timezone" id="settings-timezone" value="Africa/Casablanca">
+        </div>
+
+        <div class="form-group">
+            <label>Language</label>
+            <select name="preferred_language" id="settings-language">
+                <option value="fr">Français</option>
+                <option value="en">English</option>
+                <option value="es">Español</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Settings</button>
+    </form>
+</div>
+
+<script>
+    async function loadSettings() {
+        try {
+            const response = await axios.get('/api/users/profile/');
+            const profile = response.data;
+
+            document.getElementById('settings-bio').value = profile.bio || '';
+            document.getElementById('settings-theme').value = profile.theme || 'light';
+            document.getElementById('settings-language').value = profile.preferred_language || 'fr';
+            document.getElementById('settings-timezone').value = profile.timezone || 'Africa/Casablanca';
+        } catch (error) {
+            console.error('Error loading settings:', error);
+        }
+    }
+
+    document.getElementById('settings-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const data = {
+            bio: document.getElementById('settings-bio').value,
+            theme: document.getElementById('settings-theme').value,
+            preferred_language: document.getElementById('settings-language').value,
+            timezone: document.getElementById('settings-timezone').value,
+        };
+
+        try {
+            await axios.put('/api/users/update_profile/', data);
+            alert('Settings saved!');
+            location.reload();
+        } catch (error) {
+            alert('Error saving settings');
+        }
+    });
+
+    loadSettings();
+</script>
+{% endblock %}

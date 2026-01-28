@@ -1,0 +1,1332 @@
+{% extends 'base.html' %}
+
+{% block title %}Study Tracker{% endblock %}
+
+{% block extra_css %}
+<style>
+    .study-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: var(--space-20);
+    }
+
+    .study-header {
+        margin-bottom: var(--space-32);
+    }
+
+    .study-header h1 {
+        font-size: var(--font-size-4xl);
+        font-weight: var(--font-weight-bold);
+        margin-bottom: var(--space-8);
+        color: var(--text-primary);
+    }
+
+    .study-header p {
+        color: var(--text-secondary);
+        font-size: var(--font-size-base);
+    }
+
+    .study-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--space-16);
+        margin-bottom: var(--space-32);
+    }
+
+    .study-stat-card {
+        background: var(--bg-secondary);
+        padding: var(--space-20);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        border-left: 4px solid var(--color-primary);
+    }
+
+    .study-stat-label {
+        font-size: var(--font-size-xs);
+        color: var(--text-secondary);
+        font-weight: var(--font-weight-semibold);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: var(--space-8);
+    }
+
+    .study-stat-value {
+        font-size: var(--font-size-4xl);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-primary);
+    }
+
+    .study-main-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-20);
+        margin-bottom: var(--space-24);
+    }
+
+    .study-card {
+        background: var(--bg-secondary);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        padding: var(--space-20);
+    }
+
+    .study-card-title {
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-bold);
+        margin-bottom: var(--space-16);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: var(--space-8);
+    }
+
+    .study-form-group {
+        margin-bottom: var(--space-16);
+    }
+
+    .study-form-group label {
+        display: block;
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-primary);
+        margin-bottom: var(--space-6);
+    }
+
+    .study-form-input,
+    .study-form-select {
+        width: 100%;
+        padding: var(--space-8) var(--space-12);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-base);
+        font-size: var(--font-size-sm);
+        font-family: var(--font-family-base);
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        transition: all var(--duration-fast) var(--ease-standard);
+    }
+
+    .study-form-input:focus,
+    .study-form-select:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px var(--color-focus-ring);
+    }
+
+    .study-btn-group {
+        display: flex;
+        gap: var(--space-8);
+        align-items: center;
+        margin-left: auto;
+    }
+
+    .study-btn {
+        padding: var(--space-10) var(--space-16);
+        border: none;
+        border-radius: var(--radius-base);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
+        cursor: pointer;
+        transition: all var(--duration-fast) var(--ease-standard);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .study-btn-primary {
+        background: var(--color-primary);
+        color: var(--color-btn-primary-text);
+        width: 100%;
+    }
+
+    .study-btn-primary:hover {
+        background: var(--color-primary-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .study-btn-plus {
+        background: var(--color-success);
+        color: var(--color-btn-primary-text);
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: var(--font-size-xl);
+        flex-shrink: 0;
+    }
+
+    .study-btn-plus:hover {
+        background: rgba(var(--color-success-rgb), 0.9);
+    }
+
+    .study-btn-minus {
+        background: var(--color-warning);
+        color: var(--color-btn-primary-text);
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: var(--font-size-xl);
+        flex-shrink: 0;
+    }
+
+    .study-btn-minus:hover {
+        background: rgba(var(--color-warning-rgb), 0.9);
+    }
+
+    .study-btn-delete {
+        background: var(--color-error);
+        color: var(--color-btn-primary-text);
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: var(--font-size-lg);
+        flex-shrink: 0;
+    }
+
+    .study-btn-delete:hover {
+        background: rgba(var(--color-error-rgb), 0.9);
+    }
+
+    .study-btn-small {
+        padding: var(--space-4) var(--space-10);
+        font-size: var(--font-size-xs);
+        width: auto;
+        height: auto;
+    }
+
+    .study-progress-bar {
+        height: 8px;
+        background: var(--color-border);
+        border-radius: 4px;
+        overflow: hidden;
+        margin: var(--space-8) 0;
+        width: 100%;
+    }
+
+    .study-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
+        transition: width var(--duration-normal) ease;
+    }
+
+    .study-progress-text {
+        font-size: var(--font-size-xs);
+        color: var(--text-secondary);
+        font-weight: var(--font-weight-semibold);
+    }
+
+    .study-subjects-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-16);
+    }
+
+    .study-subject-box {
+        background: var(--bg-primary);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-16);
+    }
+
+    .study-subject-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-12);
+        gap: var(--space-8);
+        flex-wrap: wrap;
+    }
+
+    .study-subject-name {
+        font-weight: var(--font-weight-bold);
+        color: var(--text-primary);
+        font-size: var(--font-size-base);
+        flex: 1;
+        min-width: 150px;
+    }
+
+    .study-subject-actions {
+        display: flex;
+        gap: var(--space-6);
+        flex-shrink: 0;
+    }
+
+    .study-chapters-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-12);
+    }
+
+    .study-chapter-item {
+        background: var(--bg-secondary);
+        padding: var(--space-12);
+        border: 1px solid var(--color-border);
+        border-left: 3px solid var(--color-primary);
+        border-radius: var(--radius-base);
+    }
+
+    .study-chapter-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-12);
+        gap: var(--space-8);
+        flex-wrap: wrap;
+    }
+
+    .study-chapter-title {
+        font-weight: var(--font-weight-semibold);
+        font-size: var(--font-size-base);
+        color: var(--text-primary);
+        flex: 1;
+        min-width: 100px;
+    }
+
+    .study-chapter-coeff {
+        background: var(--color-secondary);
+        padding: var(--space-4) var(--space-10);
+        border-radius: var(--radius-base);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-primary);
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .study-sections-list {
+        margin-top: var(--space-12);
+    }
+
+    .study-section-row {
+        display: flex;
+        align-items: center;
+        gap: var(--space-8);
+        padding: var(--space-10);
+        background: var(--bg-primary);
+        border-radius: var(--radius-base);
+        margin-bottom: var(--space-8);
+        flex-wrap: wrap;
+    }
+
+    .study-section-name {
+        flex: 1;
+        font-size: var(--font-size-sm);
+        color: var(--text-primary);
+        min-width: 100px;
+    }
+
+    .study-section-percent {
+        font-weight: var(--font-weight-bold);
+        color: var(--color-primary);
+        min-width: 45px;
+        text-align: right;
+        flex-shrink: 0;
+    }
+
+    .study-chart-container {
+        background: var(--bg-secondary);
+        padding: var(--space-20);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .study-chart-title {
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-bold);
+        margin-bottom: var(--space-20);
+        color: var(--text-primary);
+    }
+
+    .study-chart-bars {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: var(--space-16);
+    }
+
+    .study-chart-bar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .study-bar-container {
+        width: 60px;
+        height: 250px;
+        background: var(--color-border);
+        border-radius: var(--radius-base);
+        overflow: hidden;
+        margin-bottom: var(--space-12);
+    }
+
+    .study-bar {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(180deg, var(--color-primary), var(--color-primary-hover));
+        border-radius: var(--radius-base);
+        transition: all var(--duration-normal) ease;
+    }
+
+    .study-bar:hover {
+        filter: brightness(1.1);
+    }
+
+    .study-bar-label {
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-primary);
+        text-align: center;
+        max-width: 100px;
+        word-break: break-word;
+    }
+
+    .study-bar-percent {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-primary);
+        margin-top: var(--space-8);
+    }
+
+    .study-empty-state {
+        text-align: center;
+        padding: 60px 40px;
+        color: var(--text-secondary);
+    }
+
+    .study-empty-icon {
+        font-size: 48px;
+        margin-bottom: var(--space-12);
+    }
+
+    .study-tab-container {
+        display: flex;
+        gap: var(--space-12);
+        margin-bottom: var(--space-20);
+        border-bottom: 1px solid var(--color-border);
+        overflow-x: auto;
+    }
+
+    .study-tab {
+        padding: var(--space-12) var(--space-16);
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-secondary);
+        transition: all var(--duration-fast) var(--ease-standard);
+        margin-bottom: -1px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .study-tab.active {
+        color: var(--color-primary);
+        border-bottom-color: var(--color-primary);
+    }
+
+    .study-tab-content {
+        display: none;
+    }
+
+    .study-tab-content.active {
+        display: block;
+    }
+
+    .study-average-card {
+        background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+        color: var(--color-btn-primary-text);
+        padding: var(--space-20);
+        border-radius: var(--radius-lg);
+        text-align: center;
+        margin-top: var(--space-20);
+    }
+
+    .study-average-label {
+        font-size: var(--font-size-sm);
+        opacity: 0.9;
+        font-weight: var(--font-weight-semibold);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: var(--space-8);
+    }
+
+    .study-average-value {
+        font-size: var(--font-size-4xl);
+        font-weight: var(--font-weight-bold);
+    }
+
+    @media (max-width: 1024px) {
+        .study-main-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .study-chart-bars {
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        }
+
+        .study-bar-container {
+            height: 200px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .study-container {
+            padding: var(--space-16);
+        }
+
+        .study-header h1 {
+            font-size: var(--font-size-3xl);
+        }
+
+        .study-header p {
+            font-size: var(--font-size-sm);
+        }
+
+        .study-stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-12);
+            margin-bottom: var(--space-24);
+        }
+
+        .study-stat-card {
+            padding: var(--space-16);
+        }
+
+        .study-stat-value {
+            font-size: var(--font-size-2xl);
+        }
+
+        .study-card {
+            padding: var(--space-16);
+        }
+
+        .study-card-title {
+            font-size: var(--font-size-lg);
+            margin-bottom: var(--space-12);
+        }
+
+        .study-form-input,
+        .study-form-select {
+            padding: var(--space-6) var(--space-10);
+            font-size: var(--font-size-xs);
+        }
+
+        .study-form-group {
+            margin-bottom: var(--space-12);
+        }
+
+        .study-btn-primary {
+            padding: var(--space-10) var(--space-16);
+            font-size: var(--font-size-sm);
+        }
+
+        .study-btn-plus,
+        .study-btn-minus,
+        .study-btn-delete {
+            width: 36px;
+            height: 36px;
+            font-size: var(--font-size-base);
+        }
+
+        .study-btn-group {
+            gap: var(--space-6);
+        }
+
+        .study-section-row {
+            flex-wrap: wrap;
+            gap: var(--space-6);
+            padding: var(--space-8);
+        }
+
+        .study-section-name {
+            flex: 1 1 100%;
+            min-width: 0;
+        }
+
+        .study-section-percent {
+            flex: 0 0 auto;
+            min-width: 40px;
+        }
+
+        .study-chapter-header {
+            flex-wrap: wrap;
+            gap: var(--space-6);
+        }
+
+        .study-chapter-title {
+            flex: 1 1 auto;
+            min-width: 100px;
+        }
+
+        .study-chapter-coeff {
+            flex: 0 0 auto;
+            padding: var(--space-2) var(--space-8);
+            font-size: var(--font-size-xs);
+        }
+
+        .study-chapter-item {
+            padding: var(--space-10);
+            border-left-width: 2px;
+        }
+
+        .study-subject-box {
+            padding: var(--space-12);
+        }
+
+        .study-subject-header {
+            flex-wrap: wrap;
+            gap: var(--space-6);
+        }
+
+        .study-subject-name {
+            flex: 1 1 auto;
+            min-width: 100px;
+            font-size: var(--font-size-sm);
+        }
+
+        .study-btn-small {
+            padding: var(--space-3) var(--space-6);
+            font-size: var(--font-size-xs);
+        }
+
+        .study-chart-container {
+            padding: var(--space-16);
+        }
+
+        .study-chart-title {
+            font-size: var(--font-size-lg);
+            margin-bottom: var(--space-16);
+        }
+
+        .study-chart-bars {
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: var(--space-12);
+        }
+
+        .study-bar-container {
+            width: 50px;
+            height: 180px;
+        }
+
+        .study-bar-label {
+            font-size: var(--font-size-xs);
+        }
+
+        .study-bar-percent {
+            font-size: var(--font-size-base);
+            margin-top: var(--space-6);
+        }
+
+        .study-average-card {
+            padding: var(--space-16);
+            margin-top: var(--space-12);
+        }
+
+        .study-average-label {
+            font-size: var(--font-size-xs);
+            margin-bottom: var(--space-6);
+        }
+
+        .study-average-value {
+            font-size: var(--font-size-3xl);
+        }
+
+        .study-tab-container {
+            gap: var(--space-8);
+            margin-bottom: var(--space-16);
+        }
+
+        .study-tab {
+            padding: var(--space-10) var(--space-12);
+            font-size: var(--font-size-sm);
+        }
+
+        .study-empty-state {
+            padding: 40px 20px;
+        }
+
+        .study-empty-icon {
+            font-size: var(--font-size-3xl);
+            margin-bottom: var(--space-8);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .study-container {
+            padding: var(--space-12);
+        }
+
+        .study-header h1 {
+            font-size: var(--font-size-2xl);
+            margin-bottom: var(--space-6);
+        }
+
+        .study-header p {
+            font-size: var(--font-size-xs);
+        }
+
+        .study-stats-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-10);
+            margin-bottom: var(--space-16);
+        }
+
+        .study-stat-card {
+            padding: var(--space-12);
+            border-left-width: 3px;
+        }
+
+        .study-stat-label {
+            font-size: var(--font-size-xs);
+            margin-bottom: var(--space-4);
+        }
+
+        .study-stat-value {
+            font-size: var(--font-size-2xl);
+        }
+
+        .study-card {
+            padding: var(--space-12);
+            margin-bottom: var(--space-12);
+        }
+
+        .study-card-title {
+            font-size: var(--font-size-base);
+            margin-bottom: var(--space-10);
+        }
+
+        .study-form-group {
+            margin-bottom: var(--space-10);
+        }
+
+        .study-form-group label {
+            font-size: var(--font-size-xs);
+            margin-bottom: var(--space-4);
+        }
+
+        .study-form-input,
+        .study-form-select {
+            padding: var(--space-6) var(--space-8);
+            font-size: var(--font-size-xs);
+        }
+
+        .study-btn-primary {
+            padding: var(--space-8) var(--space-12);
+            font-size: var(--font-size-xs);
+        }
+
+        .study-btn-plus,
+        .study-btn-minus,
+        .study-btn-delete {
+            width: 32px;
+            height: 32px;
+            font-size: var(--font-size-sm);
+        }
+
+        .study-btn-group {
+            gap: var(--space-4);
+        }
+
+        .study-section-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--space-4);
+            padding: var(--space-6);
+        }
+
+        .study-section-name {
+            flex: 1 1 100%;
+            font-size: var(--font-size-xs);
+        }
+
+        .study-section-percent {
+            font-size: var(--font-size-xs);
+            min-width: 35px;
+        }
+
+        .study-chapter-item {
+            padding: var(--space-8);
+            margin-bottom: var(--space-6);
+        }
+
+        .study-chapter-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--space-4);
+        }
+
+        .study-chapter-title {
+            font-size: var(--font-size-sm);
+            flex: 1 1 100%;
+        }
+
+        .study-chapter-coeff {
+            font-size: var(--font-size-xs);
+            padding: var(--space-2) var(--space-4);
+        }
+
+        .study-subject-box {
+            padding: var(--space-10);
+        }
+
+        .study-subject-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--space-6);
+        }
+
+        .study-subject-name {
+            font-size: var(--font-size-sm);
+        }
+
+        .study-btn-small {
+            padding: var(--space-2) var(--space-6);
+            font-size: var(--font-size-xs);
+            width: 100%;
+        }
+
+        .study-progress-bar {
+            height: 6px;
+            margin: var(--space-4) 0;
+        }
+
+        .study-progress-text {
+            font-size: var(--font-size-xs);
+        }
+
+        .study-chart-bars {
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-10);
+        }
+
+        .study-bar-container {
+            width: 45px;
+            height: 150px;
+        }
+
+        .study-bar-label {
+            font-size: var(--font-size-xs);
+        }
+
+        .study-bar-percent {
+            font-size: var(--font-size-sm);
+            margin-top: var(--space-3);
+        }
+
+        .study-chart-container {
+            padding: var(--space-12);
+        }
+
+        .study-chart-title {
+            font-size: var(--font-size-base);
+            margin-bottom: var(--space-10);
+        }
+
+        .study-average-card {
+            padding: var(--space-12);
+            margin-top: var(--space-12);
+        }
+
+        .study-average-label {
+            font-size: var(--font-size-xs);
+            margin-bottom: var(--space-4);
+        }
+
+        .study-average-value {
+            font-size: var(--font-size-2xl);
+        }
+
+        .study-tab {
+            padding: var(--space-8) var(--space-10);
+            font-size: var(--font-size-xs);
+        }
+
+        .study-empty-state {
+            padding: 30px 12px;
+        }
+
+        .study-empty-icon {
+            font-size: var(--font-size-2xl);
+            margin-bottom: var(--space-6);
+        }
+    }
+
+    @media (max-width: 360px) {
+        .study-stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .study-chart-bars {
+            grid-template-columns: 1fr;
+        }
+
+        .study-btn-plus,
+        .study-btn-minus,
+        .study-btn-delete {
+            width: 28px;
+            height: 28px;
+            font-size: var(--font-size-sm);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="study-container">
+    <div class="study-header">
+        <h1>📚 Study Tracker</h1>
+        <p>Suivez votre progression et gérez vos révisions efficacement</p>
+    </div>
+
+    <div class="study-stats-grid">
+        <div class="study-stat-card">
+            <div class="study-stat-label">Progression Globale</div>
+            <div class="study-stat-value" id="global-progress">0%</div>
+        </div>
+        <div class="study-stat-card">
+            <div class="study-stat-label">Moyenne Pondérée</div>
+            <div class="study-stat-value" id="weighted-average">0.0</div>
+        </div>
+        <div class="study-stat-card">
+            <div class="study-stat-label">Matières Actives</div>
+            <div class="study-stat-value" id="active-subjects">0</div>
+        </div>
+        <div class="study-stat-card">
+            <div class="study-stat-label">Chapitres</div>
+            <div class="study-stat-value" id="total-chapters">0</div>
+        </div>
+    </div>
+
+    <div class="study-main-grid">
+        <div>
+            <div class="study-card">
+                <div class="study-card-title">➕ Ajouter une Matière</div>
+                <form id="subject-form">
+                    <div class="study-form-group">
+                        <label>Nom de la Matière</label>
+                        <input type="text" class="study-form-input" id="subject-name" placeholder="Ex: Mathématiques" required>
+                    </div>
+                    <button type="submit" class="study-btn study-btn-primary">Ajouter</button>
+                </form>
+            </div>
+
+            <div class="study-card" style="margin-top: 20px;">
+                <div class="study-card-title">📖 Ajouter un Chapitre</div>
+                <form id="chapter-form">
+                    <div class="study-form-group">
+                        <label>Matière</label>
+                        <select class="study-form-select" id="chapter-subject" required>
+                            <option value="">-- Sélectionner --</option>
+                        </select>
+                    </div>
+                    <div class="study-form-group">
+                        <label>Titre du Chapitre</label>
+                        <input type="text" class="study-form-input" id="chapter-title" placeholder="Ex: Équations" required>
+                    </div>
+                    <div class="study-form-group">
+                        <label>Coefficient (×)</label>
+                        <input type="number" class="study-form-input" id="chapter-coefficient" value="1" min="1" max="10" step="0.1" required>
+                    </div>
+                    <button type="submit" class="study-btn study-btn-primary">Ajouter</button>
+                </form>
+            </div>
+
+            <div class="study-card" style="margin-top: 20px;">
+                <div class="study-card-title">📌 Ajouter une Section</div>
+                <form id="section-form">
+                    <div class="study-form-group">
+                        <label>Matière</label>
+                        <select class="study-form-select" id="section-subject" required>
+                            <option value="">-- Sélectionner --</option>
+                        </select>
+                    </div>
+                    <div class="study-form-group">
+                        <label>Chapitre</label>
+                        <select class="study-form-select" id="section-chapter" required>
+                            <option value="">-- Sélectionner --</option>
+                        </select>
+                    </div>
+                    <div class="study-form-group">
+                        <label>Titre de la Section</label>
+                        <input type="text" class="study-form-input" id="section-title" placeholder="Ex: Introduction" required>
+                    </div>
+                    <button type="submit" class="study-btn study-btn-primary">Ajouter</button>
+                </form>
+            </div>
+        </div>
+
+        <div>
+            <div class="study-chart-container">
+                <div class="study-chart-title">📊 Progression par Matière</div>
+                <div class="study-chart-bars" id="chart-bars">
+                    <div class="study-empty-state" style="grid-column: 1/-1; padding: 40px;">
+                        <div class="study-empty-icon">📊</div>
+                        <p>Aucune matière pour le moment</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="study-average-card">
+                <div class="study-average-label">📈 Moyenne de Progression</div>
+                <div class="study-average-value" id="average-display">0%</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="study-card">
+        <div class="study-tab-container">
+            <button class="study-tab active" onclick="switchTab('subjects')">📚 Mes Matières</button>
+            <button class="study-tab" onclick="switchTab('stats')">📊 Statistiques</button>
+        </div>
+
+        <div id="subjects" class="study-tab-content active">
+            <div id="subjects-container" class="study-subjects-list"></div>
+            <div id="empty-subjects" class="study-empty-state">
+                <div class="study-empty-icon">📚</div>
+                <p>Aucune matière créée</p>
+            </div>
+        </div>
+
+        <div id="stats" class="study-tab-content">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                <div id="stats-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let appState = {
+        subjects: [],
+        chapters: [],
+        sections: []
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadData();
+        updateAllSelects();
+        setupListeners();
+        updateAll();
+    });
+
+    function setupListeners() {
+        document.getElementById('subject-form').addEventListener('submit', addSubject);
+        document.getElementById('chapter-form').addEventListener('submit', addChapter);
+        document.getElementById('section-form').addEventListener('submit', addSection);
+        document.getElementById('section-subject').addEventListener('change', updateChaptersSelect);
+    }
+
+    function addSubject(e) {
+        e.preventDefault();
+        const name = document.getElementById('subject-name').value.trim();
+        if (name) {
+            appState.subjects.push({
+                id: Date.now(),
+                name: name
+            });
+            document.getElementById('subject-form').reset();
+            updateAllSelects();
+            updateAll();
+            saveData();
+        }
+    }
+
+    function addChapter(e) {
+        e.preventDefault();
+        const subjectId = parseInt(document.getElementById('chapter-subject').value);
+        const title = document.getElementById('chapter-title').value.trim();
+        const coefficient = parseFloat(document.getElementById('chapter-coefficient').value);
+
+        if (subjectId && title) {
+            appState.chapters.push({
+                id: Date.now(),
+                subjectId: subjectId,
+                title: title,
+                coefficient: coefficient
+            });
+            document.getElementById('chapter-form').reset();
+            document.getElementById('chapter-coefficient').value = 1;
+            updateAllSelects();
+            updateAll();
+            saveData();
+        }
+    }
+
+    function addSection(e) {
+        e.preventDefault();
+        const subjectId = parseInt(document.getElementById('section-subject').value);
+        const chapterId = parseInt(document.getElementById('section-chapter').value);
+        const title = document.getElementById('section-title').value.trim();
+
+        if (subjectId && chapterId && title) {
+            appState.sections.push({
+                id: Date.now(),
+                subjectId: subjectId,
+                chapterId: chapterId,
+                title: title,
+                progress: 0
+            });
+            document.getElementById('section-form').reset();
+            updateAll();
+            saveData();
+        }
+    }
+
+    function updateProgress(sectionId, delta) {
+        const section = appState.sections.find(s => s.id === sectionId);
+        if (section) {
+            section.progress = Math.max(0, Math.min(100, section.progress + delta));
+            updateAll();
+            saveData();
+        }
+    }
+
+    function deleteSection(sectionId) {
+        if (confirm('Supprimer cette section?')) {
+            appState.sections = appState.sections.filter(s => s.id !== sectionId);
+            updateAll();
+            saveData();
+        }
+    }
+
+    function deleteChapter(chapterId) {
+        if (confirm('Supprimer ce chapitre?')) {
+            appState.chapters = appState.chapters.filter(ch => ch.id !== chapterId);
+            appState.sections = appState.sections.filter(s => s.chapterId !== chapterId);
+            updateAll();
+            saveData();
+        }
+    }
+
+    function deleteSubject(subjectId) {
+        if (confirm('Supprimer cette matière?')) {
+            appState.subjects = appState.subjects.filter(s => s.id !== subjectId);
+            appState.chapters = appState.chapters.filter(ch => ch.subjectId !== subjectId);
+            appState.sections = appState.sections.filter(s => s.subjectId !== subjectId);
+            updateAllSelects();
+            updateAll();
+            saveData();
+        }
+    }
+
+    function updateAllSelects() {
+        const selects = ['chapter-subject', 'section-subject'];
+        selects.forEach(id => {
+            const select = document.getElementById(id);
+            const current = select.value;
+            select.innerHTML = '<option value="">-- Sélectionner --</option>';
+            appState.subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject.id;
+                option.textContent = subject.name;
+                select.appendChild(option);
+            });
+            select.value = current;
+        });
+    }
+
+    function updateChaptersSelect() {
+        const subjectId = parseInt(document.getElementById('section-subject').value);
+        const select = document.getElementById('section-chapter');
+        select.innerHTML = '<option value="">-- Sélectionner --</option>';
+        appState.chapters.filter(ch => ch.subjectId === subjectId).forEach(chapter => {
+            const option = document.createElement('option');
+            option.value = chapter.id;
+            option.textContent = chapter.title;
+            select.appendChild(option);
+        });
+    }
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.study-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.study-tab-content').forEach(tc => tc.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById(tabName).classList.add('active');
+    }
+
+    function updateAll() {
+        const totalSections = appState.sections.length;
+        const avgProgress = totalSections > 0
+            ? Math.round(appState.sections.reduce((sum, s) => sum + s.progress, 0) / totalSections)
+            : 0;
+
+        document.getElementById('global-progress').textContent = avgProgress + '%';
+        document.getElementById('active-subjects').textContent = appState.subjects.length;
+        document.getElementById('total-chapters').textContent = appState.chapters.length;
+
+        updateWeightedAverage();
+        updateChart();
+        updateSubjectsList();
+        updateStats();
+    }
+
+    function updateWeightedAverage() {
+        if (appState.chapters.length === 0) {
+            document.getElementById('weighted-average').textContent = '0.0';
+            return;
+        }
+
+        let totalWeightedProgress = 0;
+        let totalCoefficient = 0;
+
+        appState.chapters.forEach(chapter => {
+            const chapterSections = appState.sections.filter(s => s.chapterId === chapter.id);
+            if (chapterSections.length > 0) {
+                const chapterProgress = chapterSections.reduce((sum, s) => sum + s.progress, 0) / chapterSections.length;
+                totalWeightedProgress += chapterProgress * chapter.coefficient;
+                totalCoefficient += chapter.coefficient;
+            }
+        });
+
+        const average = totalCoefficient > 0 ? (totalWeightedProgress / totalCoefficient).toFixed(1) : 0;
+        document.getElementById('weighted-average').textContent = average;
+        document.getElementById('average-display').textContent = Math.round(average) + '%';
+    }
+
+    function updateChart() {
+        const chartBars = document.getElementById('chart-bars');
+
+        if (appState.subjects.length === 0) {
+            chartBars.innerHTML = `
+                <div class="study-empty-state" style="grid-column: 1/-1;">
+                    <div class="study-empty-icon">📊</div>
+                    <p>Aucune matière pour le moment</p>
+                </div>
+            `;
+            return;
+        }
+
+        chartBars.innerHTML = appState.subjects.map(subject => {
+            const sections = appState.sections.filter(s => s.subjectId === subject.id);
+            const progress = sections.length > 0
+                ? Math.round(sections.reduce((sum, s) => sum + s.progress, 0) / sections.length)
+                : 0;
+
+            return `
+                <div class="study-chart-bar">
+                    <div class="study-bar-container">
+                        <div class="study-bar" style="height: ${progress}%"></div>
+                    </div>
+                    <div class="study-bar-label">${subject.name}</div>
+                    <div class="study-bar-percent">${progress}%</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function updateSubjectsList() {
+        const container = document.getElementById('subjects-container');
+        const emptyState = document.getElementById('empty-subjects');
+
+        if (appState.subjects.length === 0) {
+            container.innerHTML = '';
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        emptyState.style.display = 'none';
+        container.innerHTML = appState.subjects.map(subject => {
+            const chapters = appState.chapters.filter(ch => ch.subjectId === subject.id);
+            const sections = appState.sections.filter(s => s.subjectId === subject.id);
+            const avgProgress = sections.length > 0
+                ? Math.round(sections.reduce((sum, s) => sum + s.progress, 0) / sections.length)
+                : 0;
+
+            const chaptersHtml = chapters.map(chapter => {
+                const chapterSections = sections.filter(s => s.chapterId === chapter.id);
+                const sectionsHtml = chapterSections.map(section => `
+                    <div class="study-section-row">
+                        <span class="study-section-name">${section.title}</span>
+                        <span class="study-section-percent">${section.progress}%</span>
+                        <div class="study-btn-group" style="margin-left: auto;">
+                            <button class="study-btn study-btn-plus" onclick="updateProgress(${section.id}, 2)">+</button>
+                            <button class="study-btn study-btn-minus" onclick="updateProgress(${section.id}, -2)">−</button>
+                            <button class="study-btn study-btn-delete" onclick="deleteSection(${section.id})">✕</button>
+                        </div>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="study-chapter-item">
+                        <div class="study-chapter-header">
+                            <span class="study-chapter-title">${chapter.title}</span>
+                            <span class="study-chapter-coeff">Coeff: ×${chapter.coefficient}</span>
+                            <button class="study-btn study-btn-delete study-btn-small" onclick="deleteChapter(${chapter.id})" style="margin-left: 8px;">✕</button>
+                        </div>
+                        <div class="study-sections-list">
+                            ${sectionsHtml || '<p style="font-size: 12px; color: var(--text-secondary);">Aucune section</p>'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="study-subject-box">
+                    <div class="study-subject-header">
+                        <span class="study-subject-name">${subject.name}</span>
+                        <button class="study-btn study-btn-delete study-btn-small" onclick="deleteSubject(${subject.id})">Supprimer</button>
+                    </div>
+                    <div class="study-progress-bar">
+                        <div class="study-progress-fill" style="width: ${avgProgress}%"></div>
+                    </div>
+                    <div class="study-progress-text">${avgProgress}% • ${sections.length} sections</div>
+                    <div class="study-chapters-list" style="margin-top: 15px;">
+                        ${chaptersHtml}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function updateStats() {
+        const container = document.getElementById('stats-container');
+
+        container.innerHTML = appState.subjects.map(subject => {
+            const chapters = appState.chapters.filter(ch => ch.subjectId === subject.id);
+            const sections = appState.sections.filter(s => s.subjectId === subject.id);
+            const avgProgress = sections.length > 0
+                ? Math.round(sections.reduce((sum, s) => sum + s.progress, 0) / sections.length)
+                : 0;
+
+            const totalCoeff = chapters.reduce((sum, ch) => sum + ch.coefficient, 0);
+            let weightedProgress = 0;
+            chapters.forEach(ch => {
+                const chSections = sections.filter(s => s.chapterId === ch.id);
+                if (chSections.length > 0) {
+                    const chProgress = chSections.reduce((sum, s) => sum + s.progress, 0) / chSections.length;
+                    weightedProgress += chProgress * ch.coefficient;
+                }
+            });
+            const weighted = totalCoeff > 0 ? Math.round(weightedProgress / totalCoeff) : 0;
+
+            return `
+                <div style="background: var(--bg-primary); padding: 16px; border-radius: 8px; border: 1px solid var(--color-border);">
+                    <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 10px; font-size: 14px;">${subject.name}</div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">Progression: <strong style="color: var(--color-primary);">${avgProgress}%</strong></div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">Pondérée: <strong style="color: var(--color-primary);">${weighted}%</strong></div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">Chapitres: <strong style="color: var(--color-primary);">${chapters.length}</strong></div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function loadData() {
+        const stored = localStorage.getItem('studyTrackerState');
+        if (stored) {
+            appState = JSON.parse(stored);
+        }
+    }
+
+    function saveData() {
+        localStorage.setItem('studyTrackerState', JSON.stringify(appState));
+    }
+</script>
+{% endblock %}

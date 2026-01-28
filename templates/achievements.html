@@ -1,0 +1,1520 @@
+{% extends 'base.html' %}
+
+{% block title %}Achievements - Infinity Ascension{% endblock %}
+
+{% block content %}
+<div class="achievements-container">
+    <!-- Canvas pour la visualisation 3D -->
+    <div class="universe-background" id="universe-canvas"></div>
+
+    <!-- Header Épique -->
+    <div class="achievements-header">
+        <div class="header-content">
+            <h1 class="header-title">🌌 INFINITY ASCENSION</h1>
+            <p class="header-subtitle">Traverse 1000 niveaux à travers 10 galaxies cosmiques</p>
+        </div>
+        <div class="header-stats">
+            <div class="stat-mini">
+                <span class="stat-label">Niveau Actuel</span>
+                <span class="stat-value" id="current-level">1</span>
+            </div>
+            <div class="stat-mini">
+                <span class="stat-label">XP Total</span>
+                <span class="stat-value" id="total-xp">0</span>
+            </div>
+            <div class="stat-mini">
+                <span class="stat-label">Progression</span>
+                <span class="stat-value" id="progress-percent">0%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barre de Progression Globale -->
+    <div class="global-progress">
+        <div class="progress-info">
+            <span class="progress-label">🚀 Voyage Cosmique</span>
+            <span class="progress-details">
+                <span id="progress-level">1</span> / 1000
+            </span>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            <div class="progress-markers">
+                <div class="marker" style="left: 0%">1</div>
+                <div class="marker" style="left: 10%">100</div>
+                <div class="marker" style="left: 25%">250</div>
+                <div class="marker" style="left: 50%">500</div>
+                <div class="marker" style="left: 75%">750</div>
+                <div class="marker" style="left: 100%">1000</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contrôles de Vue -->
+    <div class="view-controls">
+        <button class="view-btn active" data-view="galaxies" title="Vue Galaxies">
+            <i class="fas fa-th"></i> Galaxies
+        </button>
+        <button class="view-btn" data-view="timeline" title="Vue Timeline">
+            <i class="fas fa-stream"></i> Timeline
+        </button>
+        <button class="view-btn" data-view="list" title="Vue Liste">
+            <i class="fas fa-list"></i> Tous les Niveaux
+        </button>
+        <button class="view-btn" data-view="stats" title="Statistiques">
+            <i class="fas fa-chart-line"></i> Stats
+        </button>
+    </div>
+
+    <!-- Vue GALAXIES (Par défaut) -->
+    <div class="view-content active" id="galaxies-view">
+        <div class="galaxies-grid" id="galaxies-grid">
+            <!-- Généré par JavaScript -->
+        </div>
+    </div>
+
+    <!-- Vue TIMELINE -->
+    <div class="view-content" id="timeline-view">
+        <div class="timeline-container">
+            <div class="timeline-scroll" id="timeline-scroll">
+                <!-- Généré par JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Vue LISTE -->
+    <div class="view-content" id="list-view">
+        <div class="levels-list" id="levels-list">
+            <!-- Généré par JavaScript -->
+        </div>
+    </div>
+
+    <!-- Vue STATS -->
+    <div class="view-content" id="stats-view">
+        <div class="stats-dashboard" id="stats-dashboard">
+            <!-- Généré par JavaScript -->
+        </div>
+    </div>
+
+    <!-- Modal: Détails Niveau -->
+    <div class="modal" id="level-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-header">
+                <div class="level-badge" id="modal-level-badge"></div>
+                <div class="level-info-modal">
+                    <h2 id="modal-level-title"></h2>
+                    <p id="modal-level-galaxy"></p>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3>🎯 Objectif</h3>
+                    <p id="modal-level-description"></p>
+                </div>
+                <div class="modal-section">
+                    <h3>⚡ Récompenses</h3>
+                    <div id="modal-level-rewards"></div>
+                </div>
+                <div class="modal-section">
+                    <h3>📊 Progression</h3>
+                    <div id="modal-level-xp-info"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    :root {
+        --galaxy-1: #3498db;
+        --galaxy-2: #e74c3c;
+        --galaxy-3: #2ecc71;
+        --galaxy-4: #f39c12;
+        --galaxy-5: #9b59b6;
+        --galaxy-6: #1abc9c;
+        --galaxy-7: #e67e22;
+        --galaxy-8: #34495e;
+        --galaxy-9: #d35400;
+        --galaxy-10: #c0392b;
+    }
+
+    .achievements-container {
+        max-width: 100%;
+        width: 100%;
+        padding: var(--space-24);
+        background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(26, 188, 156, 0.05) 100%);
+        min-height: 100vh;
+        position: relative;
+    }
+
+    .universe-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: radial-gradient(ellipse at 20% 50%, rgba(52, 152, 219, 0.15) 0%, transparent 50%),
+                    radial-gradient(ellipse at 80% 80%, rgba(155, 89, 182, 0.15) 0%, transparent 50%),
+                    radial-gradient(ellipse at 40% 20%, rgba(46, 204, 113, 0.1) 0%, transparent 50%);
+        overflow: hidden;
+    }
+
+    .star {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: white;
+        border-radius: 50%;
+        opacity: 0.6;
+        animation: twinkle 3s infinite;
+    }
+
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 1; }
+    }
+
+    .achievements-header {
+        background: rgba(33, 128, 141, 1);
+        padding: var(--space-32);
+        border-radius: var(--radius-lg);
+        margin-bottom: var(--space-32);
+        box-shadow: 0 20px 60px rgba(26, 188, 156, 0.3);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--space-24);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .achievements-header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .header-content {
+        flex: 1;
+        position: relative;
+        z-index: 2;
+    }
+
+    .header-title {
+        font-size: 3rem;
+        color: white;
+        margin: 0;
+        font-weight: bold;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .header-subtitle {
+        font-size: 1.125rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin: var(--space-8) 0 0 0;
+    }
+
+    .header-stats {
+        display: flex;
+        gap: var(--space-16);
+        position: relative;
+        z-index: 2;
+    }
+
+    .stat-mini {
+        background: rgba(255, 255, 255, 0.15);
+        padding: var(--space-16) var(--space-24);
+        border-radius: var(--radius-lg);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        text-align: center;
+    }
+
+    .stat-mini .stat-label {
+        display: block;
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: var(--space-4);
+    }
+
+    .stat-mini .stat-value {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: white;
+    }
+
+    .global-progress {
+        background: var(--bg-primary);
+        padding: var(--space-24);
+        border-radius: var(--radius-lg);
+        margin-bottom: var(--space-32);
+        border: 1px solid var(--color-border);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .progress-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-16);
+    }
+
+    .progress-label {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .progress-details {
+        font-size: 1.125rem;
+        font-weight: bold;
+        color: var(--color-primary);
+    }
+
+    .progress-bar-container {
+        position: relative;
+        height: 12px;
+        background: var(--color-secondary);
+        border-radius: 9999px;
+        overflow: hidden;
+        border: 1px solid var(--color-border);
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--color-primary) 0%, #1abc9c 100%);
+        border-radius: 9999px;
+        width: 0%;
+        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 0 20px rgba(26, 188, 156, 0.6);
+    }
+
+    .progress-markers {
+        position: absolute;
+        top: -30px;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        pointer-events: none;
+    }
+
+    .marker {
+        position: absolute;
+        transform: translateX(-50%);
+        font-size: 0.75rem;
+        font-weight: bold;
+        color: var(--text-secondary);
+        opacity: 0.5;
+    }
+
+    .view-controls {
+        display: flex;
+        gap: var(--space-12);
+        margin-bottom: var(--space-24);
+        flex-wrap: wrap;
+    }
+
+    .view-btn {
+        padding: var(--space-10) var(--space-20);
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: bold;
+        color: var(--text-secondary);
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: var(--space-8);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .view-btn:hover {
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+        box-shadow: 0 4px 12px rgba(26, 188, 156, 0.2);
+    }
+
+    .view-btn.active {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+        color: white;
+        box-shadow: 0 8px 24px rgba(26, 188, 156, 0.3);
+    }
+
+    .view-content {
+        display: none;
+        animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .view-content.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .galaxies-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: var(--space-24);
+    }
+
+    .galaxy-card {
+        background: var(--bg-primary);
+        border: 2px solid var(--galaxy-color);
+        border-radius: var(--radius-lg);
+        padding: var(--space-24);
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .galaxy-card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+    }
+
+    .galaxy-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 16px 40px rgba(26, 188, 156, 0.2);
+    }
+
+    .galaxy-card:hover::before {
+        opacity: 1;
+    }
+
+    .galaxy-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-16);
+        margin-bottom: var(--space-16);
+        padding-bottom: var(--space-16);
+        border-bottom: 2px solid var(--galaxy-color);
+    }
+
+    .galaxy-icon {
+        font-size: 2.5rem;
+    }
+
+    .galaxy-title h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        color: var(--text-primary);
+    }
+
+    .galaxy-range {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .galaxy-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-12);
+        margin-bottom: var(--space-16);
+    }
+
+    .galaxy-stat {
+        background: var(--color-secondary);
+        padding: var(--space-12);
+        border-radius: var(--radius-md);
+        border-left: 3px solid var(--galaxy-color);
+    }
+
+    .galaxy-stat-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .galaxy-stat-value {
+        font-size: 1.125rem;
+        font-weight: bold;
+        color: var(--text-primary);
+    }
+
+    .galaxy-progress-mini {
+        height: 6px;
+        background: var(--color-border);
+        border-radius: 9999px;
+        overflow: hidden;
+    }
+
+    .galaxy-progress-fill {
+        height: 100%;
+        background: var(--galaxy-color);
+        width: 0%;
+        transition: width 0.3s;
+    }
+
+    .galaxy-levels {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: var(--space-8);
+        margin-top: var(--space-16);
+    }
+
+    .galaxy-level-item {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--color-secondary);
+        border-radius: var(--radius-md);
+        font-size: 0.75rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid var(--color-border);
+    }
+
+    .galaxy-level-item:hover {
+        background: var(--galaxy-color);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .galaxy-level-item.unlocked {
+        background: var(--galaxy-color);
+        color: white;
+        box-shadow: 0 0 12px rgba(26, 188, 156, 0.3);
+    }
+
+    .galaxy-level-item.current {
+        background: linear-gradient(135deg, var(--galaxy-color) 0%, #1abc9c 100%);
+        color: white;
+        box-shadow: 0 0 20px rgba(26, 188, 156, 0.6);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            box-shadow: 0 0 20px rgba(26, 188, 156, 0.6);
+        }
+        50% {
+            box-shadow: 0 0 40px rgba(26, 188, 156, 1);
+        }
+    }
+
+    .timeline-container {
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        padding: var(--space-24);
+        border: 1px solid var(--color-border);
+        overflow-x: auto;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .timeline-scroll {
+        display: flex;
+        gap: var(--space-16);
+        min-width: min-content;
+        padding: var(--space-16);
+    }
+
+    .timeline-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-12);
+        min-width: 100px;
+    }
+
+    .timeline-badge {
+        width: 80px;
+        height: 80px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 2px solid var(--galaxy-color);
+        background: var(--color-surface);
+        font-size: 1.125rem;
+    }
+
+    .timeline-badge:hover {
+        transform: scale(1.15);
+        box-shadow: 0 0 20px rgba(26, 188, 156, 0.4);
+    }
+
+    .timeline-badge.unlocked {
+        background: var(--galaxy-color);
+        color: white;
+    }
+
+    .timeline-level {
+        font-size: 0.875rem;
+        font-weight: bold;
+        color: var(--text-secondary);
+    }
+
+    .levels-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: var(--space-16);
+    }
+
+    .level-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: var(--space-16);
+        cursor: pointer;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .level-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        border-color: var(--galaxy-color);
+    }
+
+    .level-number {
+        font-size: 1.875rem;
+        font-weight: bold;
+        color: var(--galaxy-color);
+        margin-bottom: var(--space-8);
+    }
+
+    .level-title {
+        font-size: 0.875rem;
+        color: var(--text-primary);
+        margin-bottom: var(--space-8);
+        font-weight: 600;
+    }
+
+    .level-xp {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+
+    .stats-dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--space-24);
+    }
+
+    .stats-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-24);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .stats-card h3 {
+        margin: 0 0 var(--space-16) 0;
+        color: var(--text-primary);
+        font-size: 1.125rem;
+    }
+
+    .stats-value {
+        font-size: 2.25rem;
+        font-weight: bold;
+        color: var(--color-primary);
+        margin-bottom: var(--space-8);
+    }
+
+    .stats-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 3000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal.active {
+        display: flex;
+        animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .modal-content {
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-close {
+        position: absolute;
+        top: var(--space-16);
+        right: var(--space-16);
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: color 0.2s;
+        z-index: 10;
+    }
+
+    .modal-close:hover {
+        color: #e74c3c;
+    }
+
+    .modal-header {
+        display: flex;
+        gap: var(--space-16);
+        padding: var(--space-24);
+        border-bottom: 1px solid var(--color-border);
+        align-items: flex-start;
+    }
+
+    .level-badge {
+        width: 100px;
+        height: 100px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: bold;
+        background: var(--color-secondary);
+        flex-shrink: 0;
+    }
+
+    .level-info-modal h2 {
+        margin: 0 0 var(--space-8) 0;
+        color: var(--text-primary);
+    }
+
+    .level-info-modal p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    .modal-body {
+        padding: var(--space-24);
+    }
+
+    .modal-section {
+        margin-bottom: var(--space-24);
+    }
+
+    .modal-section h3 {
+        margin: 0 0 var(--space-12) 0;
+        color: var(--text-primary);
+        font-size: 1rem;
+    }
+
+    .modal-section p {
+        margin: 0;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+        .achievements-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .header-title {
+            font-size: 1.875rem;
+        }
+
+        .galaxies-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+<script>
+
+
+    // ==================== CONSTANTS ====================
+    const TOTAL_LEVELS = 1000;
+    const LEVELS_PER_GALAXY = 100;
+    const TOTAL_GALAXIES = 10;
+    let LAST_KNOWN_LEVEL = 1;
+    let POPUP_SHOWN = false;
+    let USER_NAME = 'Voyageur'; // ✅ PAR DÉFAUT
+
+    const GALAXIES = [
+        { name: 'ANDROMEDA', icon: '🌍', color: 'var(--galaxy-1)', description: 'La galaxie du commencement' },
+        { name: 'TRIANGULUM', icon: '⭐', color: 'var(--galaxy-2)', description: 'La galaxie de la maîtrise' },
+        { name: 'CENTAURUS', icon: '💫', color: 'var(--galaxy-3)', description: 'La galaxie de l\'énergie' },
+        { name: 'VIRGO', icon: '🌟', color: 'var(--galaxy-4)', description: 'La galaxie de la perfection' },
+        { name: 'FORNAX', icon: '✨', color: 'var(--galaxy-5)', description: 'La galaxie de l\'éveille' },
+        { name: 'COMA', icon: '🌌', color: 'var(--galaxy-6)', description: 'La galaxie de l\'harmonie' },
+        { name: 'PERSEUS', icon: '⚡', color: 'var(--galaxy-7)', description: 'La galaxie de la puissance' },
+        { name: 'HERCULES', icon: '💪', color: 'var(--galaxy-8)', description: 'La galaxie de la force' },
+        { name: 'BOÖTES', icon: '🔥', color: 'var(--galaxy-9)', description: 'La galaxie de l\'intensité' },
+        { name: 'HYDRA', icon: '👑', color: 'var(--galaxy-10)', description: 'La galaxie suprême' }
+    ];
+
+    // ==================== HELPER FUNCTIONS ====================
+
+    /**
+     * ✅ CALCULE LE XP REQUIS POUR UN NIVEAU SPÉCIFIQUE
+     * Formule: niveau * (niveau + 1) * 50
+     */
+    function getXpForLevel(level) {
+        return level * (level + 1) * 50;
+    }
+
+    /**
+     * ✅ CALCULE LE XP TOTAL CUMULÉ JUSQU'À UN NIVEAU
+     * Somme tous les XP des niveaux précédents
+     */
+    function getTotalXpForLevel(level) {
+        let total = 0;
+        for (let i = 1; i <= level; i++) {
+            total += getXpForLevel(i);
+        }
+        return total;
+    }
+
+    /**
+     * ✅ CALCULE LE NIVEAU À PARTIR DU XP TOTAL
+     * Inverse de getTotalXpForLevel()
+     */
+    function calculateLevelFromXp(totalXp) {
+        let level = 1;
+        while (level < TOTAL_LEVELS) {
+            if (getTotalXpForLevel(level + 1) > totalXp) {
+                break;
+            }
+            level++;
+        }
+        return Math.min(level, TOTAL_LEVELS);
+    }
+
+    /**
+     * ✅ CRÉE LES CONFETTI
+     */
+    function createConfetti() {
+        const canvas = document.createElement('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        canvas.style.position = 'fixed';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        canvas.style.pointerEvents = 'none';
+        canvas.style.zIndex = '9999';
+        document.body.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const particles = [];
+
+        // Crée 150 confetti
+        for (let i = 0; i < 150; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                size: Math.random() * 8 + 4,
+                speedX: (Math.random() - 0.5) * 8,
+                speedY: Math.random() * 5 + 3,
+                rotation: Math.random() * 360,
+                rotationSpeed: (Math.random() - 0.5) * 10,
+                opacity: 1,
+                color: ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181'][Math.floor(Math.random() * 5)]
+            });
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach((p, index) => {
+                p.x += p.speedX;
+                p.y += p.speedY;
+                p.rotation += p.rotationSpeed;
+                p.opacity -= 0.01;
+
+                ctx.save();
+                ctx.globalAlpha = p.opacity;
+                ctx.fillStyle = p.color;
+                ctx.translate(p.x, p.y);
+                ctx.rotate((p.rotation * Math.PI) / 180);
+                ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                ctx.restore();
+
+                if (p.opacity <= 0) {
+                    particles.splice(index, 1);
+                }
+            });
+
+            if (particles.length > 0) {
+                requestAnimationFrame(animate);
+            } else {
+                canvas.remove();
+            }
+        }
+
+        animate();
+    }
+
+    /**
+     * ✅ AFFICHE UN POP-UP DE FÉLICITATIONS AVEC LE NOM DE L'UTILISATEUR
+     */
+    function showCongratulationsModal(level, galaxy) {
+        // ✅ EMPÊCHE DOUBLE AFFICHAGE
+        if (POPUP_SHOWN) return;
+        POPUP_SHOWN = true;
+
+        const modal = document.createElement('div');
+        modal.className = 'congratulations-modal';
+        modal.innerHTML = `
+            <div class="congratulations-content">
+                <div class="congratulations-icon">${galaxy.icon}</div>
+                <h1 class="congratulations-title">🎉 Bravo ${USER_NAME}! 🎉</h1>
+                <p class="congratulations-text">
+                    Tu as atteint le
+                </p>
+                <div class="congratulations-level">
+                    <span class="level-badge" style="background: var(--color-primary);">${level}</span>
+                    <span class="galaxy-name">${galaxy.name}</span>
+                </div>
+                <p class="congratulations-subtitle">
+                    ${galaxy.description}
+                </p>
+                <button class="congratulations-btn" onclick="this.closest('.congratulations-modal').remove(); POPUP_SHOWN = false;">
+                    ✨ Continuer l'aventure
+                </button>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Trigger animation
+        setTimeout(() => modal.classList.add('active'), 10);
+
+        // Crée les confetti
+        createConfetti();
+
+        // Joue un son de victoire
+        playVictorySound();
+
+        // Ferme après 5 secondes
+        setTimeout(() => {
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.remove();
+                POPUP_SHOWN = false;
+            }, 500);
+        }, 5000);
+    }
+
+    /**
+     * ✅ SON DE VICTOIRE SIMPLE
+     */
+    function playVictorySound() {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        } catch (e) {
+            // Ignore si Web Audio API n'est pas disponible
+        }
+    }
+
+    /**
+     * ✅ VÉRIFIE SI UN NOUVEAU NIVEAU A ÉTÉ DÉVERROUILLÉ
+     */
+    function checkLevelUnlock(currentLevel) {
+        // ✅ Si le niveau a changé ET est plus élevé que le dernier
+        if (currentLevel > LAST_KNOWN_LEVEL) {
+            const galaxyIndex = Math.floor((currentLevel - 1) / LEVELS_PER_GALAXY);
+            const galaxy = GALAXIES[galaxyIndex];
+
+            console.log(`🎉 Nouveau niveau déverrouillé: ${currentLevel} (Galaxie: ${galaxy.name})`);
+            showCongratulationsModal(currentLevel, galaxy);
+
+            // ✅ UPDATE LE DERNIER NIVEAU VU
+            LAST_KNOWN_LEVEL = currentLevel;
+        }
+    }
+
+    // ==================== LOAD CHALLENGE DATA ====================
+    async function loadChallengeData() {
+        try {
+            console.log('📊 Chargement des données de session...');
+            const response = await fetch('/api/get-user-data/');
+
+            if (!response.ok) {
+                throw new Error(`Erreur API: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            console.log('✅ Données de session chargées:', data);
+
+            // ✅ CHARGE LE NOM DE L'UTILISATEUR
+            if (data.user && data.user.username) {
+                USER_NAME = data.user.username.charAt(0).toUpperCase() + data.user.username.slice(1);
+            }
+
+            return {
+                totalXP: data.totalXP || 0,
+                level: data.level || 1,
+                traitsHP: data.traitsHP || {},
+                evaluations: data.evaluations || [],
+                detections: data.detections || {},
+                validatedDates: data.validatedDates || [],
+                calendar: data.calendar || {}
+            };
+        } catch (error) {
+            console.error('❌ Erreur chargement données session:', error);
+            return {
+                totalXP: 0,
+                level: 1,
+                traitsHP: {},
+                evaluations: [],
+                detections: {},
+                validatedDates: [],
+                calendar: {}
+            };
+        }
+    }
+
+    // ==================== GET PROFILE DATA ====================
+    async function getProfileData() {
+        try {
+            // Charger les données de session d'abord
+            const sessionData = await loadChallengeData();
+
+            // ✅ FORCE LE CALCUL DU NIVEAU AVEC LA FORMULE
+            const calculatedLevel = calculateLevelFromXp(sessionData.totalXP);
+
+            return {
+                level: calculatedLevel,
+                total_xp: sessionData.totalXP
+            };
+        } catch (error) {
+            console.error('Erreur chargement profil:', error);
+        }
+        return { level: 1, total_xp: 0 };
+    }
+
+    // ==================== UPDATE PROGRESS ====================
+    async function updateProgress() {
+        const data = await getProfileData();
+        const currentLevel = Math.min(data.level, TOTAL_LEVELS);
+        const totalXp = data.total_xp;
+        const progressPercent = (currentLevel / TOTAL_LEVELS) * 100;
+
+        document.getElementById('current-level').textContent = currentLevel;
+        document.getElementById('total-xp').textContent = totalXp.toLocaleString();
+        document.getElementById('progress-percent').textContent = progressPercent.toFixed(1) + '%';
+        document.getElementById('progress-level').textContent = currentLevel;
+        document.getElementById('progress-bar-fill').style.width = progressPercent + '%';
+
+        // ✅ VÉRIFIE SI UN NOUVEAU NIVEAU A ÉTÉ DÉVERROUILLÉ
+        checkLevelUnlock(currentLevel);
+
+        return data;
+    }
+
+    // ==================== RENDER GALAXIES ====================
+    async function renderGalaxies() {
+        const container = document.getElementById('galaxies-grid');
+        const data = await getProfileData();
+        const currentLevel = data.level || 1;
+
+        container.innerHTML = GALAXIES.map((galaxy, galaxyIndex) => {
+            const galaxyStart = galaxyIndex * LEVELS_PER_GALAXY + 1;
+            const galaxyEnd = (galaxyIndex + 1) * LEVELS_PER_GALAXY;
+            const unlockedCount = Math.min(Math.max(currentLevel - galaxyStart + 1, 0), LEVELS_PER_GALAXY);
+            const progressPercent = (unlockedCount / LEVELS_PER_GALAXY) * 100;
+            const isUnlocked = currentLevel >= galaxyStart;
+
+            let levelItems = '';
+            for (let i = 1; i <= 10; i++) {
+                const levelNum = galaxyStart + (i - 1) * 10;
+                const isLevelUnlocked = levelNum <= currentLevel;
+                const isCurrent = levelNum === currentLevel;
+                levelItems += `
+                    <div class="galaxy-level-item ${isLevelUnlocked ? 'unlocked' : ''} ${isCurrent ? 'current' : ''}" onclick="showLevelDetail(${levelNum})">
+                        ${levelNum}
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="galaxy-card ${isUnlocked ? 'unlocked' : 'locked'}" style="--galaxy-color: ${galaxy.color}">
+                    <div class="galaxy-header">
+                        <div class="galaxy-icon">${galaxy.icon}</div>
+                        <div class="galaxy-title">
+                            <h3>${galaxy.name}</h3>
+                            <div class="galaxy-range">Niv. ${galaxyStart} - ${galaxyEnd}</div>
+                        </div>
+                    </div>
+                    <div class="galaxy-stats">
+                        <div class="galaxy-stat">
+                            <div class="galaxy-stat-label">Débloqués</div>
+                            <div class="galaxy-stat-value">${unlockedCount}/10</div>
+                        </div>
+                        <div class="galaxy-stat">
+                            <div class="galaxy-stat-label">Niveaux</div>
+                            <div class="galaxy-stat-value">${LEVELS_PER_GALAXY}</div>
+                        </div>
+                    </div>
+                    <div class="galaxy-progress-mini">
+                        <div class="galaxy-progress-fill" style="width: ${progressPercent}%; background: ${galaxy.color};"></div>
+                    </div>
+                    <p style="font-size: 0.875rem; color: var(--text-secondary); margin: var(--space-12) 0 0 0;">
+                        ${galaxy.description}
+                    </p>
+                    <div class="galaxy-levels">
+                        ${levelItems}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ==================== RENDER TIMELINE ====================
+    async function renderTimeline() {
+        const container = document.getElementById('timeline-scroll');
+        const data = await getProfileData();
+        const currentLevel = data.level || 1;
+
+        let html = '';
+        for (let level = 1; level <= TOTAL_LEVELS; level += 10) {
+            const isUnlocked = level <= currentLevel;
+            const isCurrent = level === currentLevel;
+            const galaxyIndex = Math.floor((level - 1) / LEVELS_PER_GALAXY);
+            const galaxy = GALAXIES[galaxyIndex];
+
+            html += `
+                <div class="timeline-item">
+                    <div class="timeline-badge ${isUnlocked ? 'unlocked' : ''} ${isCurrent ? 'current' : ''}" style="background: ${isUnlocked || isCurrent ? galaxy.color : 'var(--color-surface)'}; border-color: ${galaxy.color};" onclick="showLevelDetail(${level})">
+                        ${level}
+                    </div>
+                    <div class="timeline-level">Level ${level}</div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+    }
+
+    // ==================== RENDER LIST ====================
+    async function renderList() {
+        const container = document.getElementById('levels-list');
+        const data = await getProfileData();
+        const currentLevel = data.level || 1;
+
+        let html = '';
+        for (let level = 1; level <= TOTAL_LEVELS; level++) {
+            const isUnlocked = level <= currentLevel;
+            const galaxyIndex = Math.floor((level - 1) / LEVELS_PER_GALAXY);
+            const galaxy = GALAXIES[galaxyIndex];
+            const totalXpRequired = getTotalXpForLevel(level);
+
+            html += `
+                <div class="level-card ${isUnlocked ? 'unlocked' : ''}" onclick="showLevelDetail(${level})">
+                    <div class="level-number" style="color: ${galaxy.color};">${level}</div>
+                    <div class="level-title">${galaxy.name}</div>
+                    <div class="level-xp">${totalXpRequired.toLocaleString()} XP</div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+    }
+
+    // ==================== RENDER STATS ====================
+    async function renderStats() {
+        const container = document.getElementById('stats-dashboard');
+        const data = await getProfileData();
+        const currentLevel = data.level || 1;
+        const totalXp = data.total_xp || 0;
+
+        const totalXpForCurrent = getTotalXpForLevel(currentLevel);
+        const totalXpForNext = getTotalXpForLevel(currentLevel + 1);
+        const progressToNext = totalXpForNext > totalXpForCurrent
+            ? ((totalXp - totalXpForCurrent) / (totalXpForNext - totalXpForCurrent)) * 100
+            : 100;
+
+        const html = `
+            <div class="stats-card">
+                <h3>📊 Niveau Actuel</h3>
+                <div class="stats-value">${currentLevel}/1000</div>
+                <div class="stats-label">Position: ${(currentLevel / TOTAL_LEVELS * 100).toFixed(2)}%</div>
+            </div>
+            <div class="stats-card">
+                <h3>⚡ XP Total</h3>
+                <div class="stats-value">${totalXp.toLocaleString()}</div>
+                <div class="stats-label">Accumulation totale</div>
+            </div>
+            <div class="stats-card">
+                <h3>🎯 XP Vers Prochain</h3>
+                <div class="stats-value">${Math.min(100, Math.max(0, progressToNext)).toFixed(1)}%</div>
+                <div class="stats-label">${getTotalXpForLevel(currentLevel + 1).toLocaleString()} XP requis</div>
+            </div>
+            <div class="stats-card">
+                <h3>🌌 Galaxie Actuelle</h3>
+                <div class="stats-value">${GALAXIES[Math.floor((currentLevel - 1) / LEVELS_PER_GALAXY)].name}</div>
+                <div class="stats-label">Progression: ${((currentLevel % LEVELS_PER_GALAXY || LEVELS_PER_GALAXY) / LEVELS_PER_GALAXY * 100).toFixed(1)}%</div>
+            </div>
+        `;
+        container.innerHTML = html;
+    }
+
+    // ==================== SHOW LEVEL DETAIL ====================
+    async function showLevelDetail(level) {
+        const galaxyIndex = Math.floor((level - 1) / LEVELS_PER_GALAXY);
+        const galaxy = GALAXIES[galaxyIndex];
+        const totalXpRequired = getTotalXpForLevel(level);
+        const data = await getProfileData();
+        const isUnlocked = level <= data.level;
+
+        document.getElementById('modal-level-badge').textContent = level;
+        document.getElementById('modal-level-badge').style.background = galaxy.color;
+        document.getElementById('modal-level-title').textContent = `Level ${level}`;
+        document.getElementById('modal-level-galaxy').textContent = galaxy.name;
+        document.getElementById('modal-level-description').textContent = `Atteindre ce niveau dans la galaxie ${galaxy.name}`;
+
+        document.getElementById('modal-level-xp-info').innerHTML = `
+            <div style="background: var(--color-secondary); padding: var(--space-12); border-radius: var(--radius-md);">
+                <div style="font-size: 0.875rem; color: var(--text-secondary);">XP Total Requis</div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: ${galaxy.color};">
+                    ${totalXpRequired.toLocaleString()} XP
+                </div>
+            </div>
+        `;
+
+        document.getElementById('modal-level-rewards').innerHTML = `
+            <div style="color: ${isUnlocked ? 'var(--color-primary)' : 'var(--text-secondary)'};">
+                ${isUnlocked ? '✅ Débloqué' : '🔒 Verrouillé'}
+            </div>
+        `;
+
+        document.getElementById('level-modal').classList.add('active');
+    }
+
+    // ==================== MODAL CONTROLS ====================
+    document.getElementById('modal-close').addEventListener('click', () => {
+        document.getElementById('level-modal').classList.remove('active');
+    });
+
+    document.getElementById('level-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'level-modal') {
+            document.getElementById('level-modal').classList.remove('active');
+        }
+    });
+
+    // ==================== VIEW CONTROLS ====================
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const viewName = this.getAttribute('data-view');
+
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+
+            this.classList.add('active');
+            document.getElementById(viewName + '-view').classList.add('active');
+
+            if (viewName === 'timeline') await renderTimeline();
+            else if (viewName === 'list') await renderList();
+            else if (viewName === 'stats') await renderStats();
+        });
+    });
+
+    // ==================== INITIALIZE ====================
+    async function initialize() {
+        await updateProgress();
+        await renderGalaxies();
+        createUniverseBackground();
+        console.log('✅ Achievements Page Loaded!');
+    }
+
+    function createUniverseBackground() {
+        const canvas = document.getElementById('universe-canvas');
+        if (!canvas) return;
+
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            canvas.appendChild(star);
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initialize);
+    } else {
+        initialize();
+    }
+
+
+</script>
+
+<style>
+    /* ==================== CONGRATULATIONS MODAL ==================== */
+    .congratulations-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .congratulations-modal.active {
+        opacity: 1;
+    }
+
+    .congratulations-content {
+        background: linear-gradient(135deg, #667eea 0%, #fbfcf5 100%);
+        border-radius: var(--radius-lg);
+        padding: 3rem 2rem;
+        text-align: center;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.5s ease;
+        color: white;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .congratulations-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+        animation: bounce 0.6s ease;
+    }
+
+    @keyframes bounce {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    .congratulations-title {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 1rem 0;
+        animation: fadeInDown 0.5s ease 0.2s both;
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .congratulations-text {
+        font-size: 1rem;
+        margin: 1rem 0;
+        opacity: 0.9;
+        animation: fadeIn 0.5s ease 0.3s both;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    .congratulations-level {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin: 1.5rem 0;
+        animation: fadeIn 0.5s ease 0.4s both;
+    }
+
+    .level-badge {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: bold;
+        color: white;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .galaxy-name {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    .congratulations-subtitle {
+        font-size: 0.95rem;
+        margin: 1rem 0;
+        opacity: 0.85;
+        animation: fadeIn 0.5s ease 0.5s both;
+    }
+
+    .congratulations-btn {
+        margin-top: 1.5rem;
+        padding: 0.75rem 2rem;
+        background: white;
+        color: #667eea;
+        border: none;
+        border-radius: var(--radius-md);
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.5s ease 0.6s both;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .congratulations-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .congratulations-btn:active {
+        transform: translateY(0);
+    }
+
+    /* ==================== GALAXY UNLOCK STATE ==================== */
+    .galaxy-card.locked {
+        opacity: 0.6;
+        filter: grayscale(30%);
+    }
+
+    .galaxy-card.unlocked {
+        animation: galaxyUnlock 0.5s ease;
+    }
+
+    @keyframes galaxyUnlock {
+        0% {
+            transform: scale(0.95);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .level-card.unlocked {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .level-card.unlocked:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+</style>
+
+
+
+{% endblock %}

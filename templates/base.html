@@ -1,0 +1,611 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EVPE - Gamification Life{% endblock %}</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ====== ROOT VARIABLES ====== */
+        :root {
+            /* Colors - Primitive */
+            --color-white: rgba(255, 255, 255, 1);
+            --color-black: rgba(0, 0, 0, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-gray-400: rgba(119, 124, 124, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-300: rgba(50, 184, 198, 1);
+            --color-teal-400: rgba(45, 166, 178, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-teal-700: rgba(26, 104, 115, 1);
+            --color-teal-800: rgba(41, 150, 161, 1);
+            --color-red-400: rgba(255, 84, 89, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-orange-400: rgba(230, 129, 97, 1);
+            --color-orange-500: rgba(168, 75, 47, 1);
+
+            /* RGB versions */
+            --color-brown-600-rgb: 94, 82, 64;
+            --color-teal-500-rgb: 33, 128, 141;
+            --color-slate-900-rgb: 19, 52, 59;
+            --color-red-500-rgb: 192, 21, 47;
+            --color-orange-500-rgb: 168, 75, 47;
+            --color-success-rgb: 33, 128, 141;
+            --color-error-rgb: 192, 21, 47;
+            --color-warning-rgb: 168, 75, 47;
+
+            /* Semantic Colors - Light Mode */
+            --bg-primary: var(--color-cream-50);
+            --bg-secondary: var(--color-cream-100);
+            --text-primary: var(--color-slate-900);
+            --text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-primary-active: var(--color-teal-700);
+            --color-secondary: rgba(var(--color-brown-600-rgb), 0.12);
+            --color-secondary-hover: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-btn-primary-text: var(--color-cream-50);
+            --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+            --color-error: var(--color-red-500);
+            --color-success: var(--color-teal-500);
+            --color-warning: var(--color-orange-500);
+            --color-info: var(--color-slate-500);
+            --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.4);
+            --color-bg-1: rgba(59, 130, 246, 0.08);
+
+            /* Typography */
+            --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-family-mono: 'Courier New', monospace;
+            --font-size-xs: 11px;
+            --font-size-sm: 12px;
+            --font-size-base: 14px;
+            --font-size-md: 14px;
+            --font-size-lg: 16px;
+            --font-size-xl: 18px;
+            --font-size-2xl: 20px;
+            --font-size-3xl: 24px;
+            --font-size-4xl: 30px;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            --line-height-tight: 1.2;
+            --line-height-normal: 1.5;
+
+            /* Spacing */
+            --space-4: 4px;
+            --space-6: 6px;
+            --space-8: 8px;
+            --space-10: 10px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --space-32: 32px;
+
+            /* Radius */
+            --radius-sm: 6px;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --radius-full: 9999px;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+
+            /* Transitions */
+            --transition: all 0.3s ease;
+            --duration-fast: 150ms;
+            --duration-normal: 250ms;
+            --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Dark Mode */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: var(--color-charcoal-700);
+                --bg-secondary: var(--color-charcoal-800);
+                --text-primary: var(--color-gray-200);
+                --text-secondary: rgba(167, 169, 169, 0.7);
+                --color-primary: var(--color-teal-300);
+                --color-primary-hover: var(--color-teal-400);
+                --color-primary-active: var(--color-teal-800);
+                --color-secondary: rgba(119, 124, 124, 0.15);
+                --color-secondary-hover: rgba(119, 124, 124, 0.25);
+                --color-border: rgba(119, 124, 124, 0.3);
+                --color-card-border: rgba(119, 124, 124, 0.2);
+                --color-error: var(--color-red-400);
+                --color-success: var(--color-teal-300);
+                --color-warning: var(--color-orange-400);
+            }
+        }
+
+        /* ====== GLOBAL STYLES ====== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: var(--font-size-base);
+            font-family: var(--font-family-base);
+            line-height: var(--line-height-normal);
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ====== NAVBAR ====== */
+        .navbar {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--color-border);
+            padding: var(--space-16) var(--space-20);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: var(--space-8);
+        }
+
+        .navbar-brand i {
+            font-size: var(--font-size-2xl);
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: var(--space-16);
+            align-items: center;
+            list-style: none;
+        }
+
+        .navbar-menu a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            padding: var(--space-8) var(--space-12);
+            border-radius: var(--radius-base);
+            transition: all var(--duration-fast) var(--ease-standard);
+            display: flex;
+            align-items: center;
+            gap: var(--space-6);
+        }
+
+        .navbar-menu a:hover {
+            background: var(--color-secondary);
+            color: var(--color-primary);
+        }
+
+        .navbar-menu a.active {
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-12);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-bold);
+        }
+
+        @media (max-width: 768px) {
+            .navbar-menu {
+                flex-wrap: wrap;
+                gap: var(--space-8);
+            }
+
+            .navbar-menu a {
+                font-size: var(--font-size-xs);
+                padding: var(--space-6) var(--space-8);
+            }
+        }
+
+        /* ====== MAIN CONTENT ====== */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-20);
+        }
+
+        /* ====== BUTTONS ====== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-8);
+            padding: var(--space-10) var(--space-16);
+            border-radius: var(--radius-base);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            cursor: pointer;
+            transition: all var(--duration-fast) var(--ease-standard);
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--color-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-secondary-hover);
+        }
+
+        /* ====== TYPOGRAPHY ====== */
+        h1, h2, h3, h4, h5, h6 {
+            margin: 0;
+            font-weight: var(--font-weight-bold);
+            line-height: var(--line-height-tight);
+            color: var(--text-primary);
+        }
+
+        h1 { font-size: var(--font-size-4xl); }
+        h2 { font-size: var(--font-size-3xl); }
+        h3 { font-size: var(--font-size-2xl); }
+
+        /* ====== FOOTER ====== */
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--color-border);
+            padding: var(--space-20);
+            margin-top: var(--space-32);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="{% url 'gamification:index' %}" class="navbar-brand">
+                <i class="fas fa-gamepad"></i>
+                <span>EVPE - Gamification Life</span>
+            </a>
+
+            <ul class="navbar-menu">
+
+                <li><a href="{% url 'gamification:actions' %}" class="{% if request.resolver_match.url_name == 'actions' %}active{% endif %}">
+                    <i class="fas fa-tasks"></i>
+                    Actions
+                </a></li>
+                <li><a href="{% url 'gamification:challenges' %}" class="{% if request.resolver_match.url_name == 'challenges' %}active{% endif %}">
+                    <i class="fas fa-bullseye"></i>
+                    Challenges
+                </a></li>
+                <li><a href="{% url 'gamification:achievements' %}" class="{% if request.resolver_match.url_name == 'achievements' %}active{% endif %}">
+                    <i class="fas fa-trophy"></i>
+                    Achievements
+                </a></li>
+                <li><a href="{% url 'gamification:skills' %}" class="{% if request.resolver_match.url_name == 'skills_page' %}active{% endif %}">
+                    <i class="fas fa-graduation-cap"></i>
+                    Skills
+                </a></li>
+                <li><a href="{% url 'gamification:study_tracker' %}" class="{% if request.resolver_match.url_name == 'study_tracker' %}active{% endif %}">
+                    <i class="fas fa-book"></i>
+                    Études
+                </a></li>
+                <li><a href="{% url 'gamification:leaderboard' %}" class="{% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}">
+                    <i class="fas fa-ranking-star"></i>
+                    Classement
+                </a></li>
+                <li><a href="{% url 'gamification:profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                    <i class="fas fa-user"></i>
+                    Profil
+                </a></li>
+            </ul>
+
+            <div class="navbar-user">
+                {% if user.is_authenticated %}
+                    <div class="user-avatar">{{ user.username|first|upper }}</div>
+                    <a href="{% url 'logout' %}" class="btn btn-secondary">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Déconnexion
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Connexion
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 EVPE - Ayman Tijan. Tous les droits réservés.</p>
+    </footer>
+
+    <!-- API CLIENT GLOBAL -->
+    <script>
+        /**
+         * API Client - Gère toutes les requêtes API
+         */
+        const apiClient = {
+            getProfile: async () => {
+                try {
+                    const response = await fetch('/api/profile/', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Erreur getProfile:', error);
+                    return null;
+                }
+            },
+
+            getLeaderboard: async () => {
+                try {
+                    const response = await fetch('/api/leaderboard/', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Erreur getLeaderboard:', error);
+                    return [];
+                }
+            },
+
+            getLeaderboardWeekly: async () => {
+                try {
+                    const response = await fetch('/api/leaderboard/weekly/', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Erreur getLeaderboardWeekly:', error);
+                    return [];
+                }
+            },
+
+            getLeaderboardMonthly: async () => {
+                try {
+                    const response = await fetch('/api/leaderboard/monthly/', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Erreur getLeaderboardMonthly:', error);
+                    return [];
+                }
+            },
+
+            getLeaderboardSimple: async () => {
+                try {
+                    const response = await fetch('/api/leaderboard/simple/', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Erreur getLeaderboardSimple:', error);
+                    return [];
+                }
+            },
+
+            getUserRank: async () => {
+                try {
+                    const response = await fetch('/api/user-rank/', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Erreur getUserRank:', error);
+                    return null;
+                }
+            },
+
+            getSkills: async () => {
+                try {
+                    const response = await fetch('/api/skills/', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Erreur getSkills:', error);
+                    return [];
+                }
+            },
+
+            getAchievements: async () => {
+                try {
+                    const response = await fetch('/api/achievements/', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Erreur getAchievements:', error);
+                    return [];
+                }
+            },
+
+            getChallenges: async () => {
+                try {
+                    const response = await fetch('/api/challenges/', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Erreur getChallenges:', error);
+                    return [];
+                }
+            },
+
+            getStudySessions: async () => {
+                try {
+                    const response = await fetch('/api/study-sessions/', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Erreur getStudySessions:', error);
+                    return [];
+                }
+            },
+
+            getDashboardStats: async () => {
+                try {
+                    const response = await fetch('/api/dashboard-stats/', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Erreur getDashboardStats:', error);
+                    return null;
+                }
+            },
+
+            getResources: async () => {
+                try {
+                    const response = await fetch('/api/resources/', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Erreur getResources:', error);
+                    return null;
+                }
+            },
+
+            searchResources: async (query, domain = null, type = null) => {
+                try {
+                    let url = `/api/search/?q=${encodeURIComponent(query)}`;
+                    if (domain) url += `&domain=${encodeURIComponent(domain)}`;
+                    if (type) url += `&type=${encodeURIComponent(type)}`;
+
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Erreur searchResources:', error);
+                    return null;
+                }
+            }
+        };
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

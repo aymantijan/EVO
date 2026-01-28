@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="home-container">
+    <section class="hero">
+        <h1>🎮 EVPE - Gamification Life</h1>
+        <p>Transformez votre vie en un jeu vidéo épique!</p>
+        <div class="hero-buttons">
+            <a href="/leaderboard/" class="btn btn-primary">Aller au Classement</a>
+            <a href="/study_tracker/" class="btn btn-primary">Study Tracker</a>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="feature-card">
+            <i class="fas fa-trophy"></i>
+            <h3>Gamification</h3>
+            <p>Gagnez XP, débloquez achievements, grimpez des niveaux</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-book"></i>
+            <h3>Study Tracker</h3>
+            <p>Organisez vos études en matières, chapitres, sections</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-chart-bar"></i>
+            <h3>Analytics</h3>
+            <p>Visualisez votre progression avec des graphiques</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-crown"></i>
+            <h3>Leaderboard</h3>
+            <p>Compétrez avec d'autres joueurs</p>
+        </div>
+    </section>
+</div>
+
+<style>
+    .home-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .hero {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: linear-gradient(360deg, rgb(142,185,191) 0%, rgba(29, 116, 128, 1) 100%);
+        color: white;
+        border-radius: 12px;
+        margin-bottom: 3rem;
+    }
+
+    .hero h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: white;
+    }
+
+    .hero p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: transform 0.3s;
+    }
+
+    body.theme-dark .feature-card {
+        background: #2d2d2d;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .feature-card i {
+        font-size: 2.5rem;
+        color: rgba(29, 116, 128, 1);
+        margin-bottom: 1rem;
+    }
+
+    .feature-card h3 {
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}
