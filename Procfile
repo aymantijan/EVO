@@ -1,1 +1,1 @@
-web: bash start.sh
+web: gunicorn gamification_config.wsgi_with_migrations:application --log-file -
