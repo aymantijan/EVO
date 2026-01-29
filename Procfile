@@ -1,1 +1,1 @@
-web: gunicorn gamification_config.wsgi_with_migrations:application --log-file -
+web: python manage.py migrate --noinput && gunicorn gamification_config.wsgi:application
