@@ -1,46 +1,18 @@
-# Core Django
 Django==4.2.8
-asgiref==3.11.0
-sqlparse==0.5.5
-tzdata==2025.3
-
-# Django REST
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.5.1
-django-filter==23.5
-
-# Django utilities
 django-cors-headers==4.9.0
-django-extensions==4.1
 django-crispy-forms==2.5
 crispy-bootstrap5==2025.6
-whitenoise==6.11.0
-
-# Database
+django-filter==23.5
+django-extensions==4.1
 dj-database-url==3.1.0
-psycopg[binary]==3.1.18
-
-# Server
+psycopg2==2.9.9
 gunicorn==24.1.1
-
-# Environment
+whitenoise==6.11.0
 python-dotenv==1.2.1
 python-decouple==3.8
-
-# Background tasks
+requests==2.32.5
+pillow==11.0.0
 redis==5.3.1
 celery==5.3.4
-
-# HTTP & utilities
-requests==2.32.5
-charset-normalizer==3.4.4
-idna==3.11
-urllib3==2.6.2
-certifi==2025.11.12
-
-# Media & images
-pillow==11.0.0
-
-# Build / runtime safety
-setuptools==80.9.0
-wheel==0.45.1
