@@ -1,0 +1,1 @@
+web: gunicorn gamification_config.wsgi --log-file -
