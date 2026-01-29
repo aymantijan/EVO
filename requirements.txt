@@ -26,4 +26,4 @@ Werkzeug==3.1.4
 tzdata==2025.3
 setuptools==80.9.0
 wheel==0.45.1
-gunicorn
+gunicorn==24.1.1
