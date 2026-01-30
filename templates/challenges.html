@@ -223,6 +223,38 @@
         color: var(--text-secondary);
     }
 
+    /* NEW: Specific styling for sleep time inputs */
+    .sleep-time-inputs {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .sleep-time-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+
+    .sleep-time-input {
+        padding: 0.6rem 0.875rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-family: inherit;
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        width: 80px;
+    }
+
+    .sleep-time-input:focus {
+        outline: none;
+        border-color: rgba(33, 128, 141, 1);
+        box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+        background-color: rgba(6, 182, 212, 0.02);
+    }
+
     .hp-calc-display {
         font-size: 0.85rem;
         color: var(--success-color);
@@ -230,13 +262,15 @@
         padding: 0.5rem 1rem;
         background: rgba(16, 185, 129, 0.1);
         border-radius: 0.5rem;
-        min-width: 110px;
-        text-align: center;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        white-space: nowrap;
+        transition: all 200ms ease;
     }
 
     .hp-calc-display.negative {
         color: var(--danger-color);
         background: rgba(239, 68, 68, 0.1);
+        border-color: rgba(239, 68, 68, 0.3);
     }
 
     .quotidien-action-bar {
@@ -244,6 +278,53 @@
         gap: 1rem;
         margin-top: 2rem;
         flex-wrap: wrap;
+    }
+
+    .vision-btn {
+        padding: 0.875rem 1.75rem;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 200ms ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .vision-btn-primary {
+        background: rgba(33, 128, 141, 1);
+        color: white;
+    }
+
+    .vision-btn-primary:hover {
+        background: rgba(6, 182, 212, 1);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+
+    .vision-btn-secondary {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .vision-btn-secondary:hover {
+        background: #e5e7eb;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .vision-btn-success {
+        background: var(--success-color);
+        color: white;
+        flex: 1;
+    }
+
+    .vision-btn-success:hover {
+        background: #059669;
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
     }
 
     .ia-section {
@@ -255,169 +336,137 @@
     }
 
     .ia-section h3 {
-        font-size: 1.25rem;
-        color: var(--text-primary);
+        font-size: 1.5rem;
         margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
+        color: var(--text-primary);
     }
 
     .ia-section-subtitle {
-        color: var(--text-secondary);
         font-size: 0.9rem;
+        color: var(--text-secondary);
         margin-bottom: 1.5rem;
+        line-height: 1.6;
     }
 
     .ia-textarea {
         width: 100%;
         min-height: 180px;
         padding: 1rem;
-        border: 1.5px solid var(--border-color);
-        border-radius: 0.75rem;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        font-size: 0.95rem;
-        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        font-size: 0.9rem;
+        font-family: inherit;
         resize: vertical;
         margin-bottom: 1.5rem;
         transition: all 150ms ease;
-        background: var(--bg-secondary);
-    }
-
-    .ia-textarea::placeholder {
-        color: var(--text-secondary);
-        opacity: 0.6;
     }
 
     .ia-textarea:focus {
         outline: none;
         border-color: rgba(33, 128, 141, 1);
-        box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1);
-        background: var(--bg-primary);
+        box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+        background-color: rgba(6, 182, 212, 0.02);
     }
 
     .ia-action-bar {
         display: flex;
-        gap: 0.75rem;
+        gap: 1rem;
         flex-wrap: wrap;
-        margin-bottom: 1.5rem;
     }
 
     .ia-results {
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-color);
-        border-radius: 0.75rem;
-        padding: 1.5rem;
-        margin-top: 1.5rem;
+        margin-top: 2rem;
         display: none;
-        max-height: 1200px;
-        overflow-y: auto;
-        box-shadow: var(--shadow-sm);
     }
 
     .ia-results.active {
         display: block;
-        animation: slideDown 300ms ease;
-    }
-
-    @keyframes slideDown {
-        from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
     }
 
     .ia-result-section {
-        margin-bottom: 1.5rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .ia-result-section:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-        padding-bottom: 0;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
     }
 
     .ia-result-title {
+        font-size: 1.1rem;
         font-weight: 700;
-        color: rgba(33, 128, 141, 1);
         margin-bottom: 1rem;
-        font-size: 1.05rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+        color: var(--text-primary);
     }
 
     .xp-hp-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 1rem;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
     }
 
     .xp-hp-card {
-        background: var(--bg-primary);
-        border: 2px solid var(--border-color);
-        border-radius: 0.75rem;
-        padding: 1.5rem;
+        background: white;
+        padding: 1.25rem;
+        border-radius: 0.5rem;
         text-align: center;
+        border: 2px solid;
     }
 
     .xp-hp-card.xp {
-        border-color: #fbbf24;
+        border-color: rgba(33, 128, 141, 1);
+        background: rgba(6, 182, 212, 0.05);
     }
 
     .xp-hp-card.hp {
         border-color: var(--success-color);
+        background: rgba(16, 185, 129, 0.05);
     }
 
     .xp-hp-label {
-        font-size: 0.85rem;
-        color: var(--text-secondary);
+        font-size: 0.8rem;
         font-weight: 600;
         text-transform: uppercase;
+        color: var(--text-secondary);
         margin-bottom: 0.5rem;
     }
 
     .xp-hp-value {
-        font-size: 2.5rem;
+        font-size: 2rem;
         font-weight: 800;
-        margin-bottom: 0.25rem;
     }
 
     .xp-hp-card.xp .xp-hp-value {
-        color: #fbbf24;
+        color: rgba(33, 128, 141, 1);
     }
 
     .xp-hp-card.hp .xp-hp-value {
         color: var(--success-color);
     }
 
-    .xp-hp-breakdown {
-        font-size: 0.75rem;
-        color: var(--text-secondary);
-        margin-top: 0.75rem;
-        padding-top: 0.75rem;
-        border-top: 1px solid var(--border-color);
-    }
-
     .detections-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 0.75rem;
+        margin-top: 1rem;
     }
 
     .detection-card {
-        background: var(--bg-primary);
-        border: 1px solid var(--border-color);
-        border-radius: 0.75rem;
+        background: white;
         padding: 1rem;
+        border-radius: 0.5rem;
         text-align: center;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--border-color);
+        transition: all 150ms ease;
+    }
+
+    .detection-card:hover {
+        border-color: rgba(33, 128, 141, 1);
+        box-shadow: var(--shadow-sm);
     }
 
     .detection-emoji {
-        font-size: 2rem;
+        font-size: 1.5rem;
         margin-bottom: 0.5rem;
     }
 
@@ -425,150 +474,87 @@
         font-size: 0.75rem;
         color: var(--text-secondary);
         font-weight: 600;
-        text-transform: uppercase;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
     }
 
     .detection-value {
-        font-size: 1.75rem;
+        font-size: 1.25rem;
         font-weight: 800;
         color: rgba(33, 128, 141, 1);
     }
 
     .trait-detection-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 0.75rem;
+        margin-top: 1rem;
     }
 
     .trait-detection-item {
-        background: var(--bg-primary);
-        border: 1px solid rgba(6, 182, 212, 0.3);
-        border-left: 3px solid rgba(33, 128, 141, 1);
-        border-radius: 0.5rem;
+        background: white;
         padding: 1rem;
-        font-size: 0.9rem;
+        border-radius: 0.5rem;
+        border: 1px solid var(--border-color);
         transition: all 150ms ease;
     }
 
     .trait-detection-item:hover {
-        box-shadow: var(--shadow-md);
-        transform: translateY(-2px);
         border-color: rgba(33, 128, 141, 1);
+        box-shadow: var(--shadow-sm);
     }
 
     .trait-detection-item.negative {
-        border-left-color: var(--danger-color);
-        border-color: rgba(239, 68, 68, 0.3);
-        background: rgba(239, 68, 68, 0.05);
-    }
-
-    .trait-detection-item.negative:hover {
         border-color: var(--danger-color);
+        background: rgba(239, 68, 68, 0.02);
     }
 
     .trait-name {
         font-weight: 700;
+        font-size: 0.95rem;
         color: var(--text-primary);
-        margin-bottom: 0.4rem;
-        display: flex;
-        align-items: center;
-    }
-
-    .trait-detection-item.negative .trait-name {
-        color: var(--danger-color);
+        margin-bottom: 0.5rem;
     }
 
     .trait-values {
         display: flex;
-        justify-content: space-between;
-        gap: 0.5rem;
-        font-size: 0.8rem;
-        margin-top: 0.5rem;
+        gap: 1rem;
+        margin-top: 0.75rem;
     }
 
     .trait-value {
-        background: rgba(6, 182, 212, 0.1);
-        padding: 0.35rem 0.75rem;
-        border-radius: 0.35rem;
-        font-weight: 600;
-    }
-
-    .trait-value.xp {
-        background: rgba(251, 191, 36, 0.1);
-        color: #fbbf24;
+        font-size: 0.9rem;
+        font-weight: 700;
+        padding: 0.4rem 0.75rem;
+        border-radius: 0.375rem;
     }
 
     .trait-value.hp {
         background: rgba(16, 185, 129, 0.1);
         color: var(--success-color);
+        border: 1px solid rgba(16, 185, 129, 0.3);
     }
 
-    .vision-btn {
-        padding: 0.75rem 1.5rem;
-        border: none;
-        border-radius: 0.5rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 200ms ease;
-        font-size: 0.9rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .vision-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    .vision-btn-primary {
-        background: rgba(33, 128, 141, 1);
-        color: white;
-    }
-
-    .vision-btn-primary:hover:not(:disabled) {
-        background: var(--primary-hover);
-        box-shadow: var(--shadow-md);
-        transform: translateY(-2px);
-    }
-
-    .vision-btn-success {
-        background: var(--success-color);
-        color: white;
-    }
-
-    .vision-btn-success:hover:not(:disabled) {
-        background: #059669;
-        box-shadow: var(--shadow-md);
-        transform: translateY(-2px);
-    }
-
-    .vision-btn-secondary {
-        background: var(--bg-secondary);
-        color: rgba(33, 128, 141, 1);
-        border: 1.5px solid var(--border-color);
-    }
-
-    .vision-btn-secondary:hover:not(:disabled) {
-        border-color: rgba(33, 128, 141, 1);
-        background: rgba(6, 182, 212, 0.05);
+    .trait-detection-item.negative .trait-value.hp {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+        border-color: rgba(239, 68, 68, 0.3);
     }
 
     .loading {
-        text-align: center;
-        padding: 3rem 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 3rem;
         color: var(--text-secondary);
     }
 
     .spinner {
-        display: inline-block;
-        width: 32px;
-        height: 32px;
-        border: 4px solid rgba(6, 182, 212, 0.2);
+        width: 40px;
+        height: 40px;
+        border: 4px solid var(--border-color);
         border-top-color: rgba(33, 128, 141, 1);
         border-radius: 50%;
-        animation: spin 0.8s linear infinite;
+        animation: spin 1s linear infinite;
         margin-bottom: 1rem;
     }
 
@@ -577,17 +563,28 @@
     }
 
     .alert-message {
-        padding: 1rem 1.25rem;
+        margin-top: 1.5rem;
+        padding: 1rem 1.5rem;
         border-radius: 0.5rem;
-        margin-bottom: 1.5rem;
+        font-weight: 600;
         display: none;
-        align-items: center;
-        gap: 0.75rem;
-        animation: slideDown 300ms ease;
+        transition: all 200ms ease;
     }
 
     .alert-message.show {
-        display: flex;
+        display: block;
+        animation: slideDown 300ms ease;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .alert-message.success {
@@ -849,6 +846,145 @@ document.addEventListener('DOMContentLoaded', function() {
     loadUserStats();  // ✅ CHARGER LES STATS AU DÉMARRAGE
 });
 
+// ==================== SLEEP QUALITY SCALES (FROM IMAGES) ====================
+
+// Barème Qualité basé sur l'heure de coucher (CT = Coefficient de Temps)
+const SLEEP_QUALITY_TIME_SCALE = {
+    '20h-21h': { coefficient: 0.7, label: 'Très tôt' },
+    '21h-22h': { coefficient: 1.0, label: 'Optimal' },
+    '22h-23h': { coefficient: 0.95, label: 'Optimal' },
+    '23h-0h': { coefficient: 0.8, label: 'Acceptable' },
+    '0h-1h': { coefficient: 0.6, label: 'Tard' },
+    '1h-2h': { coefficient: 0.4, label: 'Très tard' },
+    '2h-3h': { coefficient: 0.2, label: 'Extrêmement tard' },
+    '3h+': { coefficient: 0.0, label: 'Décalage majeur' }
+};
+
+// Barème Quantité (CQ = Coefficient de Quantité)
+const SLEEP_QUANTITY_SCALE = {
+    '0-4': { coefficient: 0.1, label: 'Très insuffisant' },
+    '4-5': { coefficient: 0.3, label: 'Insuffisant' },
+    '5-6': { coefficient: 0.5, label: 'Limite basse' },
+    '6-7': { coefficient: 0.7, label: 'En dessous de l\'optimal' },
+    '7-8': { coefficient: 0.9, label: 'Bon' },
+    '8-9': { coefficient: 1.0, label: 'Optimal' },
+    '9-10': { coefficient: 0.7, label: 'Légèrement excessif' },
+    '10-11': { coefficient: 0.5, label: 'Excessif' },
+    '11+': { coefficient: 0.3, label: 'Très excessif' }
+};
+
+// ==================== HP CALCULATION FORMULAS ====================
+
+// Base HP pour un sommeil parfait (8-9h, coucher 21h-22h)
+const BASE_SLEEP_HP = 200;
+const BASE_NAP_HP = 50;
+
+// Calculer les HP du sommeil en fonction du temps de coucher et de la durée
+function calculateSleepHP(bedTime, wakeTime) {
+    if (!bedTime || !wakeTime) return 0;
+
+    // Convertir les heures en minutes depuis minuit
+    const [bedHour, bedMin] = bedTime.split(':').map(Number);
+    const [wakeHour, wakeMin] = wakeTime.split(':').map(Number);
+
+    let bedMinutes = bedHour * 60 + bedMin;
+    let wakeMinutes = wakeHour * 60 + wakeMin;
+
+    // Si l'heure de réveil est avant l'heure de coucher, on a dormi la nuit
+    if (wakeMinutes <= bedMinutes) {
+        wakeMinutes += 24 * 60; // Ajouter 24h
+    }
+
+    // Calculer la durée totale de sommeil en heures
+    const sleepDuration = (wakeMinutes - bedMinutes) / 60;
+
+    // Déterminer le coefficient de qualité (CT) basé sur l'heure de coucher
+    let qualityCoef = 0;
+    const bedHour24 = bedHour;
+
+    if (bedHour24 >= 20 && bedHour24 < 21) {
+        qualityCoef = SLEEP_QUALITY_TIME_SCALE['20h-21h'].coefficient;
+    } else if (bedHour24 >= 21 && bedHour24 < 22) {
+        qualityCoef = SLEEP_QUALITY_TIME_SCALE['21h-22h'].coefficient;
+    } else if (bedHour24 >= 22 && bedHour24 < 23) {
+        qualityCoef = SLEEP_QUALITY_TIME_SCALE['22h-23h'].coefficient;
+    } else if (bedHour24 >= 23 || bedHour24 < 0) {
+        qualityCoef = SLEEP_QUALITY_TIME_SCALE['23h-0h'].coefficient;
+    } else if (bedHour24 >= 0 && bedHour24 < 1) {
+        qualityCoef = SLEEP_QUALITY_TIME_SCALE['0h-1h'].coefficient;
+    } else if (bedHour24 >= 1 && bedHour24 < 2) {
+        qualityCoef = SLEEP_QUALITY_TIME_SCALE['1h-2h'].coefficient;
+    } else if (bedHour24 >= 2 && bedHour24 < 3) {
+        qualityCoef = SLEEP_QUALITY_TIME_SCALE['2h-3h'].coefficient;
+    } else {
+        qualityCoef = SLEEP_QUALITY_TIME_SCALE['3h+'].coefficient;
+    }
+
+    // Déterminer le coefficient de quantité (CQ) basé sur la durée
+    let quantityCoef = 0;
+    if (sleepDuration <= 4) {
+        quantityCoef = SLEEP_QUANTITY_SCALE['0-4'].coefficient;
+    } else if (sleepDuration <= 5) {
+        quantityCoef = SLEEP_QUANTITY_SCALE['4-5'].coefficient;
+    } else if (sleepDuration <= 6) {
+        quantityCoef = SLEEP_QUANTITY_SCALE['5-6'].coefficient;
+    } else if (sleepDuration <= 7) {
+        quantityCoef = SLEEP_QUANTITY_SCALE['6-7'].coefficient;
+    } else if (sleepDuration <= 8) {
+        quantityCoef = SLEEP_QUANTITY_SCALE['7-8'].coefficient;
+    } else if (sleepDuration <= 9) {
+        quantityCoef = SLEEP_QUANTITY_SCALE['8-9'].coefficient;
+    } else if (sleepDuration <= 10) {
+        quantityCoef = SLEEP_QUANTITY_SCALE['9-10'].coefficient;
+    } else if (sleepDuration <= 11) {
+        quantityCoef = SLEEP_QUANTITY_SCALE['10-11'].coefficient;
+    } else {
+        quantityCoef = SLEEP_QUANTITY_SCALE['11+'].coefficient;
+    }
+
+    // Calculer les HP totaux: BASE_HP × CT × CQ
+    const totalHP = BASE_SLEEP_HP * qualityCoef * quantityCoef;
+
+    return Math.floor(totalHP);
+}
+
+// Calculer les HP de la sieste (basé uniquement sur la durée)
+function calculateNapHP(bedTime, wakeTime) {
+    if (!bedTime || !wakeTime) return 0;
+
+    const [bedHour, bedMin] = bedTime.split(':').map(Number);
+    const [wakeHour, wakeMin] = wakeTime.split(':').map(Number);
+
+    let bedMinutes = bedHour * 60 + bedMin;
+    let wakeMinutes = wakeHour * 60 + wakeMin;
+
+    // Pour une sieste, on assume que c'est dans la même journée
+    if (wakeMinutes <= bedMinutes) {
+        return 0; // Sieste invalide
+    }
+
+    const napDurationMinutes = wakeMinutes - bedMinutes;
+    const napDurationHours = napDurationMinutes / 60;
+
+    // Sieste optimale: 15-30 minutes
+    // HP = BASE_NAP_HP pour 20 minutes, diminue si trop court ou trop long
+    let napHP = 0;
+    if (napDurationMinutes < 10) {
+        napHP = BASE_NAP_HP * 0.2;
+    } else if (napDurationMinutes <= 30) {
+        napHP = BASE_NAP_HP * 1.0;
+    } else if (napDurationMinutes <= 60) {
+        napHP = BASE_NAP_HP * 0.8;
+    } else if (napDurationMinutes <= 90) {
+        napHP = BASE_NAP_HP * 0.6;
+    } else {
+        // Sieste trop longue
+        napHP = BASE_NAP_HP * 0.3;
+    }
+
+    return Math.floor(napHP);
+}
+
 // ==================== TRAITS COMPLETS - 76 TRAITS ====================
 
 const TRAITS_COMPLETS = {
@@ -1049,13 +1185,15 @@ const ACTIVITY_BAREME_HP = {
         name: 'Sommeil/Repos',
         emoji: '😴',
         traits: [{ name: 'Résilience', hp: 120 }, { name: 'Stabilité Émotionnelle', hp: 80 }],
-        formula: (hours) => Math.floor(120 * hours + Math.max(0, (hours - 7) * 20))
+        usesTimeInputs: true,
+        formula: calculateSleepHP
     },
     2: {
         name: 'Sieste',
         emoji: '⏱️',
         traits: [{ name: 'Résilience', hp: 30 }],
-        formula: (minutes) => Math.floor((minutes / 60) * 50)
+        usesTimeInputs: true,
+        formula: calculateNapHP
     },
     3: {
         name: 'Focus École',
@@ -1098,87 +1236,29 @@ const ACTIVITY_BAREME_HP = {
         hpPerQuality: { 'Excellent': 150, 'Bon': 100, 'Moyen': 60, 'Mauvais': 20 }
     },
     8: {
-        name: 'Social',
-        emoji: '👥',
-        traits: [{ name: 'Empathie', hp: 80 }, { name: 'Sociabilité', hp: 70 }],
-        options: ['Amis', 'Amour', 'Famille', 'Collègues', 'Communauté'],
-        formula: (hours, type) => {
-            const values = { 'Amis': 80, 'Amour': 110, 'Famille': 100, 'Collègues': 90, 'Communauté': 75 };
-            return Math.floor((values[type] || 80) * hours);
-        }
+        name: 'Hydratation',
+        emoji: '💧',
+        traits: [{ name: 'Discipline', hp: 30 }],
+        options: ['Excellent', 'Bon', 'Moyen', 'Mauvais'],
+        hpPerQuality: { 'Excellent': 80, 'Bon': 60, 'Moyen': 40, 'Mauvais': 20 }
     },
     9: {
-        name: 'Développement Personnel',
-        emoji: '🧘',
-        traits: [{ name: 'Flexibilité Mentale', hp: 70 }, { name: 'Croissance Personnelle', hp: 90 }],
-        options: ['Méditation', 'Journal', 'Coaching', 'Formation', 'Mentorat'],
-        formula: (hours, type) => {
-            const depth = { 'Méditation': 1.2, 'Journal': 1.3, 'Coaching': 1.5, 'Formation': 1.4, 'Mentorat': 1.6 };
-            return Math.floor(120 * hours * (depth[type] || 1.0));
-        }
+        name: 'Procrastination',
+        emoji: '📱',
+        traits: [{ name: 'Discipline', hp: -40 }, { name: 'Gestion du Temps', hp: -30 }],
+        formula: (hours) => Math.floor(-60 * hours)
     },
     10: {
-        name: 'Contributions',
-        emoji: '🤝',
-        traits: [{ name: 'Altruisme', hp: 100 }, { name: 'Sens du Devoir', hp: 80 }],
-        options: ['Bénévolat', 'Open-Source', 'Mentorat', 'Aide Communauté'],
-        formula: (hours, type) => {
-            const values = { 'Bénévolat': 100, 'Open-Source': 110, 'Mentorat': 130, 'Aide Communauté': 90 };
-            return Math.floor((values[type] || 100) * hours);
-        }
+        name: 'Méditation/Mindfulness',
+        emoji: '🧘',
+        traits: [{ name: 'Stabilité Émotionnelle', hp: 60 }, { name: 'Maîtrise de Soi', hp: 50 }],
+        formula: (hours) => Math.floor(100 * hours)
     }
 };
 
-// ==================== XP BAREME ====================
+// ==================== FUNCTIONS TO DETECT ARTEFACTS AND TRAITS ====================
 
-const XP_BAREME = {
-  apprentissage_leger: 20,
-  apprentissage_standard: 40,
-  apprentissage_approfondi: 80,
-  apprentissage_expert: 150,
-  travail_junior: 100,
-  travail_standard: 200,
-  travail_senior: 400,
-  projet_simple: 100,
-  projet_complexe: 300,
-  projet_strategique: 500,
-  social_contribution: 75,
-  social_networking: 120,
-  innovation_minor: 100,
-  innovation_major: 300
-};
-
-function calculateXPScore(description) {
-  const descLower = description.toLowerCase();
-  let xpScore = 0;
-
-  if (descLower.includes("analyse") || descLower.includes("données")) {
-    xpScore += XP_BAREME.apprentissage_approfondi;
-  }
-  if (descLower.includes("2000") || descLower.includes("complex")) {
-    xpScore += XP_BAREME.apprentissage_expert;
-  }
-  if (descLower.includes("projet") || descLower.includes("livr")) {
-    xpScore += XP_BAREME.projet_complexe;
-  }
-  if (descLower.includes("dashboards") || descLower.includes("pivot")) {
-    xpScore += XP_BAREME.apprentissage_approfondi;
-  }
-  if (descLower.includes("innovation") || descLower.includes("créative")) {
-    xpScore += XP_BAREME.innovation_major;
-  }
-  if (descLower.includes("présenté") || descLower.includes("professeur")) {
-    xpScore += XP_BAREME.social_contribution;
-  }
-
-  const wordCount = description.split(" ").length;
-  if (wordCount > 200) xpScore += 50;
-  if (wordCount > 300) xpScore += 50;
-
-  return Math.min(xpScore, 500);
-}
-
-function detectArtefacts(description) {
+function detectArtefactsFromDescription(description) {
   const artefacts = {
     booksRead: 0,
     academicArticles: 0,
@@ -1190,13 +1270,21 @@ function detectArtefacts(description) {
 
   const descLower = description.toLowerCase();
 
-  Object.entries(ARTEFACTS_KEYWORDS).forEach(([artefact, keywords]) => {
+  for (let key in ARTEFACTS_KEYWORDS) {
+    const keywords = ARTEFACTS_KEYWORDS[key];
     keywords.forEach(keyword => {
-      if (descLower.includes(keyword.toLowerCase())) {
-        artefacts[artefact]++;
+      const regex = new RegExp(`(\\d+)\\s*${keyword}`, 'gi');
+      const matches = descLower.match(regex);
+      if (matches) {
+        matches.forEach(match => {
+          const num = parseInt(match.match(/\d+/)[0]);
+          artefacts[key] += num;
+        });
+      } else if (descLower.includes(keyword.toLowerCase())) {
+        artefacts[key] += 1;
       }
     });
-  });
+  }
 
   return artefacts;
 }
@@ -1255,7 +1343,18 @@ function renderDailyTasks() {
 
         let inputsHtml = '';
 
-        if (activity.formula && !activity.hpPerQuality) {
+        // NEW: Handle time-based inputs for sleep and nap
+        if (activity.usesTimeInputs) {
+            inputsHtml = `
+                <div class="sleep-time-inputs">
+                    <span class="sleep-time-label">Coucher:</span>
+                    <input type="time" class="sleep-time-input" id="activity${id}_bed" onchange="updateActivityPreview(${id})">
+                    <span class="sleep-time-label">Réveil:</span>
+                    <input type="time" class="sleep-time-input" id="activity${id}_wake" onchange="updateActivityPreview(${id})">
+                </div>
+                <div class="hp-calc-display" id="preview${id}">+0 HP</div>
+            `;
+        } else if (activity.formula && !activity.hpPerQuality) {
             const options = activity.options ? activity.options.map(opt => `<option value="${opt}">${opt}</option>`).join('') : '';
 
             if (options) {
@@ -1306,9 +1405,17 @@ function updateActivityPreview(id) {
     const activity = ACTIVITY_BAREME_HP[id];
     let hp = 0;
 
-    if (activity.formula && !activity.hpPerQuality) {
+    // NEW: Handle time-based inputs for sleep and nap
+    if (activity.usesTimeInputs) {
+        const bedTime = document.getElementById(`activity${id}_bed`)?.value;
+        const wakeTime = document.getElementById(`activity${id}_wake`)?.value;
+
+        if (bedTime && wakeTime) {
+            hp = activity.formula(bedTime, wakeTime);
+        }
+    } else if (activity.formula && !activity.hpPerQuality) {
         const select = document.getElementById(`activity${id}_select`)?.value;
-        const duration = parseFloat(document.getElementById(`activity${id}_duration`).value) || 0;
+        const duration = parseFloat(document.getElementById(`activity${id}_duration`)?.value) || 0;
 
         if (duration > 0) {
             if (select) {
@@ -1342,9 +1449,22 @@ async function submitDaily() {
         let shouldAdd = false;
         let details = {};
 
-        if (activity.formula && !activity.hpPerQuality) {
+        // NEW: Handle time-based inputs
+        if (activity.usesTimeInputs) {
+            const bedTime = document.getElementById(`activity${id}_bed`)?.value;
+            const wakeTime = document.getElementById(`activity${id}_wake`)?.value;
+
+            if (bedTime && wakeTime) {
+                hp = activity.formula(bedTime, wakeTime);
+                details = {
+                    bed_time: bedTime,
+                    wake_time: wakeTime
+                };
+                shouldAdd = true;
+            }
+        } else if (activity.formula && !activity.hpPerQuality) {
             const select = document.getElementById(`activity${id}_select`)?.value;
-            const duration = parseFloat(document.getElementById(`activity${id}_duration`).value);
+            const duration = parseFloat(document.getElementById(`activity${id}_duration`)?.value);
 
             if (duration && duration > 0) {
                 if (select) {
@@ -1354,10 +1474,10 @@ async function submitDaily() {
                     hp = activity.formula(duration);
                     details = { duration: duration };
                 }
-                shouldAdd = duration > 0;
+                shouldAdd = true;
             }
         } else if (activity.hpPerQuality) {
-            const select = document.getElementById(`activity${id}_select`).value;
+            const select = document.getElementById(`activity${id}_select`)?.value;
             if (select) {
                 hp = activity.hpPerQuality[select] || 0;
                 details = { quality: select };
@@ -1366,6 +1486,7 @@ async function submitDaily() {
         }
 
         if (shouldAdd) {
+            totalHPGained += hp;
             activities_data.push({
                 id: parseInt(id),
                 name: activity.name,
@@ -1373,12 +1494,11 @@ async function submitDaily() {
                 traits: activity.traits || [],
                 details: details
             });
-            totalHPGained += hp;
         }
     });
 
     if (activities_data.length === 0) {
-        showAlert('dailyAlert', 'Complétez au moins une activité', 'error');
+        showAlert('dailyAlert', 'Aucune activité saisie', 'error');
         return;
     }
 
@@ -1399,6 +1519,7 @@ async function submitDaily() {
         if (response.ok) {
             showAlert('dailyAlert', `✅ ${activities_data.length} activité(s) enregistrée(s) | Total: ${totalHPGained > 0 ? '+' : ''}${Math.floor(totalHPGained)} HP`, 'success');
             renderDailyTasks();
+            loadUserStats(); // Reload stats after saving
         } else {
             showAlert('dailyAlert', 'Erreur lors de l\'enregistrement', 'error');
         }
@@ -1410,10 +1531,19 @@ async function submitDaily() {
 
 function clearAllDaily() {
     Object.keys(ACTIVITY_BAREME_HP).forEach(id => {
-        const selectEl = document.getElementById(`activity${id}_select`);
-        const durationEl = document.getElementById(`activity${id}_duration`);
-        if (selectEl) selectEl.value = '';
-        if (durationEl) durationEl.value = '';
+        const activity = ACTIVITY_BAREME_HP[id];
+
+        if (activity.usesTimeInputs) {
+            const bedEl = document.getElementById(`activity${id}_bed`);
+            const wakeEl = document.getElementById(`activity${id}_wake`);
+            if (bedEl) bedEl.value = '';
+            if (wakeEl) wakeEl.value = '';
+        } else {
+            const selectEl = document.getElementById(`activity${id}_select`);
+            const durationEl = document.getElementById(`activity${id}_duration`);
+            if (selectEl) selectEl.value = '';
+            if (durationEl) durationEl.value = '';
+        }
         updateActivityPreview(id);
     });
     showAlert('dailyAlert', '🔄 Activités réinitialisées', 'info');
@@ -1577,6 +1707,7 @@ async function saveIAEvaluation() {
             data.traits.forEach(t => totalHP += t.hp_amount || 0);
             showAlert('iaAlert', `✅ Évaluation enregistrée | XP: ${data.xpTotal} | HP: ${totalHP >= 0 ? '+' : ''}${totalHP}`, 'success');
             clearIAForm();
+            loadUserStats(); // Reload stats after saving
         } else {
             showAlert('iaAlert', 'Erreur lors de l\'enregistrement', 'error');
         }
