@@ -179,7 +179,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://evpe.up.railway.app',
     'https://*.railway.app',
 ]
-CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = False
 
 # Logging configuration
