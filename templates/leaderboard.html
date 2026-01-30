@@ -1236,7 +1236,7 @@
             document.getElementById('your-rank-card').style.display = 'block';
             const yourRank = filteredPlayers.findIndex(p => !p.isLegend && p.id === currentUser.id) + 1;
             if (yourRank > 0) {
-                document.getElementById('your-rank-position').textContent = yourRank + ' (Joueur)';
+                document.getElementById('your-rank-position').textContent = yourRank;
             } else {
                 document.getElementById('your-rank-position').textContent = '-';
             }
