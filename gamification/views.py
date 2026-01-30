@@ -539,9 +539,10 @@ def api_get_user_data(request):
 # ==================== API ENDPOINTS - DAILY ACTIVITIES ====================
 
 @require_http_methods(["POST"])
+@require_http_methods(["POST"])
 @login_required
 def api_save_daily_activity(request):
-    """✅ Sauvegarde les activités quotidiennes"""
+    """✅ Sauvegarde les activités quotidiennes - VERSION AMÉLIORÉE avec support barèmes sommeil"""
     try:
         data = json.loads(request.body)
         activities = data.get('activities', [])
@@ -551,7 +552,8 @@ def api_save_daily_activity(request):
         user = request.user
         profile, _ = UserProfile.objects.get_or_create(user=user)
 
-        SCORING_MAP = {
+        # Map de scoring de base - utilisé si le frontend n'envoie pas de HP calculés
+        FALLBACK_SCORING_MAP = {
             1: {'xp': 50, 'traits': {'Résilience': 30, 'Discipline': 50}},
             2: {'xp': 40, 'traits': {'Discipline': 40}},
             3: {'xp': 60, 'traits': {'Discipline': 35, 'Apprentissage': 50}},
@@ -590,8 +592,52 @@ def api_save_daily_activity(request):
 
         for activity in activities:
             activity_id = activity.get('id')
-            if activity_id in SCORING_MAP:
-                scoring = SCORING_MAP[activity_id]
+            activity_name = activity.get('name', f'Activité {activity_id}')
+            
+            # ✅ NOUVEAU: Si le frontend envoie les HP calculés (pour sommeil/sieste avec barèmes)
+            if 'hp' in activity and 'traits' in activity:
+                hp_total = activity.get('hp', 0)
+                traits_from_frontend = activity.get('traits', [])
+                
+                # Calculer la somme des HP de base des traits
+                base_hp_sum = sum(t.get('hp', 0) for t in traits_from_frontend)
+                
+                # Appliquer le ratio aux traits
+                for trait_info in traits_from_frontend:
+                    trait_name = trait_info.get('name')
+                    base_trait_hp = trait_info.get('hp', 0)
+                    
+                    if trait_name and base_hp_sum > 0:
+                        # Calculer le HP proportionnel basé sur le HP total calculé
+                        # Exemple: Si sommeil devrait donner 200 HP base mais donne 150 HP réel
+                        # Et un trait vaut 120 HP base, il recevra (120/200) * 150 = 90 HP
+                        hp_amount = int((base_trait_hp / base_hp_sum) * hp_total)
+                        
+                        traits_hp_gained[trait_name] = traits_hp_gained.get(trait_name, 0) + hp_amount
+                        
+                        trait, _ = PersonalityTrait.objects.get_or_create(
+                            name=trait_name,
+                            defaults={'category': 'behavioral'}
+                        )
+
+                        EvaluationTraitLink.objects.create(
+                            evaluation=evaluation,
+                            trait=trait,
+                            hp_awarded=hp_amount,
+                            relevance=f"{activity_name}: {trait_name}"
+                        )
+
+                        user_trait, created = UserPersonalityTrait.objects.get_or_create(
+                            user=user,
+                            trait=trait
+                        )
+
+                        user_trait.hp += hp_amount
+                        user_trait.save()
+                        
+            # ✅ ANCIEN: Fallback pour les activités qui utilisent le scoring map
+            elif activity_id in FALLBACK_SCORING_MAP:
+                scoring = FALLBACK_SCORING_MAP[activity_id]
                 total_xp += scoring['xp']
 
                 for trait_name, hp_amount in scoring['traits'].items():
@@ -606,7 +652,7 @@ def api_save_daily_activity(request):
                         evaluation=evaluation,
                         trait=trait,
                         hp_awarded=hp_amount,
-                        relevance=f"Activité {activity_id}: {trait_name}"
+                        relevance=f"{activity_name}: {trait_name}"
                     )
 
                     user_trait, created = UserPersonalityTrait.objects.get_or_create(
@@ -635,7 +681,7 @@ def api_save_daily_activity(request):
         return JsonResponse({
             'success': True,
             'message': 'Activités enregistrées',
-            'total_xp': 0,
+            'total_xp': total_xp,
             'traits_hp': traits_hp_gained,
             'level': profile.level,
             'evaluation_id': evaluation.id
@@ -644,6 +690,7 @@ def api_save_daily_activity(request):
         import traceback
         traceback.print_exc()
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
 
 
 @require_http_methods(["GET"])
