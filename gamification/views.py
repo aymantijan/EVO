@@ -1888,4 +1888,126 @@ def remove_domain(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
+# ---- SUBJECTS ----
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_study_subjects(request):
+    subjects = StudySubject.objects.filter(user=request.user)
+    serializer = StudySubjectSerializer(subjects, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_study_subject(request):
+    serializer = StudySubjectSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_study_subject(request, subject_id):
+    try:
+        subject = StudySubject.objects.get(id=subject_id, user=request.user)
+    except StudySubject.DoesNotExist:
+        return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+    # CASCADE supprime automatiquement les chapitres et sections liés
+    subject.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# ---- CHAPTERS ----
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_study_chapters(request):
+    chapters = StudyChapter.objects.filter(user=request.user)
+    serializer = StudyChapterSerializer(chapters, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_study_chapter(request):
+    # Vérifie que la matière appartient à l'utilisateur
+    subject_id = request.data.get('subject')
+    if not StudySubject.objects.filter(id=subject_id, user=request.user).exists():
+        return Response({'error': 'Subject not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = StudyChapterSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_study_chapter(request, chapter_id):
+    try:
+        chapter = StudyChapter.objects.get(id=chapter_id, user=request.user)
+    except StudyChapter.DoesNotExist:
+        return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+    # CASCADE supprime automatiquement les sections liées
+    chapter.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# ---- SECTIONS ----
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_study_sections(request):
+    sections = StudySection.objects.filter(user=request.user)
+    serializer = StudySectionSerializer(sections, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_study_section(request):
+    # Vérifie que la matière et le chapitre appartiennent à l'utilisateur
+    subject_id = request.data.get('subject')
+    chapter_id = request.data.get('chapter')
+    if not StudySubject.objects.filter(id=subject_id, user=request.user).exists():
+        return Response({'error': 'Subject not found'}, status=status.HTTP_404_NOT_FOUND)
+    if not StudyChapter.objects.filter(id=chapter_id, user=request.user).exists():
+        return Response({'error': 'Chapter not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = StudySectionSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_study_section(request, section_id):
+    try:
+        section = StudySection.objects.get(id=section_id, user=request.user)
+    except StudySection.DoesNotExist:
+        return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = StudySectionSerializer(section, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_study_section(request, section_id):
+    try:
+        section = StudySection.objects.get(id=section_id, user=request.user)
+    except StudySection.DoesNotExist:
+        return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+    section.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
 # ==================== END OF FILE ====================
