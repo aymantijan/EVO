@@ -1004,17 +1004,29 @@
 </div>
 
 <script>
+    // =====================================================================
+    // ÉTAT LOCAL (miroir de ce qui est dans la base de données)
+    // =====================================================================
     let appState = {
-        subjects: [],
-        chapters: [],
-        sections: []
+        subjects: [],   // [{id, name, created_at}]
+        chapters: [],   // [{id, subject, title, coefficient, created_at}]
+        sections: []    // [{id, subject, chapter, title, progress, ...}]
     };
 
+    // =====================================================================
+    // CSRF TOKEN — nécessaire pour POST / PATCH / DELETE avec Django
+    // =====================================================================
+    function getCsrfToken() {
+        const cookie = document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='));
+        return cookie ? cookie.trim().split('=')[1] : '';
+    }
+
+    // =====================================================================
+    // INITIALISATION
+    // =====================================================================
     document.addEventListener('DOMContentLoaded', () => {
-        loadData();
-        updateAllSelects();
+        loadData();          // charge depuis l'API (async)
         setupListeners();
-        updateAll();
     });
 
     function setupListeners() {
@@ -1024,99 +1036,209 @@
         document.getElementById('section-subject').addEventListener('change', updateChaptersSelect);
     }
 
-    function addSubject(e) {
+    // =====================================================================
+    // LOAD — récupère les 3 collections en parallèle depuis l'API
+    // =====================================================================
+    async function loadData() {
+        try {
+            const [subjectsRes, chaptersRes, sectionsRes] = await Promise.all([
+                fetch('/gamification/api/study-tracker/subjects/'),
+                fetch('/gamification/api/study-tracker/chapters/'),
+                fetch('/gamification/api/study-tracker/sections/')
+            ]);
+            appState.subjects = await subjectsRes.json();
+            appState.chapters = await chaptersRes.json();
+            appState.sections = await sectionsRes.json();
+        } catch (err) {
+            console.error('Erreur lors du chargement des données:', err);
+        }
+        // Met à jour l'interface après chargement
+        updateAllSelects();
+        updateAll();
+    }
+
+    // =====================================================================
+    // CRUD — SUBJECTS
+    // =====================================================================
+    async function addSubject(e) {
         e.preventDefault();
         const name = document.getElementById('subject-name').value.trim();
-        if (name) {
-            appState.subjects.push({
-                id: Date.now(),
-                name: name
+        if (!name) return;
+
+        try {
+            const res = await fetch('/gamification/api/study-tracker/subjects/create/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({ name })
             });
+            if (!res.ok) throw new Error(await res.text());
+            const newSubject = await res.json();
+
+            appState.subjects.push(newSubject);
             document.getElementById('subject-form').reset();
             updateAllSelects();
             updateAll();
-            saveData();
+        } catch (err) {
+            console.error('Erreur ajout matière:', err);
+            alert('Erreur lors de l\'ajout de la matière.');
         }
     }
 
-    function addChapter(e) {
-        e.preventDefault();
-        const subjectId = parseInt(document.getElementById('chapter-subject').value);
-        const title = document.getElementById('chapter-title').value.trim();
-        const coefficient = parseFloat(document.getElementById('chapter-coefficient').value);
+    async function deleteSubject(subjectId) {
+        if (!confirm('Supprimer cette matière et tout son contenu?')) return;
 
-        if (subjectId && title) {
-            appState.chapters.push({
-                id: Date.now(),
-                subjectId: subjectId,
-                title: title,
-                coefficient: coefficient
+        try {
+            const res = await fetch(`/gamification/api/study-tracker/subjects/${subjectId}/delete/`, {
+                method: 'DELETE',
+                headers: { 'X-CSRFToken': getCsrfToken() }
             });
+            if (!res.ok) throw new Error(await res.text());
+
+            // Retire du miroir local (CASCADE côté serveur gère chapitres/sections)
+            appState.subjects  = appState.subjects.filter(s => s.id !== subjectId);
+            appState.chapters  = appState.chapters.filter(ch => ch.subject !== subjectId);
+            appState.sections  = appState.sections.filter(s => s.subject !== subjectId);
+            updateAllSelects();
+            updateAll();
+        } catch (err) {
+            console.error('Erreur suppression matière:', err);
+            alert('Erreur lors de la suppression.');
+        }
+    }
+
+    // =====================================================================
+    // CRUD — CHAPTERS
+    // =====================================================================
+    async function addChapter(e) {
+        e.preventDefault();
+        const subjectId  = parseInt(document.getElementById('chapter-subject').value);
+        const title      = document.getElementById('chapter-title').value.trim();
+        const coefficient = parseFloat(document.getElementById('chapter-coefficient').value);
+        if (!subjectId || !title) return;
+
+        try {
+            const res = await fetch('/gamification/api/study-tracker/chapters/create/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({ subject: subjectId, title, coefficient })
+            });
+            if (!res.ok) throw new Error(await res.text());
+            const newChapter = await res.json();
+
+            appState.chapters.push(newChapter);
             document.getElementById('chapter-form').reset();
             document.getElementById('chapter-coefficient').value = 1;
             updateAllSelects();
             updateAll();
-            saveData();
+        } catch (err) {
+            console.error('Erreur ajout chapitre:', err);
+            alert('Erreur lors de l\'ajout du chapitre.');
         }
     }
 
-    function addSection(e) {
+    async function deleteChapter(chapterId) {
+        if (!confirm('Supprimer ce chapitre et ses sections?')) return;
+
+        try {
+            const res = await fetch(`/gamification/api/study-tracker/chapters/${chapterId}/delete/`, {
+                method: 'DELETE',
+                headers: { 'X-CSRFToken': getCsrfToken() }
+            });
+            if (!res.ok) throw new Error(await res.text());
+
+            appState.chapters = appState.chapters.filter(ch => ch.id !== chapterId);
+            appState.sections = appState.sections.filter(s => s.chapter !== chapterId);
+            updateAll();
+        } catch (err) {
+            console.error('Erreur suppression chapitre:', err);
+            alert('Erreur lors de la suppression.');
+        }
+    }
+
+    // =====================================================================
+    // CRUD — SECTIONS
+    // =====================================================================
+    async function addSection(e) {
         e.preventDefault();
         const subjectId = parseInt(document.getElementById('section-subject').value);
         const chapterId = parseInt(document.getElementById('section-chapter').value);
-        const title = document.getElementById('section-title').value.trim();
+        const title     = document.getElementById('section-title').value.trim();
+        if (!subjectId || !chapterId || !title) return;
 
-        if (subjectId && chapterId && title) {
-            appState.sections.push({
-                id: Date.now(),
-                subjectId: subjectId,
-                chapterId: chapterId,
-                title: title,
-                progress: 0
+        try {
+            const res = await fetch('/gamification/api/study-tracker/sections/create/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({ subject: subjectId, chapter: chapterId, title, progress: 0 })
             });
+            if (!res.ok) throw new Error(await res.text());
+            const newSection = await res.json();
+
+            appState.sections.push(newSection);
             document.getElementById('section-form').reset();
             updateAll();
-            saveData();
+        } catch (err) {
+            console.error('Erreur ajout section:', err);
+            alert('Erreur lors de l\'ajout de la section.');
         }
     }
 
-    function updateProgress(sectionId, delta) {
+    async function updateProgress(sectionId, delta) {
         const section = appState.sections.find(s => s.id === sectionId);
-        if (section) {
-            section.progress = Math.max(0, Math.min(100, section.progress + delta));
+        if (!section) return;
+
+        const newProgress = Math.max(0, Math.min(100, section.progress + delta));
+        if (newProgress === section.progress) return; // pas de changement
+
+        try {
+            const res = await fetch(`/gamification/api/study-tracker/sections/${sectionId}/`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({ progress: newProgress })
+            });
+            if (!res.ok) throw new Error(await res.text());
+
+            // Met à jour le miroir local immédiatement (UX fluide)
+            section.progress = newProgress;
             updateAll();
-            saveData();
+        } catch (err) {
+            console.error('Erreur mise à jour progression:', err);
         }
     }
 
-    function deleteSection(sectionId) {
-        if (confirm('Supprimer cette section?')) {
+    async function deleteSection(sectionId) {
+        if (!confirm('Supprimer cette section?')) return;
+
+        try {
+            const res = await fetch(`/gamification/api/study-tracker/sections/${sectionId}/delete/`, {
+                method: 'DELETE',
+                headers: { 'X-CSRFToken': getCsrfToken() }
+            });
+            if (!res.ok) throw new Error(await res.text());
+
             appState.sections = appState.sections.filter(s => s.id !== sectionId);
             updateAll();
-            saveData();
+        } catch (err) {
+            console.error('Erreur suppression section:', err);
+            alert('Erreur lors de la suppression.');
         }
     }
 
-    function deleteChapter(chapterId) {
-        if (confirm('Supprimer ce chapitre?')) {
-            appState.chapters = appState.chapters.filter(ch => ch.id !== chapterId);
-            appState.sections = appState.sections.filter(s => s.chapterId !== chapterId);
-            updateAll();
-            saveData();
-        }
-    }
-
-    function deleteSubject(subjectId) {
-        if (confirm('Supprimer cette matière?')) {
-            appState.subjects = appState.subjects.filter(s => s.id !== subjectId);
-            appState.chapters = appState.chapters.filter(ch => ch.subjectId !== subjectId);
-            appState.sections = appState.sections.filter(s => s.subjectId !== subjectId);
-            updateAllSelects();
-            updateAll();
-            saveData();
-        }
-    }
-
+    // =====================================================================
+    // UI — SELECTS, CHART, LISTE, STATS (identique à avant, sans changement)
+    // =====================================================================
     function updateAllSelects() {
         const selects = ['chapter-subject', 'section-subject'];
         selects.forEach(id => {
@@ -1137,7 +1259,8 @@
         const subjectId = parseInt(document.getElementById('section-subject').value);
         const select = document.getElementById('section-chapter');
         select.innerHTML = '<option value="">-- Sélectionner --</option>';
-        appState.chapters.filter(ch => ch.subjectId === subjectId).forEach(chapter => {
+        // NOTE: le champ FK dans le serializer s'appelle "subject" (pas "subjectId")
+        appState.chapters.filter(ch => ch.subject === subjectId).forEach(chapter => {
             const option = document.createElement('option');
             option.value = chapter.id;
             option.textContent = chapter.title;
@@ -1171,6 +1294,7 @@
     function updateWeightedAverage() {
         if (appState.chapters.length === 0) {
             document.getElementById('weighted-average').textContent = '0.0';
+            document.getElementById('average-display').textContent = '0%';
             return;
         }
 
@@ -1178,7 +1302,7 @@
         let totalCoefficient = 0;
 
         appState.chapters.forEach(chapter => {
-            const chapterSections = appState.sections.filter(s => s.chapterId === chapter.id);
+            const chapterSections = appState.sections.filter(s => s.chapter === chapter.id);
             if (chapterSections.length > 0) {
                 const chapterProgress = chapterSections.reduce((sum, s) => sum + s.progress, 0) / chapterSections.length;
                 totalWeightedProgress += chapterProgress * chapter.coefficient;
@@ -1205,7 +1329,7 @@
         }
 
         chartBars.innerHTML = appState.subjects.map(subject => {
-            const sections = appState.sections.filter(s => s.subjectId === subject.id);
+            const sections = appState.sections.filter(s => s.subject === subject.id);
             const progress = sections.length > 0
                 ? Math.round(sections.reduce((sum, s) => sum + s.progress, 0) / sections.length)
                 : 0;
@@ -1234,14 +1358,14 @@
 
         emptyState.style.display = 'none';
         container.innerHTML = appState.subjects.map(subject => {
-            const chapters = appState.chapters.filter(ch => ch.subjectId === subject.id);
-            const sections = appState.sections.filter(s => s.subjectId === subject.id);
+            const chapters = appState.chapters.filter(ch => ch.subject === subject.id);
+            const sections = appState.sections.filter(s => s.subject === subject.id);
             const avgProgress = sections.length > 0
                 ? Math.round(sections.reduce((sum, s) => sum + s.progress, 0) / sections.length)
                 : 0;
 
             const chaptersHtml = chapters.map(chapter => {
-                const chapterSections = sections.filter(s => s.chapterId === chapter.id);
+                const chapterSections = sections.filter(s => s.chapter === chapter.id);
                 const sectionsHtml = chapterSections.map(section => `
                     <div class="study-section-row">
                         <span class="study-section-name">${section.title}</span>
@@ -1290,8 +1414,8 @@
         const container = document.getElementById('stats-container');
 
         container.innerHTML = appState.subjects.map(subject => {
-            const chapters = appState.chapters.filter(ch => ch.subjectId === subject.id);
-            const sections = appState.sections.filter(s => s.subjectId === subject.id);
+            const chapters = appState.chapters.filter(ch => ch.subject === subject.id);
+            const sections = appState.sections.filter(s => s.subject === subject.id);
             const avgProgress = sections.length > 0
                 ? Math.round(sections.reduce((sum, s) => sum + s.progress, 0) / sections.length)
                 : 0;
@@ -1299,7 +1423,7 @@
             const totalCoeff = chapters.reduce((sum, ch) => sum + ch.coefficient, 0);
             let weightedProgress = 0;
             chapters.forEach(ch => {
-                const chSections = sections.filter(s => s.chapterId === ch.id);
+                const chSections = sections.filter(s => s.chapter === ch.id);
                 if (chSections.length > 0) {
                     const chProgress = chSections.reduce((sum, s) => sum + s.progress, 0) / chSections.length;
                     weightedProgress += chProgress * ch.coefficient;
@@ -1316,17 +1440,6 @@
                 </div>
             `;
         }).join('');
-    }
-
-    function loadData() {
-        const stored = localStorage.getItem('studyTrackerState');
-        if (stored) {
-            appState = JSON.parse(stored);
-        }
-    }
-
-    function saveData() {
-        localStorage.setItem('studyTrackerState', JSON.stringify(appState));
     }
 </script>
 {% endblock %}
