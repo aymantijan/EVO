@@ -5,7 +5,7 @@ from .models import (
     UserProfile, Skill, UserSkill, Achievement, UserAchievement,
     Challenge, UserChallenge, StudySession, Action,
     PersonalityTrait, UserPersonalityTrait, ActivityEvaluation,
-    EvaluationTraitLink, ActivityArtifact, Resource
+    EvaluationTraitLink, ActivityArtifact, Resource, StudySubject, StudyChapter, StudySection
 )
 
 
@@ -313,3 +313,23 @@ class DashboardStatsSerializer(serializers.Serializer):
     recent_achievements = AchievementSerializer(many=True)
     active_challenges = ChallengeSerializer(many=True)
     top_skills = UserSkillSerializer(many=True)
+
+class StudySubjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudySubject
+        fields = ['id', 'name', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+
+class StudyChapterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudyChapter
+        fields = ['id', 'subject', 'title', 'coefficient', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+
+class StudySectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudySection
+        fields = ['id', 'subject', 'chapter', 'title', 'progress', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
