@@ -1066,7 +1066,7 @@
         if (!name) return;
 
         try {
-            const res = await fetch('/gamification/api/study-tracker/subjects/create/', {
+            const res = await fetch('/api/study-tracker/subjects/create/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1091,7 +1091,7 @@
         if (!confirm('Supprimer cette matière et tout son contenu?')) return;
 
         try {
-            const res = await fetch(`/gamification/api/study-tracker/subjects/${subjectId}/delete/`, {
+            const res = await fetch(`/api/study-tracker/subjects/${subjectId}/delete/`, {
                 method: 'DELETE',
                 headers: { 'X-CSRFToken': getCsrfToken() }
             });
@@ -1120,7 +1120,7 @@
         if (!subjectId || !title) return;
 
         try {
-            const res = await fetch('/gamification/api/study-tracker/chapters/create/', {
+            const res = await fetch('/api/study-tracker/chapters/create/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1146,7 +1146,7 @@
         if (!confirm('Supprimer ce chapitre et ses sections?')) return;
 
         try {
-            const res = await fetch(`/gamification/api/study-tracker/chapters/${chapterId}/delete/`, {
+            const res = await fetch(`/api/study-tracker/chapters/${chapterId}/delete/`, {
                 method: 'DELETE',
                 headers: { 'X-CSRFToken': getCsrfToken() }
             });
@@ -1172,7 +1172,7 @@
         if (!subjectId || !chapterId || !title) return;
 
         try {
-            const res = await fetch('/gamification/api/study-tracker/sections/create/', {
+            const res = await fetch('/api/study-tracker/sections/create/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1200,7 +1200,7 @@
         if (newProgress === section.progress) return; // pas de changement
 
         try {
-            const res = await fetch(`/gamification/api/study-tracker/sections/${sectionId}/`, {
+            const res = await fetch(`/api/study-tracker/sections/${sectionId}/`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1222,7 +1222,7 @@
         if (!confirm('Supprimer cette section?')) return;
 
         try {
-            const res = await fetch(`/gamification/api/study-tracker/sections/${sectionId}/delete/`, {
+            const res = await fetch(`/api/study-tracker/sections/${sectionId}/delete/`, {
                 method: 'DELETE',
                 headers: { 'X-CSRFToken': getCsrfToken() }
             });
