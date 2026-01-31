@@ -1551,7 +1551,8 @@ function clearAllDaily() {
 
 // ==================== IA FUNCTIONS ====================
 
-// ✅ ÉTAPE 1: Appelle api/evaluate-activity/
+// ✅ ÉTAPE 1: Appelle api/evaluate-activity/ - VERSION CORRIGÉE
+// Cette fonction ANALYSE SEULEMENT, elle N'ENREGISTRE PAS en base de données
 async function evaluateWithIA() {
     const description = document.getElementById('iaDescription').value.trim();
 
@@ -1565,6 +1566,9 @@ async function evaluateWithIA() {
     resultsDiv.classList.add('active');
 
     try {
+        console.log('📤 ENVOI POUR ANALYSE (PAS D\'ENREGISTREMENT)');
+        console.log('   Description:', description.substring(0, 100) + '...');
+
         const evalResponse = await fetch('/api/evaluate-activity/', {
             method: 'POST',
             headers: {
@@ -1576,11 +1580,15 @@ async function evaluateWithIA() {
         });
 
         if (!evalResponse.ok) {
+            const errorData = await evalResponse.json();
+            console.error('❌ Erreur serveur:', errorData);
             resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: #999;">⚠️ Erreur lors de l\'analyse</div>';
+            showAlert('iaAlert', errorData.error || 'Erreur lors de l\'analyse', 'error');
             return;
         }
 
         const evalData = await evalResponse.json();
+        console.log('📥 RÉPONSE D\'ANALYSE (AUCUN ENREGISTREMENT EFFECTUÉ):', evalData);
 
         if (!evalData.success) {
             showAlert('iaAlert', evalData.error || 'Erreur lors de l\'analyse', 'error');
@@ -1588,19 +1596,16 @@ async function evaluateWithIA() {
             return;
         }
 
-        // ✅ Stocker la réponse DIRECTEMENT de l'API
+        // ✅ Stocker la réponse pour l'enregistrement ultérieur
+        // Utiliser les données retournées par l'API (personality_traits déjà en tableau)
         window.currentIAEvaluation = {
             xpTotal: evalData.total_xp || 0,
-            qualityScore: 0.8,  // Le serveur ne le retourne pas, mets une valeur par défaut
-            feedback: 'Activité analysée avec succès',  // Idem
-            traits: Object.entries(evalData.traits_hp || {}).map(([name, hp]) => ({
-                name: name,
-                hp_amount: hp,
-                relevance: 'Détecté par l\'IA'
-            })),
+            qualityScore: evalData.quality_score || 0.8,
+            feedback: evalData.feedback || 'Activité analysée avec succès',
+            traits: evalData.personality_traits || [],  // ← Déjà un tableau maintenant
             detections: evalData.detections || {},
-            description: description,
-            evaluation_id: evalData.evaluation_id
+            description: description
+            // ⚠️ PAS d'evaluation_id car rien n'a été enregistré!
         };
 
         const data = window.currentIAEvaluation;
@@ -1610,9 +1615,25 @@ async function evaluateWithIA() {
             totalHP += trait.hp_amount || 0;
         });
 
+        console.log('✅ Analyse terminée (AUCUN ENREGISTREMENT):');
+        console.log('   XP:', data.xpTotal);
+        console.log('   HP Total:', totalHP);
+        console.log('   Traits:', data.traits.length);
+        data.traits.forEach((t, i) => {
+            console.log(`      ${i+1}. ${t.name} → ${t.hp_amount} HP`);
+        });
+        console.log('   Artéfacts:', data.detections);
+
+        // ✅ AFFICHER LES RÉSULTATS (SANS AVOIR ENREGISTRÉ)
         let html = `
         <div class="ia-result-section">
-            <div class="ia-result-title">🎯 Résultats Complets</div>
+            <div class="ia-result-title">🎯 Résultats de l'Analyse</div>
+            <div style="background: rgba(255, 152, 0, 0.1); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; border-left: 3px solid #ff9800;">
+                <div style="font-weight: 600; color: #ff9800; margin-bottom: 0.5rem;">⚠️ APERÇU SEULEMENT</div>
+                <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                    Ces points ne sont PAS encore attribués. Cliquez sur "Enregistrer l'Évaluation" pour confirmer.
+                </div>
+            </div>
             <div class="xp-hp-grid">
                 <div class="xp-hp-card xp">
                     <div class="xp-hp-label">XP Global</div>
@@ -1665,17 +1686,22 @@ async function evaluateWithIA() {
             <button class="vision-btn vision-btn-success" onclick="saveIAEvaluation()">
                 💾 Enregistrer l'Évaluation
             </button>
+            <div style="margin-top: 0.75rem; text-align: center; color: var(--text-secondary); font-size: 0.85rem;">
+                ⚠️ Cliquez pour confirmer et attribuer les points
+            </div>
         </div>`;
 
         resultsDiv.innerHTML = html;
 
     } catch (error) {
-        console.error('Erreur:', error);
+        console.error('❌ ERREUR:', error);
         resultsDiv.innerHTML = '<div style="padding: 2rem; text-align: center; color: #999;">❌ Impossible de communiquer avec le serveur</div>';
+        showAlert('iaAlert', 'Impossible de communiquer avec le serveur', 'error');
     }
 }
 
-// ✅ ÉTAPE 2: Appelle api/confirm-evaluation/
+// ✅ ÉTAPE 2: Appelle api/confirm-evaluation/ - VERSION CORRIGÉE
+// Cette fonction ENREGISTRE les données en base de données
 async function saveIAEvaluation() {
     const data = window.currentIAEvaluation;
     if (!data) {
@@ -1684,6 +1710,15 @@ async function saveIAEvaluation() {
     }
 
     try {
+        console.log('📤 ENVOI POUR ENREGISTREMENT EN BASE');
+        console.log('   Description:', data.description.substring(0, 100) + '...');
+        console.log('   XP Total:', data.xpTotal);
+        console.log('   Traits:', data.traits.length);
+        data.traits.forEach((trait, i) => {
+            console.log(`      ${i+1}. ${trait.name} → ${trait.hp_amount} HP`);
+        });
+        console.log('   Artéfacts:', data.detections);
+
         const confirmResponse = await fetch('/api/confirm-evaluation/', {
             method: 'POST',
             headers: {
@@ -1696,23 +1731,58 @@ async function saveIAEvaluation() {
                 xp_amount: data.xpTotal,
                 quality_score: data.qualityScore,
                 feedback: data.feedback,
-                personality_traits: data.traits,
+                personality_traits: data.traits,  // ← Déjà au bon format
                 detections: data.detections
             })
         });
 
+        const result = await confirmResponse.json();
+        console.log('📥 RÉPONSE D\'ENREGISTREMENT:', result);
+
         if (confirmResponse.ok) {
-            const result = await confirmResponse.json();
             let totalHP = 0;
             data.traits.forEach(t => totalHP += t.hp_amount || 0);
-            showAlert('iaAlert', `✅ Évaluation enregistrée | XP: ${data.xpTotal} | HP: ${totalHP >= 0 ? '+' : ''}${totalHP}`, 'success');
+            
+            let message = `✅ Évaluation enregistrée`;
+            
+            // Afficher les stats si disponibles
+            if (result.traits_processed !== undefined) {
+                message += ` | XP: ${result.xp_awarded} | HP: ${totalHP >= 0 ? '+' : ''}${totalHP}`;
+                message += ` | Traits: ${result.traits_processed}/${result.total_traits}`;
+                
+                if (result.warnings && result.warnings.length > 0) {
+                    message += ` (${result.warnings.length} avertissements)`;
+                }
+            } else {
+                // Fallback si le serveur ne retourne pas de stats
+                message += ` | XP: ${data.xpTotal} | HP: ${totalHP >= 0 ? '+' : ''}${totalHP}`;
+            }
+            
+            showAlert('iaAlert', message, 'success');
+            
+            // Afficher les avertissements s'il y en a
+            if (result.warnings && result.warnings.length > 0) {
+                console.warn('⚠️  AVERTISSEMENTS:', result.warnings);
+            }
+            
+            // Afficher les artéfacts enregistrés
+            if (result.artifacts_saved) {
+                console.log('📦 ARTÉFACTS ENREGISTRÉS:', result.artifacts_saved);
+            }
+            
+            console.log('✅ ENREGISTREMENT CONFIRMÉ');
+            console.log('   Evaluation ID:', result.evaluation_id);
+            console.log('   Nouveau niveau:', result.new_level);
+            
             clearIAForm();
             loadUserStats(); // Reload stats after saving
         } else {
-            showAlert('iaAlert', 'Erreur lors de l\'enregistrement', 'error');
+            const errorMsg = result.error || 'Erreur inconnue';
+            showAlert('iaAlert', `❌ ${errorMsg}`, 'error');
+            console.error('❌ Erreur serveur:', result);
         }
     } catch (error) {
-        console.error('Erreur:', error);
+        console.error('❌ ERREUR CATCH:', error);
         showAlert('iaAlert', 'Impossible de communiquer avec le serveur', 'error');
     }
 }
@@ -1720,6 +1790,7 @@ async function saveIAEvaluation() {
 function clearIAForm() {
     document.getElementById('iaDescription').value = '';
     document.getElementById('iaResults').classList.remove('active');
+    document.getElementById('iaResults').innerHTML = '';
     window.currentIAEvaluation = null;
 }
 
