@@ -796,7 +796,12 @@ def api_validate_day_planning(request):
 @require_http_methods(["POST"])
 @login_required
 def api_evaluate_activity(request):
-    """✅ Évalue une activité avec l'IA"""
+    """✅ Évalue une activité avec l'IA - VERSION CORRIGÉE
+    
+    Cette fonction ANALYSE SEULEMENT l'activité et retourne les résultats.
+    Elle NE DOIT PAS enregistrer en base de données.
+    L'enregistrement se fait uniquement via api_confirm_evaluation().
+    """
     try:
         data = json.loads(request.body)
         description = data.get('description', '')
@@ -810,6 +815,13 @@ def api_evaluate_activity(request):
         api_key = os.getenv('PERPLEXITY_API_KEY')
         if not api_key:
             return JsonResponse({'success': False, 'error': 'PERPLEXITY_API_KEY not configured'}, status=400)
+
+        # 🔍 DEBUG
+        print("\n" + "=" * 100)
+        print("📊 ANALYSE IA (SANS ENREGISTREMENT)")
+        print(f"   User: {user.username}")
+        print(f"   Description: {description[:100]}...")
+        print("=" * 100)
 
         prompt = f"""Analyse cette activité et retourne UNIQUEMENT du JSON (pas de texte avant/après):
 
@@ -840,6 +852,7 @@ Retourne ce JSON valide:
             'messages': [{'role': 'user', 'content': prompt}]
         }
 
+        print("📤 Appel API Perplexity...")
         response = requests.post(
             'https://api.perplexity.ai/chat/completions',
             json=payload,
@@ -848,80 +861,78 @@ Retourne ce JSON valide:
         )
 
         if response.status_code != 200:
+            print(f"❌ Erreur API: {response.status_code}")
             return JsonResponse({'success': False, 'error': f'API error: {response.status_code}'}, status=400)
 
         result = response.json()
         content = result['choices'][0]['message']['content']
+        
+        print("📥 Réponse IA reçue")
 
         json_match = re.search(r'\{.*\}', content, re.DOTALL)
         if not json_match:
+            print("❌ Impossible de parser la réponse")
             return JsonResponse({'success': False, 'error': 'Could not parse AI response'}, status=400)
 
         evaluation_data = json.loads(json_match.group())
-
-        evaluation = ActivityEvaluation.objects.create(
-            user=user,
-            description=description,
-            is_valid=evaluation_data.get('isValid', True),
-            xp_awarded=evaluation_data.get('xpAmount', 50),
-            quality_score=evaluation_data.get('qualityScore', 0.5),
-            ai_feedback=evaluation_data.get('feedback', ''),
-            books_read=evaluation_data.get('detections', {}).get('booksRead', 0),
-            academic_articles=evaluation_data.get('detections', {}).get('academicArticles', 0),
-            projects_worked=evaluation_data.get('detections', {}).get('projectsWorked', 0),
-            online_courses=evaluation_data.get('detections', {}).get('onlineCourses', 0),
-            social_contributions=evaluation_data.get('detections', {}).get('socialContributions', 0),
-            networking_events=evaluation_data.get('detections', {}).get('networkingEvents', 0),
-        )
-
+        
+        # 📊 Calculer les totaux pour affichage
         total_xp = evaluation_data.get('xpAmount', 50) if evaluation_data.get('isValid') else 0
-        traits_hp_gained = {}
-
+        
+        # Convertir les traits au format attendu par le frontend
+        traits_for_frontend = []
+        traits_hp_dict = {}
+        
         for trait_data in evaluation_data.get('personalityTraits', []):
             trait_name = trait_data.get('name')
             hp_amount = trait_data.get('hpAmount', 0)
             relevance = trait_data.get('relevance', '')
+            
+            traits_for_frontend.append({
+                'name': trait_name,
+                'hp_amount': hp_amount,  # Note: hp_amount (pas hpAmount) pour le frontend
+                'relevance': relevance
+            })
+            
+            traits_hp_dict[trait_name] = hp_amount
+        
+        print(f"\n✅ ANALYSE TERMINÉE (AUCUN ENREGISTREMENT)")
+        print(f"   XP calculé: {total_xp}")
+        print(f"   Traits détectés: {len(traits_for_frontend)}")
+        for trait in traits_for_frontend:
+            print(f"      - {trait['name']}: {trait['hp_amount']} HP")
+        print(f"   Artéfacts: {evaluation_data.get('detections', {})}")
+        print("=" * 100 + "\n")
 
-            traits_hp_gained[trait_name] = hp_amount
-
-            trait, _ = PersonalityTrait.objects.get_or_create(
-                name=trait_name,
-                defaults={'category': 'behavioral'}
-            )
-
-            EvaluationTraitLink.objects.create(
-                evaluation=evaluation,
-                trait=trait,
-                hp_awarded=hp_amount,
-                relevance=relevance
-            )
-
-            user_trait, created = UserPersonalityTrait.objects.get_or_create(
-                user=user,
-                trait=trait
-            )
-
-            user_trait.hp += hp_amount
-            user_trait.save()
-
+        # ✅ RETOURNE SEULEMENT LES DONNÉES (PAS D'ENREGISTREMENT!)
         return JsonResponse({
             'success': True,
             'total_xp': total_xp,
-            'traits_hp': traits_hp_gained,
+            'traits_hp': traits_hp_dict,  # Pour l'affichage du total HP
+            'personality_traits': traits_for_frontend,  # Pour l'enregistrement ultérieur
             'detections': evaluation_data.get('detections', {}),
+            'quality_score': evaluation_data.get('qualityScore', 0.5),
+            'feedback': evaluation_data.get('feedback', ''),
+            'is_valid': evaluation_data.get('isValid', True),
             'level': profile.level,
-            'evaluation_id': evaluation.id
+            # ⚠️ PAS d'evaluation_id car rien n'a été créé en base!
         })
+        
     except Exception as e:
+        print("\n❌ ERREUR DANS api_evaluate_activity:")
+        print(f"❌ {str(e)}")
         import traceback
         traceback.print_exc()
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
-
 @require_http_methods(["POST"])
 @login_required
 def api_confirm_evaluation(request):
-    """✅ Confirme une évaluation IA"""
+    """✅ Confirme une évaluation IA - VERSION CORRIGÉE
+    
+    Cette fonction est la SEULE qui enregistre les données en base.
+    Elle reçoit les données de api_evaluate_activity et les enregistre.
+    """
     try:
         data = json.loads(request.body)
         user = request.user
@@ -930,59 +941,179 @@ def api_confirm_evaluation(request):
         quality_score = data.get('quality_score', 0)
         feedback = data.get('feedback', '')
         personality_traits = data.get('personality_traits', [])
-
+        detections = data.get('detections', {})
+        
+        # 🔍 DEBUG: Afficher les données reçues
+        print("\n" + "=" * 100)
+        print("📊 CONFIRMATION D'ÉVALUATION IA (ENREGISTREMENT EN BASE)")
+        print(f"   User: {user.username}")
+        print(f"   Description: {description[:100]}...")
+        print(f"   XP Amount: {xp_amount}")
+        print(f"   Quality Score: {quality_score}")
+        print(f"   Nombre de traits: {len(personality_traits)}")
+        print(f"   Traits reçus:")
+        for i, trait_data in enumerate(personality_traits):
+            print(f"      {i+1}. {trait_data.get('name')} → {trait_data.get('hp_amount')} HP")
+        print(f"   Artéfacts détectés: {detections}")
+        print("=" * 100)
+        
+        # ✅ CRÉER L'ÉVALUATION EN BASE
         evaluation = ActivityEvaluation.objects.create(
             user=user,
             description=description,
             xp_awarded=xp_amount,
             quality_score=quality_score,
             ai_feedback=feedback,
-            is_valid=True
+            is_valid=True,
+            # Enregistrer les artéfacts
+            books_read=detections.get('booksRead', 0),
+            academic_articles=detections.get('academicArticles', 0),
+            projects_worked=detections.get('projectsWorked', 0),
+            online_courses=detections.get('onlineCourses', 0),
+            social_contributions=detections.get('socialContributions', 0),
+            networking_events=detections.get('networkingEvents', 0),
         )
-
+        print(f"✅ Évaluation créée (ID: {evaluation.id})")
+        
+        # ✅ METTRE À JOUR LE PROFIL UTILISATEUR (XP)
         profile, _ = UserProfile.objects.get_or_create(user=user)
+        old_xp = profile.experience_points
         profile.experience_points += xp_amount
         profile.level = calculate_level_from_xp(profile.experience_points)
         profile.save()
-
-        for trait_data in personality_traits:
-            trait_name = trait_data.get('name')
-            hp_amount = trait_data.get('hp_amount', 0)
-
-            trait, _ = PersonalityTrait.objects.get_or_create(
-                name=trait_name,
-                defaults={'category': 'behavioral'}
-            )
-
-            EvaluationTraitLink.objects.create(
-                evaluation=evaluation,
-                trait=trait,
-                hp_awarded=hp_amount,
-                relevance=f"Détecté par IA"
-            )
-
-            user_trait, created = UserPersonalityTrait.objects.get_or_create(
-                user=user,
-                trait=trait
-            )
-
-            user_trait.hp += hp_amount
-            user_trait.save()
-
+        print(f"✅ Profil mis à jour: XP {old_xp} → {profile.experience_points} (Niveau {profile.level})")
+        
+        # Compteurs
+        traits_processed = 0
+        traits_errors = []
+        total_hp_awarded = 0
+        
+        # ✅ TRAITER LES TRAITS
+        for trait_index, trait_data in enumerate(personality_traits):
+            try:
+                trait_name = trait_data.get('name')
+                hp_amount = trait_data.get('hp_amount', 0)
+                relevance = trait_data.get('relevance', 'Détecté par IA')
+                
+                print(f"\n🔹 Trait #{trait_index+1}: {trait_name}")
+                print(f"   HP: {hp_amount} (type: {type(hp_amount)})")
+                
+                # Vérifier que hp_amount est bien un nombre
+                if not isinstance(hp_amount, (int, float)):
+                    error_msg = f"hp_amount invalide pour {trait_name}: {hp_amount} (type: {type(hp_amount)})"
+                    print(f"   ⚠️  {error_msg}")
+                    traits_errors.append(error_msg)
+                    hp_amount = 0
+                
+                if not trait_name:
+                    error_msg = f"Nom de trait manquant à l'index {trait_index}"
+                    print(f"   ❌ {error_msg}")
+                    traits_errors.append(error_msg)
+                    continue
+                
+                # Créer ou récupérer le trait
+                trait, trait_created = PersonalityTrait.objects.get_or_create(
+                    name=trait_name,
+                    defaults={'category': 'behavioral'}
+                )
+                print(f"   {'🆕' if trait_created else '✓'} Trait {'créé' if trait_created else 'existant'}")
+                
+                # Créer le lien évaluation-trait
+                eval_link = EvaluationTraitLink.objects.create(
+                    evaluation=evaluation,
+                    trait=trait,
+                    hp_awarded=hp_amount,
+                    relevance=relevance
+                )
+                print(f"   ✓ Lien créé (ID: {eval_link.id})")
+                
+                # Mettre à jour le trait utilisateur
+                user_trait, ut_created = UserPersonalityTrait.objects.get_or_create(
+                    user=user,
+                    trait=trait
+                )
+                old_hp = user_trait.hp
+                user_trait.hp += hp_amount
+                user_trait.save()
+                print(f"   ✓ UserTrait mis à jour: {old_hp} → {user_trait.hp} (+{hp_amount})")
+                
+                total_hp_awarded += hp_amount
+                traits_processed += 1
+                print(f"   ✅ Trait traité avec succès (Total: {traits_processed}/{len(personality_traits)})")
+                
+            except Exception as trait_error:
+                error_msg = f"Erreur trait {trait_name}: {str(trait_error)}"
+                traits_errors.append(error_msg)
+                print(f"   ❌ {error_msg}")
+                import traceback
+                traceback.print_exc()
+                # Continue avec les autres traits
+                continue
+        
+        # ✅ CRÉER UNE ACTION
         Action.objects.create(
             user=user,
             action_type='evaluation_confirmed',
-            description=f"Évaluation IA confirmée: {description}",
+            description=f"Évaluation IA confirmée: {description[:50]}...",
             points=xp_amount
         )
-
-        return JsonResponse({'success': True, 'evaluation_id': evaluation.id})
+        print(f"✅ Action créée")
+        
+        # Résumé
+        print("\n" + "=" * 100)
+        print("📊 RÉSUMÉ DE L'ENREGISTREMENT:")
+        print(f"   ✅ Traits traités: {traits_processed}/{len(personality_traits)}")
+        print(f"   ✅ HP total attribué: {total_hp_awarded}")
+        print(f"   ✅ XP attribué: {xp_amount}")
+        print(f"   ✅ Niveau: {profile.level}")
+        print(f"   ✅ Artéfacts enregistrés:")
+        print(f"      - Livres: {detections.get('booksRead', 0)}")
+        print(f"      - Articles: {detections.get('academicArticles', 0)}")
+        print(f"      - Projets: {detections.get('projectsWorked', 0)}")
+        print(f"      - Cours: {detections.get('onlineCourses', 0)}")
+        print(f"      - Contributions: {detections.get('socialContributions', 0)}")
+        print(f"      - Networking: {detections.get('networkingEvents', 0)}")
+        
+        if traits_errors:
+            print(f"\n   ⚠️  Erreurs rencontrées ({len(traits_errors)}):")
+            for error in traits_errors:
+                print(f"      - {error}")
+        
+        print("=" * 100 + "\n")
+        
+        # Retourner la réponse
+        response_data = {
+            'success': True,
+            'evaluation_id': evaluation.id,
+            'traits_processed': traits_processed,
+            'total_traits': len(personality_traits),
+            'total_hp_awarded': total_hp_awarded,
+            'xp_awarded': xp_amount,
+            'new_level': profile.level,
+            'artifacts_saved': {
+                'booksRead': detections.get('booksRead', 0),
+                'academicArticles': detections.get('academicArticles', 0),
+                'projectsWorked': detections.get('projectsWorked', 0),
+                'onlineCourses': detections.get('onlineCourses', 0),
+                'socialContributions': detections.get('socialContributions', 0),
+                'networkingEvents': detections.get('networkingEvents', 0),
+            }
+        }
+        
+        if traits_errors:
+            response_data['warnings'] = traits_errors
+        
+        return JsonResponse(response_data)
+        
     except Exception as e:
+        print("\n" + "=" * 100)
+        print("❌ ERREUR GLOBALE dans api_confirm_evaluation:")
+        print(f"❌ {str(e)}")
         import traceback
         traceback.print_exc()
+        print("=" * 100 + "\n")
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
-
-
+        
 # ==================== API ENDPOINTS - LEGACY/COMPATIBILITY ====================
 
 @require_http_methods(["POST"])
