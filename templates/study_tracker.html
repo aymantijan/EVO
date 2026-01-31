@@ -1042,9 +1042,9 @@
     async function loadData() {
         try {
             const [subjectsRes, chaptersRes, sectionsRes] = await Promise.all([
-                fetch('/gamification/api/study-tracker/subjects/'),
-                fetch('/gamification/api/study-tracker/chapters/'),
-                fetch('/gamification/api/study-tracker/sections/')
+                fetch('/api/study-tracker/subjects/'),
+                fetch('/api/study-tracker/chapters/'),
+                fetch('/api/study-tracker/sections/')
             ]);
             appState.subjects = await subjectsRes.json();
             appState.chapters = await chaptersRes.json();
