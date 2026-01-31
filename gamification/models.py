@@ -508,3 +508,54 @@ class Resource(models.Model):
     def level_in_galaxy(self):
         """Retourne le niveau dans la galaxie (1-100)"""
         return ((self.niveau - 1) % 100) + 1
+
+
+class StudySubject(models.Model):
+    """Matière dans le Study Tracker"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gamification_study_subjects')
+    name = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Matière (Study Tracker)"
+        verbose_name_plural = "Matières (Study Tracker)"
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.name}"
+
+
+class StudyChapter(models.Model):
+    """Chapitre dans une matière du Study Tracker"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gamification_study_chapters')
+    subject = models.ForeignKey(StudySubject, on_delete=models.CASCADE, related_name='chapters')
+    title = models.CharField(max_length=255)
+    coefficient = models.FloatField(default=1.0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Chapitre (Study Tracker)"
+        verbose_name_plural = "Chapitres (Study Tracker)"
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.subject.name} > {self.title}"
+
+
+class StudySection(models.Model):
+    """Section dans un chapitre du Study Tracker"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gamification_study_sections')
+    subject = models.ForeignKey(StudySubject, on_delete=models.CASCADE, related_name='sections')
+    chapter = models.ForeignKey(StudyChapter, on_delete=models.CASCADE, related_name='sections')
+    title = models.CharField(max_length=255)
+    progress = models.IntegerField(default=0)  # 0–100
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Section (Study Tracker)"
+        verbose_name_plural = "Sections (Study Tracker)"
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.chapter.title} > {self.title} ({self.progress}%)"

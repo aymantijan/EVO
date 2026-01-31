@@ -177,7 +177,7 @@
     text-align: center;
     margin-bottom: 40px;
     padding: 40px 20px;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    background: rgba(33, 128, 141, 1);
     border-radius: 12px;
     color: white;
 }
@@ -186,6 +186,7 @@
     font-size: 2.5rem;
     font-weight: bold;
     margin-bottom: 10px;
+    color: white;
 }
 
 .leaderboard-header p {
@@ -1009,29 +1010,255 @@
         return Math.min(100, Math.max(0, progress));
     }
 
-    // ==================== LEGENDS DATA ====================
-    const LEGENDS_BY_DOMAIN = {
-        'science': [
-            { name: 'Albert Einstein', xp: getTotalXpForLevel(900), description: 'Theorie de la relativite - Fondateur de la physique moderne', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Einstein_1921_by_F_Schmutzer.jpg' },
-            { name: 'Marie Curie', xp: getTotalXpForLevel(895), description: '2x Prix Nobel - Decouvertes chimiques revolutionnaires', avatar: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Marie_Curie_c._1920s.jpg' },
-            { name: 'Isaac Newton', xp: getTotalXpForLevel(890), description: 'Lois de la physique classique - Fondateur du calcul differentiel', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/39/GodfreyKneller-IsaacNewton-1689.jpg' }
-        ],
-        'tech': [
-            { name: 'Steve Jobs', xp: getTotalXpForLevel(850), description: 'Fondateur d\'Apple - Revolution digitale', avatar: 'https://upload.wikimedia.org/wikipedia/commons/8/85/Steve_Jobs_2006-11-05.jpg' },
-            { name: 'Bill Gates', xp: getTotalXpForLevel(840), description: 'Fondateur de Microsoft - Philanthrope mondial', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Bill_Gates_July_2015_cropped.jpg' },
-            { name: 'Elon Musk', xp: getTotalXpForLevel(830), description: 'Tesla et SpaceX - Innovation technologique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/34/Elon_Musk_Royal_Society.jpg' }
-        ],
-        'sports': [
-            { name: 'Lionel Messi', xp: getTotalXpForLevel(765), description: '8 Ballons d\'Or - GOAT du football moderne', avatar: 'https://upload.wikimedia.org/wikipedia/commons/b/b4/Messi_vs_Almeria_2018.jpg' },
-            { name: 'Cristiano Ronaldo', xp: getTotalXpForLevel(760), description: '5 Ballons d\'Or - Legende du football', avatar: 'https://upload.wikimedia.org/wikipedia/commons/d/d7/Cristiano_Ronaldo_2018_by_Glenn_Arthur.jpg' },
-            { name: 'Michael Jordan', xp: getTotalXpForLevel(755), description: '6 fois champion NBA - GOAT du basketball', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/32/Michael_Jordan_2014.jpg' }
-        ]
-    };
+// ==================== LEGENDS DATA (VERSION ÉTENDUE) ====================
+const LEGENDS_BY_DOMAIN = {
+    'science': [
+        { name: 'Albert Einstein', xp: getTotalXpForLevel(900), description: 'Théorie de la relativité - Fondateur de la physique moderne', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Einstein_1921_by_F_Schmutzer.jpg' },
+        { name: 'Marie Curie', xp: getTotalXpForLevel(895), description: '2x Prix Nobel - Découvertes chimiques révolutionnaires', avatar: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Marie_Curie_c._1920s.jpg' },
+        { name: 'Isaac Newton', xp: getTotalXpForLevel(890), description: 'Lois de la physique classique - Fondateur du calcul différentiel', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/39/GodfreyKneller-IsaacNewton-1689.jpg' },
+        { name: 'Stephen Hawking', xp: getTotalXpForLevel(885), description: 'Trous noirs et cosmologie - Vulgarisation scientifique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/Stephen_Hawking.StarChild.jpg' },
+        { name: 'Nikola Tesla', xp: getTotalXpForLevel(880), description: 'Courant alternatif - Pionnier de l\'électricité moderne', avatar: 'https://upload.wikimedia.org/wikipedia/commons/7/79/Tesla_circa_1890.jpeg' },
+        { name: 'Charles Darwin', xp: getTotalXpForLevel(875), description: 'Théorie de l\'évolution - Révolution biologique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/33/Charles_Darwin_by_Julia_Margaret_Cameron_2.jpg' },
+        { name: 'Galilée', xp: getTotalXpForLevel(870), description: 'Père de l\'astronomie moderne - Révolution scientifique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/d/d4/Justus_Sustermans_-_Portrait_of_Galileo_Galilei%2C_1636.jpg' },
+        { name: 'Ada Lovelace', xp: getTotalXpForLevel(865), description: 'Première programmeuse - Pionnière de l\'informatique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Ada_Lovelace_portrait.jpg' },
+        { name: 'Louis Pasteur', xp: getTotalXpForLevel(860), description: 'Microbiologie - Vaccination et pasteurisation', avatar: 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Louis_Pasteur.jpg' },
+        { name: 'Rosalind Franklin', xp: getTotalXpForLevel(855), description: 'Structure de l\'ADN - Cristallographie aux rayons X', avatar: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/Rosalind_Franklin_%281920-1958%29.jpg' },
+        { name: 'Carl Sagan', xp: getTotalXpForLevel(850), description: 'Cosmos - Vulgarisation de l\'astronomie', avatar: 'https://upload.wikimedia.org/wikipedia/commons/b/be/Carl_Sagan_Planetary_Society.JPG' },
+        { name: 'Richard Feynman', xp: getTotalXpForLevel(845), description: 'Physique quantique - Prix Nobel de physique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/1/1a/RichardFeynman-PaineMansionWoods1984_copyrightTamikoThiel_bw.jpg' },
+        { name: 'Jane Goodall', xp: getTotalXpForLevel(840), description: 'Primatologie - Étude des chimpanzés', avatar: 'https://upload.wikimedia.org/wikipedia/commons/f/f3/Jane_Goodall_2015.jpg' },
+        { name: 'Archimède', xp: getTotalXpForLevel(835), description: 'Mathématiques anciennes - Eurêka !', avatar: 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Domenico-Fetti_Archimedes_1620.jpg' },
+        { name: 'Johannes Kepler', xp: getTotalXpForLevel(830), description: 'Lois du mouvement planétaire - Astronomie moderne', avatar: 'https://upload.wikimedia.org/wikipedia/commons/d/d4/Johannes_Kepler_1610.jpg' },
+        { name: 'Max Planck', xp: getTotalXpForLevel(825), description: 'Père de la physique quantique - Constante de Planck', avatar: 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Max_Planck_1933.jpg' },
+        { name: 'Neil deGrasse Tyson', xp: getTotalXpForLevel(820), description: 'Astrophysicien - Vulgarisation moderne', avatar: 'https://upload.wikimedia.org/wikipedia/commons/8/82/Neil_deGrasse_Tyson_in_June_2017_%28cropped%29.jpg' },
+        { name: 'Dmitri Mendeleïev', xp: getTotalXpForLevel(815), description: 'Tableau périodique des éléments - Chimie moderne', avatar: 'https://upload.wikimedia.org/wikipedia/commons/c/c2/Mendeleev_Chairs.jpg' }
+    ],
+    
+    'tech': [
+        { name: 'Steve Jobs', xp: getTotalXpForLevel(850), description: 'Fondateur d\'Apple - Révolution digitale', avatar: 'https://upload.wikimedia.org/wikipedia/commons/d/dc/Steve_Jobs_Headshot_2010-CROP_%28cropped_2%29.jpg' },
+        { name: 'Bill Gates', xp: getTotalXpForLevel(840), description: 'Fondateur de Microsoft - Philanthrope mondial', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/a8/Bill_Gates_2017_%28cropped%29.jpg' },
+        { name: 'Elon Musk', xp: getTotalXpForLevel(830), description: 'Tesla et SpaceX - Innovation technologique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/34/Elon_Musk_Royal_Society_%28crop2%29.jpg' },
+        { name: 'Mark Zuckerberg', xp: getTotalXpForLevel(820), description: 'Fondateur de Facebook - Révolution des réseaux sociaux', avatar: 'https://upload.wikimedia.org/wikipedia/commons/1/18/Mark_Zuckerberg_F8_2019_Keynote_%2832830578717%29_%28cropped%29.jpg' },
+        { name: 'Tim Berners-Lee', xp: getTotalXpForLevel(810), description: 'Inventeur du World Wide Web - Internet moderne', avatar: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Sir_Tim_Berners-Lee.jpg' },
+        { name: 'Alan Turing', xp: getTotalXpForLevel(805), description: 'Père de l\'informatique - Décrypteur Enigma', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/a1/Alan_Turing_Aged_16.jpg' },
+        { name: 'Jeff Bezos', xp: getTotalXpForLevel(800), description: 'Fondateur d\'Amazon - E-commerce mondial', avatar: 'https://upload.wikimedia.org/wikipedia/commons/6/6c/Jeff_Bezos_at_Amazon_Spheres_Grand_Opening_in_Seattle_-_2018_%2839074799225%29_%28cropped%29.jpg' },
+        { name: 'Larry Page', xp: getTotalXpForLevel(795), description: 'Co-fondateur de Google - Révolution de la recherche', avatar: 'https://upload.wikimedia.org/wikipedia/commons/e/ec/Larry_Page_in_the_European_Parliament%2C_17.06.2009.jpg' },
+        { name: 'Sergey Brin', xp: getTotalXpForLevel(790), description: 'Co-fondateur de Google - Algorithme PageRank', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Sergey_Brin_cropped.jpg' },
+        { name: 'Steve Wozniak', xp: getTotalXpForLevel(785), description: 'Co-fondateur d\'Apple - Génie de l\'ingénierie', avatar: 'https://upload.wikimedia.org/wikipedia/commons/f/f6/Steve_Wozniak_by_Gage_Skidmore_3.jpg' },
+        { name: 'Linus Torvalds', xp: getTotalXpForLevel(780), description: 'Créateur de Linux - Open source révolutionnaire', avatar: 'https://upload.wikimedia.org/wikipedia/commons/6/69/Linus_Torvalds.jpeg' },
+        { name: 'Jack Dorsey', xp: getTotalXpForLevel(775), description: 'Fondateur de Twitter - Révolution du microblogging', avatar: 'https://upload.wikimedia.org/wikipedia/commons/2/28/Jack_Dorsey_2014_%28cropped%29.jpg' },
+        { name: 'Tim Cook', xp: getTotalXpForLevel(770), description: 'CEO d\'Apple - Leadership technologique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Tim_Cook_2009_cropped.jpg' },
+        { name: 'Satya Nadella', xp: getTotalXpForLevel(765), description: 'CEO de Microsoft - Transformation cloud', avatar: 'https://upload.wikimedia.org/wikipedia/commons/7/78/Satya_Nadella_2017_%28cropped%29.jpg' },
+        { name: 'Reed Hastings', xp: getTotalXpForLevel(760), description: 'Fondateur de Netflix - Streaming révolutionnaire', avatar: 'https://upload.wikimedia.org/wikipedia/commons/6/69/Reed_Hastings_2014_%28cropped%29.jpg' },
+        { name: 'Sam Altman', xp: getTotalXpForLevel(755), description: 'CEO d\'OpenAI - Révolution de l\'IA générative', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/34/Sam_Altman_TechCrunch_2019.jpg' },
+        { name: 'Sundar Pichai', xp: getTotalXpForLevel(750), description: 'CEO de Google - Innovation continue', avatar: 'https://upload.wikimedia.org/wikipedia/commons/d/d3/Sundar_Pichai_-_2023_%28cropped%29.jpg' },
+        { name: 'Jack Ma', xp: getTotalXpForLevel(745), description: 'Fondateur d\'Alibaba - E-commerce chinois', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/ae/Jack_Ma_2014.jpg' },
+        { name: 'Brian Chesky', xp: getTotalXpForLevel(740), description: 'Fondateur d\'Airbnb - Économie du partage', avatar: 'https://upload.wikimedia.org/wikipedia/commons/1/19/Brian_Chesky_2013.jpg' },
+        { name: 'Travis Kalanick', xp: getTotalXpForLevel(735), description: 'Fondateur d\'Uber - Disruption des transports', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Travis_Kalanick_2013_%28cropped%29.jpg' }
+    ],
+    
+    'sports': [
+        { name: 'Lionel Messi', xp: getTotalXpForLevel(765), description: '8 Ballons d\'Or - GOAT du football moderne', avatar: 'https://upload.wikimedia.org/wikipedia/commons/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg' },
+        { name: 'Cristiano Ronaldo', xp: getTotalXpForLevel(760), description: '5 Ballons d\'Or - Légende du football', avatar: 'https://upload.wikimedia.org/wikipedia/commons/8/8c/Cristiano_Ronaldo_2018.jpg' },
+        { name: 'Michael Jordan', xp: getTotalXpForLevel(755), description: '6 fois champion NBA - GOAT du basketball', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/ae/Michael_Jordan_in_2014.jpg' },
+        { name: 'Muhammad Ali', xp: getTotalXpForLevel(750), description: 'The Greatest - Légende de la boxe', avatar: 'https://upload.wikimedia.org/wikipedia/commons/8/89/Muhammad_Ali_NYWTS.jpg' },
+        { name: 'Pelé', xp: getTotalXpForLevel(745), description: '3 Coupes du Monde - Roi du football', avatar: 'https://upload.wikimedia.org/wikipedia/commons/5/5e/Pele_con_brasil.jpg' },
+        { name: 'Serena Williams', xp: getTotalXpForLevel(740), description: '23 Grand Chelem - Reine du tennis', avatar: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Serena_Williams_at_2013_US_Open.jpg' },
+        { name: 'Usain Bolt', xp: getTotalXpForLevel(735), description: 'Homme le plus rapide du monde - 8x champion olympique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/a7/Usain_Bolt_smiling_Berlin_2009.jpg' },
+        { name: 'Roger Federer', xp: getTotalXpForLevel(730), description: '20 Grand Chelem - Maestro du tennis', avatar: 'https://upload.wikimedia.org/wikipedia/commons/f/f4/Roger_Federer_%2826449879643%29_%28cropped%29.jpg' },
+        { name: 'Diego Maradona', xp: getTotalXpForLevel(725), description: 'Main de Dieu - Légende argentine', avatar: 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Maradona-Mundial_86_con_la_copa.JPEG' },
+        { name: 'Michael Phelps', xp: getTotalXpForLevel(720), description: '28 médailles olympiques - GOAT de la natation', avatar: 'https://upload.wikimedia.org/wikipedia/commons/4/4c/Michael_Phelps_Rio_Olympics_2016.jpg' },
+        { name: 'Kobe Bryant', xp: getTotalXpForLevel(715), description: '5 titres NBA - Mamba Mentality', avatar: 'https://upload.wikimedia.org/wikipedia/commons/9/96/Kobe_Bryant_8.jpg' },
+        { name: 'LeBron James', xp: getTotalXpForLevel(710), description: '4 titres NBA - King James', avatar: 'https://upload.wikimedia.org/wikipedia/commons/7/7a/LeBron_James_%2851959977144%29_%28cropped2%29.jpg' },
+        { name: 'Tiger Woods', xp: getTotalXpForLevel(705), description: '15 Majeurs - Révolution du golf', avatar: 'https://upload.wikimedia.org/wikipedia/commons/b/b4/Tiger_Woods_in_May_2019.jpg' },
+        { name: 'Rafael Nadal', xp: getTotalXpForLevel(700), description: '22 Grand Chelem - Roi de Roland-Garros', avatar: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Rafael_Nadal_10%2C_Aegon_Championships%2C_London%2C_UK_-_Diliff.jpg' },
+        { name: 'Novak Djokovic', xp: getTotalXpForLevel(695), description: '24 Grand Chelem - Records absolus', avatar: 'https://upload.wikimedia.org/wikipedia/commons/8/84/Novak_Djokovic_Trophy_Wimbledon_2019.jpg' },
+        { name: 'Zinedine Zidane', xp: getTotalXpForLevel(690), description: 'Coup de tête légendaire - Maître du football', avatar: 'https://upload.wikimedia.org/wikipedia/commons/f/f3/Zinedine_Zidane_2008.jpg' },
+        { name: 'Mike Tyson', xp: getTotalXpForLevel(685), description: 'Iron Mike - Plus jeune champion du monde poids lourd', avatar: 'https://upload.wikimedia.org/wikipedia/commons/5/54/Mike_Tyson_2019_%28cropped%29.jpg' },
+        { name: 'Tom Brady', xp: getTotalXpForLevel(680), description: '7 Super Bowl - GOAT du football américain', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/3b/Tom_Brady_2021.jpg' },
+        { name: 'Wayne Gretzky', xp: getTotalXpForLevel(675), description: 'The Great One - Légende du hockey', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/3c/Wayne_Gretzky_2006.jpg' },
+        { name: 'Simone Biles', xp: getTotalXpForLevel(670), description: 'Gymnastique - 7 médailles olympiques', avatar: 'https://upload.wikimedia.org/wikipedia/commons/f/f5/Simone_Biles_2016.jpg' },
+        { name: 'Neymar Jr', xp: getTotalXpForLevel(665), description: 'Magicien brésilien - Star mondiale', avatar: 'https://upload.wikimedia.org/wikipedia/commons/b/bb/Neymar_Jr._with_Al_Hilal%2C_3_October_2023_-_03_%28cropped%29.jpg' },
+        { name: 'Kylian Mbappé', xp: getTotalXpForLevel(660), description: 'Champion du Monde 2018 - Phénomène français', avatar: 'https://upload.wikimedia.org/wikipedia/commons/7/79/Kylian_Mbapp%C3%A9_2022_%28cropped%29.jpg' },
+        { name: 'Floyd Mayweather', xp: getTotalXpForLevel(655), description: 'Money - 50-0 invincible', avatar: 'https://upload.wikimedia.org/wikipedia/commons/c/c5/Floyd_Mayweather_2018.jpg' },
+        { name: 'Shaquille O\'Neal', xp: getTotalXpForLevel(650), description: 'Shaq - Domination physique NBA', avatar: 'https://upload.wikimedia.org/wikipedia/commons/9/9e/Shaquille_O%27Neal_2012.jpg' },
+        { name: 'Lewis Hamilton', xp: getTotalXpForLevel(645), description: '7 titres F1 - Champion de tous les temps', avatar: 'https://upload.wikimedia.org/wikipedia/commons/1/18/Lewis_Hamilton_2016_Malaysia_2.jpg' }
+    ],
+    
+    'arts': [
+        { name: 'Leonardo da Vinci', xp: getTotalXpForLevel(880), description: 'Génie de la Renaissance - Art et science', avatar: 'https://upload.wikimedia.org/wikipedia/commons/b/ba/Leonardo_self.jpg' },
+        { name: 'Pablo Picasso', xp: getTotalXpForLevel(870), description: 'Cubisme - Révolution artistique du XXe siècle', avatar: 'https://upload.wikimedia.org/wikipedia/commons/b/b8/Portrait_de_Picasso%2C_1908.jpg' },
+        { name: 'Vincent van Gogh', xp: getTotalXpForLevel(860), description: 'Post-impressionnisme - Maître de la couleur', avatar: 'https://upload.wikimedia.org/wikipedia/commons/4/4c/Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project_%28454045%29.jpg' },
+        { name: 'Michel-Ange', xp: getTotalXpForLevel(850), description: 'Chapelle Sixtine - Sculpteur et peintre légendaire', avatar: 'https://upload.wikimedia.org/wikipedia/commons/0/02/Michelangelo_Daniele_da_Volterra_%28dettaglio%29.jpg' },
+        { name: 'Wolfgang Amadeus Mozart', xp: getTotalXpForLevel(840), description: 'Prodige musical - Compositeur légendaire', avatar: 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Wolfgang-amadeus-mozart_1.jpg' },
+        { name: 'Ludwig van Beethoven', xp: getTotalXpForLevel(830), description: 'Symphonies immortelles - Génie de la musique classique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Beethoven.jpg' },
+        { name: 'William Shakespeare', xp: getTotalXpForLevel(820), description: 'Plus grand dramaturge - Maître de la littérature', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Shakespeare.jpg' },
+        { name: 'Frida Kahlo', xp: getTotalXpForLevel(810), description: 'Icône du surréalisme - Art et féminisme', avatar: 'https://upload.wikimedia.org/wikipedia/commons/0/06/Frida_Kahlo%2C_by_Guillermo_Kahlo.jpg' },
+        { name: 'Claude Monet', xp: getTotalXpForLevel(800), description: 'Impressionnisme - Maître de la lumière', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Claude_Monet_1899_Nadar_crop.jpg' },
+        { name: 'Rembrandt', xp: getTotalXpForLevel(790), description: 'Maître hollandais - Clair-obscur magistral', avatar: 'https://upload.wikimedia.org/wikipedia/commons/b/bd/Rembrandt_van_Rijn_-_Self-Portrait_-_Google_Art_Project.jpg' },
+        { name: 'Salvador Dalí', xp: getTotalXpForLevel(780), description: 'Surréalisme - Génie excentrique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/2/27/Salvador_Dali_NYWTS.jpg' },
+        { name: 'Johann Sebastian Bach', xp: getTotalXpForLevel(770), description: 'Maître du baroque - Contrepoint parfait', avatar: 'https://upload.wikimedia.org/wikipedia/commons/6/6a/Johann_Sebastian_Bach.jpg' },
+        { name: 'Andy Warhol', xp: getTotalXpForLevel(760), description: 'Pop Art - Factory et culture de masse', avatar: 'https://upload.wikimedia.org/wikipedia/commons/4/42/Andy_Warhol_1975.jpg' },
+        { name: 'Bob Dylan', xp: getTotalXpForLevel(750), description: 'Prix Nobel de littérature - Légende folk rock', avatar: 'https://upload.wikimedia.org/wikipedia/commons/0/02/Bob_Dylan_-_Azkena_Rock_Festival_2010_2.jpg' },
+        { name: 'The Beatles', xp: getTotalXpForLevel(745), description: 'Groupe le plus influent - Révolution musicale', avatar: 'https://upload.wikimedia.org/wikipedia/commons/d/df/The_Fabs.JPG' },
+        { name: 'Elvis Presley', xp: getTotalXpForLevel(740), description: 'King of Rock and Roll - Icône culturelle', avatar: 'https://upload.wikimedia.org/wikipedia/commons/9/99/Elvis_Presley_promoting_Jailhouse_Rock.jpg' },
+        { name: 'Michael Jackson', xp: getTotalXpForLevel(735), description: 'King of Pop - Moonwalk légendaire', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/31/Michael_Jackson_in_1988.jpg' },
+        { name: 'Freddie Mercury', xp: getTotalXpForLevel(730), description: 'Queen - Voix légendaire', avatar: 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Freddie_Mercury_performing_in_New_Haven%2C_CT%2C_November_1977.jpg' },
+        { name: 'David Bowie', xp: getTotalXpForLevel(725), description: 'Caméléon du rock - Icône innovante', avatar: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/David-Bowie_Chicago_2002-08-08_photoby_Adam-Bielawski-cropped.jpg' },
+        { name: 'Prince', xp: getTotalXpForLevel(720), description: 'Purple Rain - Génie musical', avatar: 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Prince_at_Coachella_001.jpg' },
+        { name: 'Banksy', xp: getTotalXpForLevel(715), description: 'Street art mystérieux - Activisme artistique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/f/f9/Banksy.jpg' }
+    ],
+    
+    'business': [
+        { name: 'Warren Buffett', xp: getTotalXpForLevel(800), description: 'Oracle d\'Omaha - Maître de l\'investissement', avatar: 'https://upload.wikimedia.org/wikipedia/commons/5/51/Warren_Buffett_KU_Visit.jpg' },
+        { name: 'Henry Ford', xp: getTotalXpForLevel(790), description: 'Révolution industrielle - Production de masse', avatar: 'https://upload.wikimedia.org/wikipedia/commons/1/18/Henry_ford_1919.jpg' },
+        { name: 'John D. Rockefeller', xp: getTotalXpForLevel(780), description: 'Premier milliardaire - Empire pétrolier', avatar: 'https://upload.wikimedia.org/wikipedia/commons/6/6a/John_D._Rockefeller_1885.jpg' },
+        { name: 'Oprah Winfrey', xp: getTotalXpForLevel(770), description: 'Magnat des médias - Philanthrope influente', avatar: 'https://upload.wikimedia.org/wikipedia/commons/b/b8/Oprah_in_2014.jpg' },
+        { name: 'Richard Branson', xp: getTotalXpForLevel(760), description: 'Fondateur de Virgin - Entrepreneur aventurier', avatar: 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Richard_Branson_March_2015_%28cropped%29.jpg' },
+        { name: 'Andrew Carnegie', xp: getTotalXpForLevel(750), description: 'Magnat de l\'acier - Philanthrope légendaire', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Andrew_Carnegie%2C_three-quarter_length_portrait%2C_seated%2C_facing_slightly_left%2C_1913.jpg' },
+        { name: 'J.P. Morgan', xp: getTotalXpForLevel(740), description: 'Banquier légendaire - Finance moderne', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/John_Pierpont_Morgan.jpg' },
+        { name: 'Bernard Arnault', xp: getTotalXpForLevel(730), description: 'LVMH - Empire du luxe', avatar: 'https://upload.wikimedia.org/wikipedia/commons/d/da/Bernard_Arnault_%283%29_-_2017_%28cropped%29.jpg' },
+        { name: 'Carlos Slim', xp: getTotalXpForLevel(720), description: 'Magnat des télécoms - Homme le plus riche du Mexique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/2/2d/Carlos_Slim_%2845680472234%29_%28cropped%29.jpg' },
+        { name: 'Ray Kroc', xp: getTotalXpForLevel(710), description: 'McDonald\'s - Fast-food mondial', avatar: 'https://upload.wikimedia.org/wikipedia/commons/c/cf/Ray_Kroc%2C_McDonald%27s_CEO.jpg' },
+        { name: 'Coco Chanel', xp: getTotalXpForLevel(700), description: 'Révolution de la mode - Chanel N°5', avatar: 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Coco_Chanel%2C_1920.jpg' },
+        { name: 'Sam Walton', xp: getTotalXpForLevel(690), description: 'Fondateur de Walmart - Retail révolutionnaire', avatar: 'https://upload.wikimedia.org/wikipedia/commons/f/fb/Sam_Walton.jpg' },
+        { name: 'Amancio Ortega', xp: getTotalXpForLevel(680), description: 'Fondateur de Zara - Fast fashion', avatar: 'https://upload.wikimedia.org/wikipedia/commons/0/09/Amancio_Ortega_2015_%28cropped%29.jpg' }
+    ],
+    
+    'politique': [
+        { name: 'Nelson Mandela', xp: getTotalXpForLevel(890), description: 'Lutte contre l\'apartheid - Prix Nobel de la paix', avatar: 'https://upload.wikimedia.org/wikipedia/commons/0/02/Nelson_Mandela_1994.jpg' },
+        { name: 'Mahatma Gandhi', xp: getTotalXpForLevel(885), description: 'Non-violence - Indépendance de l\'Inde', avatar: 'https://upload.wikimedia.org/wikipedia/commons/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg' },
+        { name: 'Winston Churchill', xp: getTotalXpForLevel(875), description: 'Leadership WWII - Premier ministre britannique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/9/9c/Sir_Winston_Churchill_-_19086236948.jpg' },
+        { name: 'Martin Luther King Jr.', xp: getTotalXpForLevel(870), description: 'Droits civiques - I Have a Dream', avatar: 'https://upload.wikimedia.org/wikipedia/commons/0/05/Martin_Luther_King%2C_Jr..jpg' },
+        { name: 'Abraham Lincoln', xp: getTotalXpForLevel(865), description: 'Abolition de l\'esclavage - Président américain légendaire', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/ab/Abraham_Lincoln_O-77_matte_collodion_print.jpg' },
+        { name: 'Angela Merkel', xp: getTotalXpForLevel(855), description: 'Chancelière allemande - Leader européenne', avatar: 'https://upload.wikimedia.org/wikipedia/commons/2/21/Angela_Merkel_2019_%28cropped%29.jpg' },
+        { name: 'Franklin D. Roosevelt', xp: getTotalXpForLevel(850), description: 'New Deal - 4 mandats présidentiels', avatar: 'https://upload.wikimedia.org/wikipedia/commons/b/b8/FDR_in_1933.jpg' },
+        { name: 'Charles de Gaulle', xp: getTotalXpForLevel(845), description: 'Résistance française - Fondateur de la Ve République', avatar: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/Charles_de_Gaulle-1963.jpg' },
+        { name: 'Margaret Thatcher', xp: getTotalXpForLevel(840), description: 'Dame de fer - Premier ministre britannique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/32/Margaret_Thatcher_cropped1.png' },
+        { name: 'Barack Obama', xp: getTotalXpForLevel(835), description: 'Premier président noir américain - Hope & Change', avatar: 'https://upload.wikimedia.org/wikipedia/commons/8/8d/President_Barack_Obama.jpg' },
+        { name: 'John F. Kennedy', xp: getTotalXpForLevel(830), description: 'Nouvelle frontière - Président charismatique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/c/c3/John_F._Kennedy%2C_White_House_color_photo_portrait.jpg' },
+        { name: 'Vladimir Poutine', xp: getTotalXpForLevel(820), description: 'Leader russe - Influence géopolitique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/6/6a/Vladimir_Putin_17-11-2021_%28cropped%29.jpg' },
+        { name: 'Xi Jinping', xp: getTotalXpForLevel(815), description: 'Président chinois - Nouvelle route de la soie', avatar: 'https://upload.wikimedia.org/wikipedia/commons/2/27/Xi_Jinping_2019.jpg' },
+        { name: 'Jacinda Ardern', xp: getTotalXpForLevel(810), description: 'Premier ministre NZ - Leadership empathique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/0/0a/Jacinda_Ardern_August_2023.jpg' }
+    ],
+    
+    'exploration': [
+        { name: 'Neil Armstrong', xp: getTotalXpForLevel(850), description: 'Premier homme sur la Lune - Explorateur spatial', avatar: 'https://upload.wikimedia.org/wikipedia/commons/0/0d/Neil_Armstrong_pose.jpg' },
+        { name: 'Youri Gagarine', xp: getTotalXpForLevel(840), description: 'Premier homme dans l\'espace - Héros soviétique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/e/ea/Gagarin_in_Sweden.jpg' },
+        { name: 'Jacques Cousteau', xp: getTotalXpForLevel(830), description: 'Pionnier de l\'océanographie - Défenseur des mers', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/a3/Cousteau.jpg' },
+        { name: 'Edmund Hillary', xp: getTotalXpForLevel(820), description: 'Premier à conquérir l\'Everest - Alpiniste légendaire', avatar: 'https://upload.wikimedia.org/wikipedia/commons/4/42/Edmund_Hillary%2C_c._1953%2C_cropped.jpg' },
+        { name: 'Christophe Colomb', xp: getTotalXpForLevel(810), description: 'Découverte des Amériques - Explorateur historique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/5/5f/Ridolfo_Ghirlandaio_Columbus.jpg' },
+        { name: 'Amelia Earhart', xp: getTotalXpForLevel(800), description: 'Pionnière de l\'aviation - Première femme pilote transatlantique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/e/ee/Amelia_Earhart_1935.jpg' },
+        { name: 'Ernest Shackleton', xp: getTotalXpForLevel(790), description: 'Expédition Endurance - Héros de l\'Antarctique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Sir_Ernest_Shackleton.jpg' },
+        { name: 'Marco Polo', xp: getTotalXpForLevel(780), description: 'Route de la soie - Explorateur vénitien', avatar: 'https://upload.wikimedia.org/wikipedia/commons/4/4c/Marco_Polo_portrait.jpg' },
+        { name: 'Buzz Aldrin', xp: getTotalXpForLevel(770), description: 'Deuxième homme sur la Lune - Astronaute légendaire', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Buzz_Aldrin.jpg' },
+        { name: 'Roald Amundsen', xp: getTotalXpForLevel(760), description: 'Premier au pôle Sud - Explorateur polaire', avatar: 'https://upload.wikimedia.org/wikipedia/commons/1/1f/Roald_Amundsen_%28crop%29.jpg' }
+    ],
+    
+    'cinema': [
+        { name: 'Charlie Chaplin', xp: getTotalXpForLevel(840), description: 'Génie du cinéma muet - The Tramp', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/3b/Charlie_Chaplin_portrait.jpg' },
+        { name: 'Steven Spielberg', xp: getTotalXpForLevel(820), description: 'Maître du blockbuster - Réalisateur légendaire', avatar: 'https://upload.wikimedia.org/wikipedia/commons/6/67/Steven_Spielberg_by_Gage_Skidmore.jpg' },
+        { name: 'Alfred Hitchcock', xp: getTotalXpForLevel(810), description: 'Maître du suspense - Réalisateur iconique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/9/94/Hitchcock%2C_Alfred_02.jpg' },
+        { name: 'Marilyn Monroe', xp: getTotalXpForLevel(800), description: 'Icône d\'Hollywood - Star légendaire', avatar: 'https://upload.wikimedia.org/wikipedia/commons/0/0d/Marilyn_Monroe_in_1952.jpg' },
+        { name: 'Stanley Kubrick', xp: getTotalXpForLevel(790), description: 'Visionnaire du cinéma - 2001 A Space Odyssey', avatar: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Kubrick_on_the_set_of_Barry_Lyndon_%281975_publicity_photo%29.jpg' },
+        { name: 'Martin Scorsese', xp: getTotalXpForLevel(780), description: 'Maître du cinéma américain - Goodfellas', avatar: 'https://upload.wikimedia.org/wikipedia/commons/6/63/Martin_Scorsese_by_David_Shankbone.jpg' },
+        { name: 'Francis Ford Coppola', xp: getTotalXpForLevel(770), description: 'Le Parrain - Trilogie légendaire', avatar: 'https://upload.wikimedia.org/wikipedia/commons/0/05/Francis_Ford_Coppola_2011_CC.jpg' },
+        { name: 'Quentin Tarantino', xp: getTotalXpForLevel(760), description: 'Pulp Fiction - Dialogues cultes', avatar: 'https://upload.wikimedia.org/wikipedia/commons/0/0b/Quentin_Tarantino_by_Gage_Skidmore.jpg' },
+        { name: 'Christopher Nolan', xp: getTotalXpForLevel(750), description: 'Inception - Maître du mind-bending', avatar: 'https://upload.wikimedia.org/wikipedia/commons/9/95/Christopher_Nolan_Cannes_2018.jpg' },
+        { name: 'Audrey Hepburn', xp: getTotalXpForLevel(740), description: 'Breakfast at Tiffany\'s - Élégance incarnée', avatar: 'https://upload.wikimedia.org/wikipedia/commons/1/19/Audrey_Hepburn_1956.jpg' },
+        { name: 'Clint Eastwood', xp: getTotalXpForLevel(730), description: 'Western et réalisation - Icône américaine', avatar: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Clint_Eastwood_at_2010_New_York_Film_Festival.jpg' },
+        { name: 'Meryl Streep', xp: getTotalXpForLevel(720), description: '3 Oscars - Plus grande actrice', avatar: 'https://upload.wikimedia.org/wikipedia/commons/4/40/Meryl_Streep_December_2014.jpg' },
+        { name: 'Robert De Niro', xp: getTotalXpForLevel(710), description: 'Taxi Driver - Acteur légendaire', avatar: 'https://upload.wikimedia.org/wikipedia/commons/e/e5/Robert_De_Niro_Cannes_2016.jpg' },
+        { name: 'Akira Kurosawa', xp: getTotalXpForLevel(700), description: 'Cinéma japonais - Les Sept Samouraïs', avatar: 'https://upload.wikimedia.org/wikipedia/commons/9/9b/Akira_Kurosawa_1976.jpg' }
+    ],
+    
+    'mode': [
+        { name: 'Coco Chanel', xp: getTotalXpForLevel(830), description: 'Révolution de la mode féminine - Chanel N°5', avatar: 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Coco_Chanel%2C_1920.jpg' },
+        { name: 'Yves Saint Laurent', xp: getTotalXpForLevel(815), description: 'Haute couture - Smoking pour femmes', avatar: 'https://upload.wikimedia.org/wikipedia/commons/6/66/Yves_Saint_Laurent_%281970s%29.jpg' },
+        { name: 'Giorgio Armani', xp: getTotalXpForLevel(800), description: 'Élégance italienne - Empire de la mode', avatar: 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Giorgio_Armani_by_Ros_O%27Gorman.jpg' },
+        { name: 'Karl Lagerfeld', xp: getTotalXpForLevel(790), description: 'Kaiser de la mode - Directeur artistique Chanel', avatar: 'https://upload.wikimedia.org/wikipedia/commons/d/d3/Karl_Lagerfeld_2014.jpg' },
+        { name: 'Christian Dior', xp: getTotalXpForLevel(780), description: 'New Look - Révolution post-guerre', avatar: 'https://upload.wikimedia.org/wikipedia/commons/7/78/Christian_Dior_%281952%29.jpg' },
+        { name: 'Gianni Versace', xp: getTotalXpForLevel(770), description: 'Luxe et glamour - Style iconique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/8/8b/Gianni_Versace_1993.jpg' },
+        { name: 'Ralph Lauren', xp: getTotalXpForLevel(760), description: 'American dream - Polo et élégance', avatar: 'https://upload.wikimedia.org/wikipedia/commons/9/90/Ralph_Lauren_%28cropped%29.jpg' },
+        { name: 'Donatella Versace', xp: getTotalXpForLevel(750), description: 'Héritage Versace - Icône de la mode', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/39/Donatella_Versace_2015_%28cropped%29.jpg' },
+        { name: 'Tom Ford', xp: getTotalXpForLevel(740), description: 'Gucci et luxe moderne - Designer star', avatar: 'https://upload.wikimedia.org/wikipedia/commons/1/1d/Tom_Ford_2018.jpg' },
+        { name: 'Alexander McQueen', xp: getTotalXpForLevel(730), description: 'Avant-garde - Génie créatif', avatar: 'https://upload.wikimedia.org/wikipedia/commons/c/c4/Alexander_McQueen_%282009%29.jpg' }
+    ],
+    
+    'philosophie': [
+        { name: 'Socrate', xp: getTotalXpForLevel(895), description: 'Père de la philosophie - Maïeutique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Socrates_Louvre.jpg' },
+        { name: 'Platon', xp: getTotalXpForLevel(890), description: 'Philosophe grec - Théorie des Idées', avatar: 'https://upload.wikimedia.org/wikipedia/commons/d/da/Plato_Pio-Clementino_Inv305.jpg' },
+        { name: 'Aristote', xp: getTotalXpForLevel(885), description: 'Logique et métaphysique - Père de la science', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/ae/Aristotle_Altemps_Inv8575.jpg' },
+        { name: 'Friedrich Nietzsche', xp: getTotalXpForLevel(875), description: 'Surhomme - Philosophie de la vie', avatar: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/Nietzsche187a.jpg' },
+        { name: 'Confucius', xp: getTotalXpForLevel(870), description: 'Sagesse chinoise - Éthique et morale', avatar: 'https://upload.wikimedia.org/wikipedia/commons/0/07/Konfuzius-1770.jpg' },
+        { name: 'Immanuel Kant', xp: getTotalXpForLevel(865), description: 'Critique de la raison pure - Philosophie transcendantale', avatar: 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Kant_gemaelde_3.jpg' },
+        { name: 'Jean-Jacques Rousseau', xp: getTotalXpForLevel(860), description: 'Contrat social - Philosophie des Lumières', avatar: 'https://upload.wikimedia.org/wikipedia/commons/b/b7/Jean-Jacques_Rousseau_%28painted_portrait%29.jpg' },
+        { name: 'René Descartes', xp: getTotalXpForLevel(855), description: 'Cogito ergo sum - Rationalisme', avatar: 'https://upload.wikimedia.org/wikipedia/commons/7/73/Frans_Hals_-_Portret_van_Ren%C3%A9_Descartes.jpg' },
+        { name: 'Karl Marx', xp: getTotalXpForLevel(850), description: 'Philosophie politique - Matérialisme historique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/d/d4/Karl_Marx_001.jpg' },
+        { name: 'Simone de Beauvoir', xp: getTotalXpForLevel(845), description: 'Féminisme - Le Deuxième Sexe', avatar: 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Simone_de_Beauvoir.jpg' },
+        { name: 'Jean-Paul Sartre', xp: getTotalXpForLevel(840), description: 'Existentialisme - L\'existence précède l\'essence', avatar: 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Sartre_1967_crop.jpg' }
+    ],
+    
+    'litterature': [
+        { name: 'William Shakespeare', xp: getTotalXpForLevel(875), description: 'Plus grand dramaturge - Hamlet et Roméo', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Shakespeare.jpg' },
+        { name: 'Victor Hugo', xp: getTotalXpForLevel(860), description: 'Les Misérables - Génie romantique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Victor_Hugo_by_%C3%89tienne_Carjat_1876.jpg' },
+        { name: 'Léon Tolstoï', xp: getTotalXpForLevel(855), description: 'Guerre et Paix - Maître russe', avatar: 'https://upload.wikimedia.org/wikipedia/commons/c/c6/L.N.Tolstoy_Prokudin-Gorsky.jpg' },
+        { name: 'Fiodor Dostoïevski', xp: getTotalXpForLevel(850), description: 'Crime et Châtiment - Psychologie profonde', avatar: 'https://upload.wikimedia.org/wikipedia/commons/7/78/Vasily_Perov_-_%D0%9F%D0%BE%D1%80%D1%82%D1%80%D0%B5%D1%82_%D0%A4.%D0%9C.%D0%94%D0%BE%D1%81%D1%82%D0%BE%D0%B5%D0%B2%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_-_Google_Art_Project.jpg' },
+        { name: 'Ernest Hemingway', xp: getTotalXpForLevel(840), description: 'Prix Nobel - Style minimaliste', avatar: 'https://upload.wikimedia.org/wikipedia/commons/2/28/ErnestHemingway.jpg' },
+        { name: 'Gabriel García Márquez', xp: getTotalXpForLevel(835), description: 'Cent ans de solitude - Réalisme magique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/0/0f/Gabriel_Garcia_Marquez.jpg' },
+        { name: 'Franz Kafka', xp: getTotalXpForLevel(830), description: 'La Métamorphose - Absurde et aliénation', avatar: 'https://upload.wikimedia.org/wikipedia/commons/d/d9/Kafka_portrait.jpg' },
+        { name: 'J.R.R. Tolkien', xp: getTotalXpForLevel(820), description: 'Le Seigneur des Anneaux - Fantasy épique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/d/d4/J._R._R._Tolkien%2C_ca._1925.jpg' },
+        { name: 'George Orwell', xp: getTotalXpForLevel(815), description: '1984 - Dystopie prophétique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/George_Orwell_press_photo.jpg' },
+        { name: 'Jane Austen', xp: getTotalXpForLevel(810), description: 'Orgueil et Préjugés - Romance classique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/c/cc/CassandraAusten-JaneAusten%28c.1810%29_hires.jpg' },
+        { name: 'Mark Twain', xp: getTotalXpForLevel(805), description: 'Tom Sawyer - Humour américain', avatar: 'https://upload.wikimedia.org/wikipedia/commons/0/0c/Mark_Twain_by_AF_Bradley.jpg' },
+        { name: 'Charles Dickens', xp: getTotalXpForLevel(800), description: 'Oliver Twist - Critique sociale', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/aa/Dickens_Gurney_head.jpg' }
+    ]
+};
 
-    const MOROCCAN_LEGENDS = [
-        { name: 'Hicham El Guerrouj', xp: getTotalXpForLevel(615), description: 'Champion d\'athletisme - Records du monde', avatar: 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Hicham_El_Guerrouj_2008.jpg' },
-        { name: 'Nawal El Moutawakel', xp: getTotalXpForLevel(610), description: 'Premier champion olympique marocain - Pionniere du sport', avatar: 'https://upload.wikimedia.org/wikipedia/commons/1/11/Nawal_El_Moutawakel.jpg' }
-    ];
+const MOROCCAN_LEGENDS = [
+    // Sports - Football
+    { name: 'Hicham El Guerrouj', xp: getTotalXpForLevel(615), description: 'Champion d\'athlétisme - Records du monde 1500m et mile', avatar: 'https://upload.wikimedia.org/wikipedia/commons/9/9a/Hicham_El_Guerrouj.jpg' },
+    { name: 'Nawal El Moutawakel', xp: getTotalXpForLevel(610), description: 'Première championne olympique africaine - 400m haies 1984', avatar: 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Nawal_El_Moutawakel_1984.jpg' },
+    { name: 'Achraf Hakimi', xp: getTotalXpForLevel(605), description: 'Défenseur PSG - Star des Lions de l\'Atlas', avatar: 'https://upload.wikimedia.org/wikipedia/commons/4/4d/Achraf_Hakimi_2022_%28cropped%29.jpg' },
+    { name: 'Saïd Aouita', xp: getTotalXpForLevel(600), description: 'Champion olympique 5000m - Légende de l\'athlétisme', avatar: 'https://upload.wikimedia.org/wikipedia/commons/7/7f/Said_Aouita_1984.jpg' },
+    { name: 'Hakim Ziyech', xp: getTotalXpForLevel(595), description: 'Magicien marocain - Star de la sélection', avatar: 'https://upload.wikimedia.org/wikipedia/commons/5/5f/Hakim_Ziyech_2022.jpg' },
+    { name: 'Yassine Bounou (Bono)', xp: getTotalXpForLevel(590), description: 'Gardien prodige - Héros Mondial 2022', avatar: 'https://upload.wikimedia.org/wikipedia/commons/b/b5/Yassine_Bounou_2022.jpg' },
+    { name: 'Sofiane Boufal', xp: getTotalXpForLevel(585), description: 'Ailier technique - Célébration iconique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/e/e9/Sofiane_Boufal_2022.jpg' },
+    { name: 'Mustapha Hadji', xp: getTotalXpForLevel(580), description: 'Légende marocaine - Coupe du Monde 1998', avatar: 'https://upload.wikimedia.org/wikipedia/commons/7/77/Mustapha_Hadji.jpg' },
+    { name: 'Youssef En-Nesyri', xp: getTotalXpForLevel(575), description: 'Buteur redoutable - Attaquant des Lions', avatar: 'https://upload.wikimedia.org/wikipedia/commons/9/99/Youssef_En-Nesyri_2022.jpg' },
+    { name: 'Noureddine Naybet', xp: getTotalXpForLevel(570), description: 'Défenseur de légende - Capitaine historique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/e/e3/Noureddine_Naybet.jpg' },
+    { name: 'Walid Regragui', xp: getTotalXpForLevel(565), description: 'Sélectionneur - Demi-finale Mondial 2022', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/af/Walid_Regragui_2022.jpg' },
+    
+    // Arts & Culture
+    { name: 'Gad Elmaleh', xp: getTotalXpForLevel(620), description: 'Humoriste international - Ambassadeur culturel', avatar: 'https://upload.wikimedia.org/wikipedia/commons/d/d7/Gad_Elmaleh_2012.jpg' },
+    { name: 'Leïla Slimani', xp: getTotalXpForLevel(615), description: 'Prix Goncourt 2016 - Écrivaine renommée', avatar: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Leila_Slimani_2018.jpg' },
+    { name: 'Tahar Ben Jelloun', xp: getTotalXpForLevel(610), description: 'Prix Goncourt 1987 - Écrivain de renommée mondiale', avatar: 'https://upload.wikimedia.org/wikipedia/commons/8/8b/Tahar_Ben_Jelloun_2015.jpg' },
+    { name: 'Saad Lamjarred', xp: getTotalXpForLevel(595), description: 'Chanteur pop - Star du monde arabe', avatar: 'https://upload.wikimedia.org/wikipedia/commons/4/4c/Saad_Lamjarred_2015.jpg' },
+    { name: 'Hindi Zahra', xp: getTotalXpForLevel(590), description: 'Chanteuse soul - Artiste internationale', avatar: 'https://upload.wikimedia.org/wikipedia/commons/9/9e/Hindi_Zahra_2014.jpg' },
+    { name: 'Nass El Ghiwane', xp: getTotalXpForLevel(600), description: 'Groupe mythique - Rolling Stones d\'Afrique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Nass_El_Ghiwane.jpg' },
+    { name: 'Majid Bekkas', xp: getTotalXpForLevel(585), description: 'Guitariste virtuose - Fusion gnawa-jazz', avatar: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Majid_Bekkas.jpg' },
+    { name: 'Maati Bouabeid', xp: getTotalXpForLevel(580), description: 'Acteur légendaire - Icône du cinéma marocain', avatar: 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Maati_Bouabeid.jpg' },
+    
+    // Politique & Histoire
+    { name: 'Mohammed V', xp: getTotalXpForLevel(650), description: 'Libérateur du Maroc - Symbole de l\'indépendance', avatar: 'https://upload.wikimedia.org/wikipedia/commons/8/8d/King_Mohammed_V_of_Morocco.jpg' },
+    { name: 'Hassan II', xp: getTotalXpForLevel(635), description: 'Roi bâtisseur - Modernisation du Maroc', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Hassan_II_of_Morocco.jpg' },
+    { name: 'Mehdi Ben Barka', xp: getTotalXpForLevel(625), description: 'Leader politique - Figure du tiers-mondisme', avatar: 'https://upload.wikimedia.org/wikipedia/commons/9/9c/Mehdi_Ben_Barka.jpg' },
+    { name: 'Allal El Fassi', xp: getTotalXpForLevel(615), description: 'Leader nationaliste - Père de l\'indépendance', avatar: 'https://upload.wikimedia.org/wikipedia/commons/7/7d/Allal_El_Fassi.jpg' },
+    { name: 'Fatima Mernissi', xp: getTotalXpForLevel(605), description: 'Sociologue féministe - Intellectuelle de renom', avatar: 'https://upload.wikimedia.org/wikipedia/commons/a/a5/Fatima_Mernissi.jpg' },
+    
+    // Business
+    { name: 'Aziz Akhannouch', xp: getTotalXpForLevel(600), description: 'Homme d\'affaires - Chef du gouvernement', avatar: 'https://upload.wikimedia.org/wikipedia/commons/9/9c/Aziz_Akhannouch_2022.jpg' },
+    { name: 'Othman Benjelloun', xp: getTotalXpForLevel(595), description: 'Banquier et industriel - BMCE Bank', avatar: 'https://upload.wikimedia.org/wikipedia/commons/3/35/Othman_Benjelloun.jpg' },
+    { name: 'Miloud Chaabi', xp: getTotalXpForLevel(590), description: 'Self-made man - Ynna Holding', avatar: 'https://upload.wikimedia.org/wikipedia/commons/c/c8/Miloud_Chaabi.jpg' },
+    { name: 'Mohamed Horani', xp: getTotalXpForLevel(585), description: 'Entrepreneur - Holmarcom Group', avatar: 'https://upload.wikimedia.org/wikipedia/commons/4/4a/Mohamed_Horani.jpg' },
+    
+    // Science & Éducation
+    { name: 'Ibn Battuta', xp: getTotalXpForLevel(700), description: 'Plus grand explorateur médiéval - 120 000 km parcourus', avatar: 'https://upload.wikimedia.org/wikipedia/commons/f/f3/Ibn_Battuta.jpg' },
+    { name: 'Averroès (Ibn Rushd)', xp: getTotalXpForLevel(695), description: 'Philosophe et médecin - Pont entre Orient et Occident', avatar: 'https://upload.wikimedia.org/wikipedia/commons/8/88/Averroes.jpg' },
+    { name: 'Ibn Khaldoun', xp: getTotalXpForLevel(690), description: 'Père de la sociologie - Al-Muqaddima', avatar: 'https://upload.wikimedia.org/wikipedia/commons/5/5f/Ibn_Khaldun.jpg' },
+    { name: 'Al-Idrisi', xp: getTotalXpForLevel(680), description: 'Géographe médiéval - Cartographie révolutionnaire', avatar: 'https://upload.wikimedia.org/wikipedia/commons/c/c0/Al-Idrisi.jpg' },
+    { name: 'Rachid Yazami', xp: getTotalXpForLevel(630), description: 'Inventeur batterie lithium-ion - Pionnier technologique', avatar: 'https://upload.wikimedia.org/wikipedia/commons/9/98/Rachid_Yazami.jpg' },
+    { name: 'Ahmed Zewail', xp: getTotalXpForLevel(640), description: 'Prix Nobel de Chimie 1999 - Femtochimie', avatar: 'https://upload.wikimedia.org/wikipedia/commons/d/d6/Ahmed_Zewail.jpg' }
+];
 
     // ==================== INITIALIZATION ====================
 

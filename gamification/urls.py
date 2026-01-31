@@ -97,4 +97,17 @@ urlpatterns = [
     path('api/resources/<str:resource_type>/', views.api_get_resources_by_type, name='api_resources_by_type'),
     path('api/resources/search/', views.api_search_resources, name='api_search_resources'),
 
+    # ============================================================
+    path('api/study-tracker/subjects/', views.get_study_subjects, name='api_study_subjects'),
+    path('api/study-tracker/subjects/create/', views.create_study_subject, name='api_create_study_subject'),
+    path('api/study-tracker/subjects/<int:subject_id>/delete/', views.delete_study_subject, name='api_delete_study_subject'),
+    
+    path('api/study-tracker/chapters/', views.get_study_chapters, name='api_study_chapters'),
+    path('api/study-tracker/chapters/create/', views.create_study_chapter, name='api_create_study_chapter'),
+    path('api/study-tracker/chapters/<int:chapter_id>/delete/', views.delete_study_chapter, name='api_delete_study_chapter'),
+    
+    path('api/study-tracker/sections/', views.get_study_sections, name='api_study_sections'),
+    path('api/study-tracker/sections/create/', views.create_study_section, name='api_create_study_section'),
+    path('api/study-tracker/sections/<int:section_id>/', views.update_study_section, name='api_update_study_section'),
+    path('api/study-tracker/sections/<int:section_id>/delete/', views.delete_study_section, name='api_delete_study_section'),
 ]
