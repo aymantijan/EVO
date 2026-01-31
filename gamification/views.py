@@ -31,7 +31,8 @@ from .models import (
     UserProfile, Skill, UserSkill, Achievement, UserAchievement,
     Challenge, UserChallenge, StudySession, Action, PersonalityTrait,
     UserPersonalityTrait, ActivityEvaluation, EvaluationTraitLink,
-    ActivityArtifact, Resource
+    ActivityArtifact, Resource,
+    StudySubject, StudyChapter, StudySection
 )
 
 from .serializers import (
@@ -40,7 +41,8 @@ from .serializers import (
     ChallengeSerializer, UserChallengeSerializer,
     StudySessionSerializer, ActionSerializer,
     DashboardStatsSerializer, LeaderboardSerializer,
-    UserRankSerializer, ResourceSerializer
+    UserRankSerializer, ResourceSerializer,
+    StudySubjectSerializer, StudyChapterSerializer, StudySectionSerializer
 )
 
 load_dotenv()
