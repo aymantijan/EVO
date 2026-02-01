@@ -503,6 +503,7 @@
     const STORAGE_KEY = 'evolutionSystem';
     let userData = null;
     let allResources = [];
+    let apiUserLevel = 1;
     let filterGenre = 'all';
     let filterType = 'Livre';
 
@@ -552,8 +553,6 @@
     async function loadResources() {
         try {
             console.log('📡 Chargement des ressources depuis /api/resources/');
-            // Récupère TOUTES les ressources actives (pas filtrées par niveau)
-            // Le client gère séparement verrouillées / déverrouillées avec le niveau réel
             const response = await fetch('/api/resources/');
 
             console.log('🔍 Réponse HTTP:', response.status, response.statusText);
@@ -568,8 +567,18 @@
             console.log('✅ JSON reçu:', data);
 
             if (data.success) {
-                allResources = data.resources || [];
-                console.log('✅ Ressources chargées:', allResources.length);
+                // Stocke le niveau réel retourné par l'API
+                apiUserLevel = data.user_level || 1;
+
+                // Aplatit les ressources déverrouillées (tous les types)
+                allResources = [];
+                Object.keys(data.resources).forEach(type => {
+                    if (Array.isArray(data.resources[type])) {
+                        allResources = allResources.concat(data.resources[type]);
+                    }
+                });
+
+                console.log('✅ Ressources déverrouillées:', allResources.length, '| Niveau utilisateur:', apiUserLevel);
             } else {
                 console.error('❌ Erreur API:', data.error);
                 alert('Erreur: ' + data.error);
@@ -610,8 +619,8 @@
     // ==================== RENDER RESOURCES ====================
     async function renderResources() {
         await updateHeader();
-        const data = await getProfileData();
-        const userLevel = data.level || 1;
+        // Utilise le niveau déjà récupéré depuis /api/resources/ (user_level)
+        const userLevel = apiUserLevel;
 
         if (!userData) userData = getEmptyUserData();
 
