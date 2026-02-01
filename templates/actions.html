@@ -551,10 +551,10 @@
     // ==================== LOAD RESOURCES FROM DB ====================
     async function loadResources() {
         try {
-            console.log('📡 Chargement des ressources depuis /api/resources/all/');
+            console.log('📡 Chargement des ressources depuis /api/resources/');
             // Récupère TOUTES les ressources actives (pas filtrées par niveau)
             // Le client gère séparement verrouillées / déverrouillées avec le niveau réel
-            const response = await fetch('/api/resources/all/');
+            const response = await fetch('/api/resources/');
 
             console.log('🔍 Réponse HTTP:', response.status, response.statusText);
 
