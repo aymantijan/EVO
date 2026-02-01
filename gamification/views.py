@@ -1677,6 +1677,40 @@ def api_get_resources(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def api_get_all_resources(request):
+    """Récupère TOUTES les ressources actives (sans filtre de niveau).
+    Le client utilise cet endpoint pour gérer séparement verrouillées / déverrouillées."""
+    try:
+        resources = Resource.objects.filter(is_active=True).order_by('niveau')
+
+        data = [
+            {
+                'id': r.id,
+                'titre': r.titre,
+                'auteur': r.auteur,
+                'type': r.type,
+                'domaine': r.domaine,
+                'description': r.description,
+                'niveau': r.niveau,
+                'url': r.url,
+                'image': r.image,
+            }
+            for r in resources
+        ]
+
+        return Response({
+            'success': True,
+            'resources': data,
+            'total_resources': len(data)
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return Response({'success': False, 'error': str(e)}, status=400)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def api_get_resources_by_type(request, resource_type):
     """Récupère les ressources d'un type spécifique"""
     try:

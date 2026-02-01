@@ -1,5 +1,3 @@
-# urls.py - ROUTES COMPLÈTES ET CORRIGÉES
-
 from django.urls import path
 from . import views
 
@@ -93,6 +91,7 @@ urlpatterns = [
 
     # ==================== API - RESOURCES ====================
 
+    path('api/resources/all/', views.api_get_all_resources, name='api_resources_all'),
     path('api/resources/', views.api_get_resources, name='api_resources'),
     path('api/resources/<str:resource_type>/', views.api_get_resources_by_type, name='api_resources_by_type'),
     path('api/resources/search/', views.api_search_resources, name='api_search_resources'),

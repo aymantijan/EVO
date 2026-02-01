@@ -532,49 +532,29 @@
         return ((level - 1) % 100) + 1;
     }
 
-    // ==================== LOAD CHALLENGE DATA ====================
-    async function loadChallengeData() {
-        try {
-            const response = await fetch('/api/get-user-data/');
-            if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
-
-            const data = await response.json();
-            return {
-                totalXP: data.totalXP || 0,
-                traitsHP: data.traitsHP || {},
-                evaluations: data.evaluations || [],
-                validatedDates: data.validatedDates || [],
-                calendar: data.calendar || {}
-            };
-        } catch (error) {
-            console.error('Erreur:', error);
-            return { totalXP: 0, traitsHP: {}, evaluations: [], validatedDates: [], calendar: {} };
-        }
-    }
-
     // ==================== GET PROFILE DATA ====================
     async function getProfileData() {
-        const sessionData = await loadChallengeData();
-
-        if (typeof apiClient !== 'undefined') {
-            try {
-                const response = await apiClient.getProfile();
-                return {
-                    level: response.data.level || 1,
-                    total_xp: response.data.total_xp || sessionData.totalXP
-                };
-            } catch (e) {
-                console.error('Erreur profil:', e);
-            }
+        try {
+            const response = await fetch('/api/profile/');
+            if (!response.ok) throw new Error(`Erreur profil: ${response.status}`);
+            const data = await response.json();
+            return {
+                level: data.level || 1,
+                total_xp: data.experience_points || 0
+            };
+        } catch (e) {
+            console.error('Erreur profil:', e);
+            return { level: 1, total_xp: 0 };
         }
-        return { level: 1, total_xp: sessionData.totalXP };
     }
 
     // ==================== LOAD RESOURCES FROM DB ====================
     async function loadResources() {
         try {
-            console.log('📡 Chargement des ressources depuis /api/resources/');
-            const response = await fetch('/api/resources/');
+            console.log('📡 Chargement des ressources depuis /api/resources/all/');
+            // Récupère TOUTES les ressources actives (pas filtrées par niveau)
+            // Le client gère séparement verrouillées / déverrouillées avec le niveau réel
+            const response = await fetch('/api/resources/all/');
 
             console.log('🔍 Réponse HTTP:', response.status, response.statusText);
 
@@ -588,24 +568,8 @@
             console.log('✅ JSON reçu:', data);
 
             if (data.success) {
-                // Les ressources sont groupées par type dans data.resources
-                allResources = [];
-
-                // Aplatit les ressources de tous les types
-                Object.keys(data.resources).forEach(type => {
-                    if (Array.isArray(data.resources[type])) {
-                        allResources = allResources.concat(data.resources[type]);
-                    }
-                });
-
+                allResources = data.resources || [];
                 console.log('✅ Ressources chargées:', allResources.length);
-                console.log('📊 Total par type:', {
-                    'Livre': data.resources['Livre']?.length || 0,
-                    'Article': data.resources['Article']?.length || 0,
-                    'FilmSérie': data.resources['FilmSérie']?.length || 0,
-                    'Podcast': data.resources['Podcast']?.length || 0,
-                    'Mentor': data.resources['Mentor']?.length || 0
-                });
             } else {
                 console.error('❌ Erreur API:', data.error);
                 alert('Erreur: ' + data.error);
