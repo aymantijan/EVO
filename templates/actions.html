@@ -32,13 +32,18 @@
     <div class="card">
         <div class="section-title">📖 Livres Accessibles</div>
         <div class="tabs">
-            <div class="tab active" onclick="filterBooks('all', 'Livre', event)">Tous</div>
-            <div class="tab" onclick="filterBooks('Finance', 'Livre', event)">💰 Finance</div>
-            <div class="tab" onclick="filterBooks('Business', 'Livre', event)">💼 Business</div>
-            <div class="tab" onclick="filterBooks('Mindset', 'Livre', event)">🧠 Mindset</div>
-            <div class="tab" onclick="filterBooks('Tech', 'Livre', event)">💻 Tech</div>
-            <div class="tab" onclick="filterBooks('Entrepreneuriat', 'Livre', event)">🚀 Entrepreneuriat</div>
-            <div class="tab" onclick="filterBooks('Philosophie', 'Livre', event)">🤔 Philosophie</div>
+            <div class="tab active" onclick="filterResources('all', 'Livre', event)">Tous</div>
+            <div class="tab" onclick="filterResources('Finance', 'Livre', event)">💰 Finance</div>
+            <div class="tab" onclick="filterResources('Business', 'Livre', event)">💼 Business</div>
+            <div class="tab" onclick="filterResources('Mindset', 'Livre', event)">🧠 Mindset</div>
+            <div class="tab" onclick="filterResources('Tech', 'Livre', event)">💻 Tech</div>
+            <div class="tab" onclick="filterResources('Entrepreneuriat', 'Livre', event)">🚀 Entrepreneuriat</div>
+            <div class="tab" onclick="filterResources('Philosophie', 'Livre', event)">🤔 Philosophie</div>
+            <div class="tab" onclick="filterResources('Physique', 'Livre', event)">⚛️ Physique</div>
+            <div class="tab" onclick="filterResources('Chimie', 'Livre', event)">🧪 Chimie</div>
+            <div class="tab" onclick="filterResources('Agriculture', 'Livre', event)">🌾 Agriculture</div>
+            <div class="tab" onclick="filterResources('Romans', 'Livre', event)">📚 Romans</div>
+            <div class="tab" onclick="filterResources('Autres', 'Livre', event)">📖 Autres</div>
         </div>
         <div id="availableBooks" class="items-grid"></div>
         <div id="noAvailableBooks" class="empty-state" style="display:none;">
@@ -51,6 +56,20 @@
     <!-- ARTICLES SCIENTIFIQUES -->
     <div class="card">
         <div class="section-title">📰 Articles Scientifiques</div>
+        <div class="tabs">
+            <div class="tab active" onclick="filterResources('all', 'Article', event)">Tous</div>
+            <div class="tab" onclick="filterResources('Finance', 'Article', event)">💰 Finance</div>
+            <div class="tab" onclick="filterResources('Business', 'Article', event)">💼 Business</div>
+            <div class="tab" onclick="filterResources('Mindset', 'Article', event)">🧠 Mindset</div>
+            <div class="tab" onclick="filterResources('Tech', 'Article', event)">💻 Tech</div>
+            <div class="tab" onclick="filterResources('Entrepreneuriat', 'Article', event)">🚀 Entrepreneuriat</div>
+            <div class="tab" onclick="filterResources('Philosophie', 'Article', event)">🤔 Philosophie</div>
+            <div class="tab" onclick="filterResources('Physique', 'Article', event)">⚛️ Physique</div>
+            <div class="tab" onclick="filterResources('Chimie', 'Article', event)">🧪 Chimie</div>
+            <div class="tab" onclick="filterResources('Agriculture', 'Article', event)">🌾 Agriculture</div>
+            <div class="tab" onclick="filterResources('Romans', 'Article', event)">📚 Romans</div>
+            <div class="tab" onclick="filterResources('Autres', 'Article', event)">📖 Autres</div>
+        </div>
         <div id="availableArticles" class="items-grid"></div>
         <div id="noArticles" class="empty-state" style="display:none;">
             <div style="font-size: 36px; margin-bottom: 10px;">📰</div>
@@ -62,6 +81,20 @@
     <!-- FILMS & SÉRIES -->
     <div class="card">
         <div class="section-title">🎬 Films & Séries à Découvrir</div>
+        <div class="tabs">
+            <div class="tab active" onclick="filterResources('all', 'FilmSérie', event)">Tous</div>
+            <div class="tab" onclick="filterResources('Finance', 'FilmSérie', event)">💰 Finance</div>
+            <div class="tab" onclick="filterResources('Business', 'FilmSérie', event)">💼 Business</div>
+            <div class="tab" onclick="filterResources('Mindset', 'FilmSérie', event)">🧠 Mindset</div>
+            <div class="tab" onclick="filterResources('Tech', 'FilmSérie', event)">💻 Tech</div>
+            <div class="tab" onclick="filterResources('Entrepreneuriat', 'FilmSérie', event)">🚀 Entrepreneuriat</div>
+            <div class="tab" onclick="filterResources('Philosophie', 'FilmSérie', event)">🤔 Philosophie</div>
+            <div class="tab" onclick="filterResources('Physique', 'FilmSérie', event)">⚛️ Physique</div>
+            <div class="tab" onclick="filterResources('Chimie', 'FilmSérie', event)">🧪 Chimie</div>
+            <div class="tab" onclick="filterResources('Agriculture', 'FilmSérie', event)">🌾 Agriculture</div>
+            <div class="tab" onclick="filterResources('Romans', 'FilmSérie', event)">📚 Romans</div>
+            <div class="tab" onclick="filterResources('Autres', 'FilmSérie', event)">📖 Autres</div>
+        </div>
         <div id="availableMovies" class="items-grid"></div>
         <div id="noMovies" class="empty-state" style="display:none;">
             <div style="font-size: 36px; margin-bottom: 10px;">🎬</div>
@@ -73,6 +106,20 @@
     <!-- PODCASTS & RÉSEAUX -->
     <div class="card">
         <div class="section-title">🎙️ Podcasts & Contenu Audio</div>
+        <div class="tabs">
+            <div class="tab active" onclick="filterResources('all', 'Podcast', event)">Tous</div>
+            <div class="tab" onclick="filterResources('Finance', 'Podcast', event)">💰 Finance</div>
+            <div class="tab" onclick="filterResources('Business', 'Podcast', event)">💼 Business</div>
+            <div class="tab" onclick="filterResources('Mindset', 'Podcast', event)">🧠 Mindset</div>
+            <div class="tab" onclick="filterResources('Tech', 'Podcast', event)">💻 Tech</div>
+            <div class="tab" onclick="filterResources('Entrepreneuriat', 'Podcast', event)">🚀 Entrepreneuriat</div>
+            <div class="tab" onclick="filterResources('Philosophie', 'Podcast', event)">🤔 Philosophie</div>
+            <div class="tab" onclick="filterResources('Physique', 'Podcast', event)">⚛️ Physique</div>
+            <div class="tab" onclick="filterResources('Chimie', 'Podcast', event)">🧪 Chimie</div>
+            <div class="tab" onclick="filterResources('Agriculture', 'Podcast', event)">🌾 Agriculture</div>
+            <div class="tab" onclick="filterResources('Romans', 'Podcast', event)">📚 Romans</div>
+            <div class="tab" onclick="filterResources('Autres', 'Podcast', event)">📖 Autres</div>
+        </div>
         <div id="availablePodcasts" class="items-grid"></div>
         <div id="noPodcasts" class="empty-state" style="display:none;">
             <div style="font-size: 36px; margin-bottom: 10px;">🎙️</div>
@@ -84,6 +131,20 @@
     <!-- MENTORS À SUIVRE -->
     <div class="card">
         <div class="section-title">👨‍🏫 Mentors à Suivre</div>
+        <div class="tabs">
+            <div class="tab active" onclick="filterResources('all', 'Mentor', event)">Tous</div>
+            <div class="tab" onclick="filterResources('Finance', 'Mentor', event)">💰 Finance</div>
+            <div class="tab" onclick="filterResources('Business', 'Mentor', event)">💼 Business</div>
+            <div class="tab" onclick="filterResources('Mindset', 'Mentor', event)">🧠 Mindset</div>
+            <div class="tab" onclick="filterResources('Tech', 'Mentor', event)">💻 Tech</div>
+            <div class="tab" onclick="filterResources('Entrepreneuriat', 'Mentor', event)">🚀 Entrepreneuriat</div>
+            <div class="tab" onclick="filterResources('Philosophie', 'Mentor', event)">🤔 Philosophie</div>
+            <div class="tab" onclick="filterResources('Physique', 'Mentor', event)">⚛️ Physique</div>
+            <div class="tab" onclick="filterResources('Chimie', 'Mentor', event)">🧪 Chimie</div>
+            <div class="tab" onclick="filterResources('Agriculture', 'Mentor', event)">🌾 Agriculture</div>
+            <div class="tab" onclick="filterResources('Romans', 'Mentor', event)">📚 Romans</div>
+            <div class="tab" onclick="filterResources('Autres', 'Mentor', event)">📖 Autres</div>
+        </div>
         <div id="availableMentors" class="items-grid"></div>
         <div id="noMentors" class="empty-state" style="display:none;">
             <div style="font-size: 36px; margin-bottom: 10px;">👨‍🏫</div>
@@ -197,53 +258,52 @@
     }
 
     .galaxy-name {
-        font-size: 16px;
         font-weight: 600;
-        opacity: 0.95;
+        font-size: 16px;
     }
 
     .galaxy-level {
         font-size: 13px;
-        opacity: 0.85;
-        margin-top: 4px;
+        opacity: 0.9;
     }
 
     .progress-info {
-        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
     }
 
     .overall-level {
         font-size: 14px;
-        margin-bottom: 8px;
-        opacity: 0.9;
+        font-weight: 600;
     }
 
     .progress-bar {
         height: 8px;
         background: rgba(255, 255, 255, 0.2);
-        border-radius: 10px;
+        border-radius: 4px;
         overflow: hidden;
     }
 
     .progress-fill {
         height: 100%;
-        background: linear-gradient(90deg, #10b981, #06b6d4);
-        border-radius: 10px;
-        transition: width 0.6s ease;
+        background: white;
+        border-radius: 4px;
+        transition: width 0.3s ease;
     }
 
-    /* ========== CARD ========== */
+    /* ========== CARDS ========== */
     .card {
-        background: var(--bg-primary);
-        border-radius: 12px;
+        background: white;
         padding: 32px;
+        border-radius: 16px;
         margin-bottom: 32px;
         box-shadow: var(--shadow);
         border: 1px solid var(--border-color);
     }
 
     .section-title {
-        font-size: 22px;
+        font-size: 24px;
         font-weight: 700;
         margin-bottom: 24px;
         color: var(--text-primary);
@@ -252,84 +312,74 @@
     /* ========== TABS ========== */
     .tabs {
         display: flex;
-        gap: 12px;
+        gap: 8px;
         margin-bottom: 24px;
-        overflow-x: auto;
-        padding-bottom: 12px;
         flex-wrap: wrap;
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 12px;
     }
 
     .tab {
         padding: 10px 16px;
-        background: var(--bg-tertiary);
-        border: 1px solid var(--border-color);
         border-radius: 8px;
         cursor: pointer;
         font-size: 14px;
         font-weight: 500;
-        transition: all 0.3s ease;
-        white-space: nowrap;
+        background: var(--bg-tertiary);
+        color: var(--text-secondary);
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
     }
 
     .tab:hover {
         background: var(--bg-secondary);
-        border-color: rgba(33, 128, 141, 1);
-        color: rgba(33, 128, 141, 1);
+        color: var(--text-primary);
+        border-color: var(--border-color);
     }
 
     .tab.active {
-        background: rgba(33, 128, 141, 1);
+        background: var(--primary);
         color: white;
-        border-color: rgba(33, 128, 141, 1);
+        border-color: var(--primary);
     }
 
     /* ========== ITEMS GRID ========== */
     .items-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
     }
 
     .item-card {
-        background: var(--bg-tertiary);
-        border: 2px solid transparent;
-        border-radius: 10px;
-        padding: 14px;
+        background: white;
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
         transition: all 0.3s ease;
         position: relative;
-        cursor: pointer;
     }
 
     .item-card:hover {
-        border-color: rgba(33, 128, 141, 1);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(59, 130, 246, 0.15);
+        border-color: var(--primary);
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-4px);
     }
 
     .item-card.checked {
-        background: linear-gradient(135deg, #10b98120 0%, #06b6d420 100%);
-        border-color: var(--secondary);
-        box-shadow: 0 0 12px rgba(16, 185, 129, 0.25), inset 0 0 12px rgba(16, 185, 129, 0.1);
+        background: #f0fdf4;
+        border-color: var(--success);
     }
 
     .item-card.locked {
         opacity: 0.6;
-        cursor: not-allowed;
-    }
-
-    .item-card.locked:hover {
-        transform: none;
-        border-color: transparent;
+        background: var(--bg-tertiary);
     }
 
     /* ========== CHECKBOX ========== */
     .checkbox-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 24px;
-        height: 24px;
-        margin-bottom: 10px;
+        position: absolute;
+        top: 16px;
+        right: 16px;
     }
 
     .checkbox-input {
@@ -337,86 +387,83 @@
     }
 
     .checkbox-custom {
-        width: 20px;
-        height: 20px;
+        width: 24px;
+        height: 24px;
         border: 2px solid var(--border-color);
-        border-radius: 5px;
+        border-radius: 6px;
+        display: inline-block;
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        background: white;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .checkbox-custom:hover {
+        border-color: var(--primary);
     }
 
     .checkbox-input:checked + .checkbox-custom {
-        background: var(--secondary);
-        border-color: var(--secondary);
-        box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+        background: var(--success);
+        border-color: var(--success);
     }
 
     .checkbox-input:checked + .checkbox-custom::after {
         content: '✓';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         color: white;
+        font-size: 16px;
         font-weight: bold;
-        font-size: 12px;
     }
 
     /* ========== ITEM CONTENT ========== */
     .item-title {
-        font-size: 14px;
-        font-weight: 600;
+        font-size: 18px;
+        font-weight: 700;
         color: var(--text-primary);
-        margin-bottom: 4px;
+        margin-bottom: 8px;
+        padding-right: 40px;
     }
 
     .item-author {
-        font-size: 12px;
+        font-size: 14px;
         color: var(--text-secondary);
-        margin-bottom: 8px;
+        margin-bottom: 12px;
     }
 
     .item-desc {
-        font-size: 12px;
-        color: var(--text-tertiary);
-        line-height: 1.4;
-        margin-bottom: 10px;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin-bottom: 16px;
+        line-height: 1.5;
     }
 
     .item-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        font-size: 11px;
-        color: var(--text-secondary);
-        border-top: 1px solid var(--border-color);
-        padding-top: 8px;
+        font-size: 13px;
+        color: var(--text-tertiary);
     }
 
     .badge {
-        background: rgba(33, 128, 141, 1);
-        color: white;
-        padding: 3px 8px;
-        border-radius: 5px;
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
         font-weight: 600;
-        font-size: 10px;
+        color: white;
     }
 
-    /* ========== LOCK BADGE ========== */
     .lock-badge {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        background: var(--danger);
-        color: white;
-        padding: 4px 8px;
-        border-radius: 5px;
-        font-size: 11px;
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 13px;
         font-weight: 600;
+        color: white;
+        margin-bottom: 12px;
     }
 
     /* ========== EMPTY STATE ========== */
@@ -428,227 +475,190 @@
 
     /* ========== LOCKED INFO ========== */
     .locked-info {
-        background: var(--bg-secondary);
-        padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        border: 1px solid var(--border-color);
-    }
-
-    .unlock-progress {
-        width: 100%;
+        background: var(--bg-tertiary);
+        padding: 24px;
+        border-radius: 12px;
+        margin-bottom: 24px;
     }
 
     .unlock-bar {
         height: 12px;
-        background: var(--bg-tertiary);
-        border-radius: 10px;
+        background: var(--bg-secondary);
+        border-radius: 6px;
         overflow: hidden;
         border: 1px solid var(--border-color);
     }
 
     .unlock-fill {
         height: 100%;
-        background: linear-gradient(90deg, var(--secondary), var(--accent));
-        transition: width 0.6s ease;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        border-radius: 6px;
+        transition: width 0.5s ease;
     }
 
     /* ========== RESPONSIVE ========== */
     @media (max-width: 768px) {
         .container {
-            padding: 20px 12px;
+            padding: 20px 16px;
         }
 
         .header {
             padding: 24px;
-            margin-bottom: 24px;
         }
 
         .header h1 {
-            font-size: 24px;
+            font-size: 28px;
         }
 
         .galaxy-info {
             grid-template-columns: 1fr;
-            gap: 12px;
-        }
-
-        .card {
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .section-title {
-            font-size: 18px;
-            margin-bottom: 16px;
-        }
-
-        .items-grid {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
         }
 
         .tabs {
-            gap: 8px;
+            flex-direction: column;
         }
 
         .tab {
-            padding: 8px 12px;
-            font-size: 13px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .items-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>
 
 <script>
-    const STORAGE_KEY = 'evolutionSystem';
-    let userData = null;
+    const STORAGE_KEY = 'gamification_user_data';
     let allResources = [];
+    let userData = null;
     let apiUserLevel = 1;
-    let filterGenre = 'all';
-    let filterType = 'Livre';
-
-    // ==================== GALAXY SYSTEM ====================
-    const GALAXIES = {
-        1: { name: '🌟 Étoile du Matin', emoji: '🌟', color: '#10b981', min: 1, max: 100 },
-        2: { name: '💫 Andromède', emoji: '💫', color: '#06b6d4', min: 101, max: 200 },
-        3: { name: '⭐ Voie Lactée', emoji: '⭐', color: '#f59e0b', min: 201, max: 300 },
-        4: { name: '🌌 Sombrero', emoji: '🌌', color: '#ec4899', min: 301, max: 400 },
-        5: { name: '🪐 Spirale du Cygne', emoji: '🪐', color: '#8b5cf6', min: 401, max: 500 },
-        6: { name: '🔴 Nébuleuse du Crabe', emoji: '🔴', color: '#ef4444', min: 501, max: 600 },
-        7: { name: '🔵 Galaxie d\'Orion', emoji: '🔵', color: '#3b82f6', min: 601, max: 700 },
-        8: { name: '💎 Trésor Cosmique', emoji: '💎', color: '#14b8a6', min: 701, max: 800 },
-        9: { name: '🌠 Paradis Stellaire', emoji: '🌠', color: '#f97316', min: 801, max: 900 },
-        10: { name: '👑 Univers Suprême', emoji: '👑', color: '#6366f1', min: 901, max: 1000 },
+    
+    // Objet pour stocker les filtres actifs par type de ressource
+    const activeFilters = {
+        'Livre': 'all',
+        'Article': 'all',
+        'FilmSérie': 'all',
+        'Podcast': 'all',
+        'Mentor': 'all'
     };
 
+    // ==================== GALAXIES ====================
+    const galaxies = [
+        { level: 1,   name: 'Étoile du Matin',    emoji: '🌟', color: '#f59e0b' },
+        { level: 100, name: 'Nébuleuse Dorée',    emoji: '✨', color: '#eab308' },
+        { level: 200, name: 'Amas de Lumière',    emoji: '💫', color: '#22d3ee' },
+        { level: 300, name: 'Constellation Sage', emoji: '🌌', color: '#8b5cf6' },
+        { level: 400, name: 'Voie Lactée',        emoji: '🌠', color: '#ec4899' },
+        { level: 500, name: 'Supernova',          emoji: '💥', color: '#ef4444' },
+        { level: 600, name: 'Quasar Céleste',     emoji: '🔥', color: '#f97316' },
+        { level: 700, name: 'Trou Noir Maître',   emoji: '🕳️', color: '#1f2937' },
+        { level: 800, name: 'Univers Infini',     emoji: '🌐', color: '#3b82f6' },
+        { level: 900, name: 'Dimension Ultime',   emoji: '🌀', color: '#a855f7' },
+        { level: 1000,name: 'Omniscience',        emoji: '👁️', color: '#14b8a6' }
+    ];
+
     function getGalaxyByLevel(level) {
-        for (let i = 1; i <= 10; i++) {
-            const g = GALAXIES[i];
-            if (level >= g.min && level <= g.max) return g;
+        for (let i = galaxies.length - 1; i >= 0; i--) {
+            if (level >= galaxies[i].level) {
+                return galaxies[i];
+            }
         }
-        return GALAXIES[1];
+        return galaxies[0];
     }
 
-    function getLevelInGalaxy(level) {
-        return ((level - 1) % 100) + 1;
-    }
-
-    // ==================== GET PROFILE DATA ====================
-    async function getProfileData() {
-        try {
-            const response = await fetch('/api/profile/');
-            if (!response.ok) throw new Error(`Erreur profil: ${response.status}`);
-            const data = await response.json();
-            return {
-                level: data.level || 1,
-                total_xp: data.experience_points || 0
-            };
-        } catch (e) {
-            console.error('Erreur profil:', e);
-            return { level: 1, total_xp: 0 };
-        }
-    }
-
-    // ==================== LOAD RESOURCES FROM DB ====================
+    // ==================== API CALLS ====================
     async function loadResources() {
         try {
-            console.log('📡 Chargement des ressources depuis /api/resources/');
             const response = await fetch('/api/resources/');
-
-            console.log('🔍 Réponse HTTP:', response.status, response.statusText);
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ Réponse d\'erreur:', errorText);
-                throw new Error(`Erreur API: ${response.status}`);
-            }
-
+            if (!response.ok) throw new Error('Erreur chargement ressources');
             const data = await response.json();
-            console.log('✅ JSON reçu:', data);
-
-            if (data.success) {
-                // Stocke le niveau réel retourné par l'API
-                apiUserLevel = data.user_level || 1;
-
-                // Aplatit les ressources déverrouillées (tous les types)
-                allResources = [];
-                Object.keys(data.resources).forEach(type => {
-                    if (Array.isArray(data.resources[type])) {
-                        allResources = allResources.concat(data.resources[type]);
-                    }
-                });
-
-                console.log('✅ Ressources déverrouillées:', allResources.length, '| Niveau utilisateur:', apiUserLevel);
-            } else {
-                console.error('❌ Erreur API:', data.error);
-                alert('Erreur: ' + data.error);
-            }
+            allResources = data.resources || [];
+            apiUserLevel = data.user_level || 1;
+            console.log(`✅ ${allResources.length} ressources chargées, niveau utilisateur: ${apiUserLevel}`);
         } catch (error) {
-            console.error('❌ Erreur chargement ressources:', error);
-            alert('Erreur: Impossible de charger les ressources. Vérifiez que Django est en cours d\'exécution.');
+            console.error('❌ Erreur loadResources:', error);
+            allResources = [];
+            apiUserLevel = 1;
         }
     }
 
-    // ==================== UPDATE HEADER ====================
     async function updateHeader() {
-        const data = await getProfileData();
-        const level = data.level || 1;
-        const galaxy = getGalaxyByLevel(level);
-        const levelInGalaxy = getLevelInGalaxy(level);
+        try {
+            const response = await fetch('/api/user/profile/');
+            if (!response.ok) throw new Error('Erreur chargement profil');
+            const data = await response.json();
+            const userLevel = data.level || 1;
+            const galaxy = getGalaxyByLevel(userLevel);
 
-        document.getElementById('globalLevel').textContent = level;
-        document.getElementById('headerLevel').textContent = levelInGalaxy;
-        document.getElementById('progressBar').style.width = (level / 1000) * 100 + '%';
+            document.getElementById('headerLevel').textContent = userLevel;
+            document.getElementById('globalLevel').textContent = userLevel;
+            
+            const galaxyBadge = document.getElementById('galaxyBadge');
+            galaxyBadge.querySelector('.galaxy-emoji').textContent = galaxy.emoji;
+            galaxyBadge.querySelector('.galaxy-name').textContent = galaxy.name;
+            galaxyBadge.querySelector('.galaxy-level').innerHTML = `Niveau <span id="headerLevel">${userLevel}</span>/100`;
 
-        const badge = document.getElementById('galaxyBadge');
-        badge.querySelector('.galaxy-emoji').textContent = galaxy.emoji;
-        badge.querySelector('.galaxy-name').textContent = galaxy.name;
+            const progress = (userLevel / 1000) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        } catch (error) {
+            console.error('❌ Erreur updateHeader:', error);
+        }
     }
 
-    // ==================== TOGGLE ITEM ====================
-    function toggleItem(id) {
-        if (!userData) userData = getEmptyUserData();
-        if (userData.checkedItems.has(id)) {
-            userData.checkedItems.delete(id);
-        } else {
-            userData.checkedItems.add(id);
+    async function toggleItem(itemId) {
+        const checkbox = document.getElementById(itemId);
+        const card = checkbox.closest('.item-card');
+        
+        try {
+            const response = await fetch('/api/resources/toggle/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ item_id: itemId })
+            });
+
+            if (!response.ok) throw new Error('Erreur toggle item');
+            
+            const data = await response.json();
+            
+            if (data.checked) {
+                card.classList.add('checked');
+                if (!userData.checkedItems) userData.checkedItems = new Set();
+                userData.checkedItems.add(itemId);
+            } else {
+                card.classList.remove('checked');
+                if (userData.checkedItems) userData.checkedItems.delete(itemId);
+            }
+            
+            saveUserData(userData);
+        } catch (error) {
+            console.error('❌ Erreur toggleItem:', error);
+            checkbox.checked = !checkbox.checked;
         }
-        saveUserData(userData);
     }
 
     // ==================== RENDER RESOURCES ====================
     async function renderResources() {
         await updateHeader();
-        // Utilise le niveau déjà récupéré depuis /api/resources/ (user_level)
         const userLevel = apiUserLevel;
 
         if (!userData) userData = getEmptyUserData();
 
         // Livres
-        let availableBooks = allResources.filter(r => r.type === 'Livre' && r.niveau <= userLevel);
-        let lockedBooks = allResources.filter(r => r.type === 'Livre' && r.niveau > userLevel);
-
-        if (filterGenre !== 'all') {
-            availableBooks = availableBooks.filter(b => b.domaine === filterGenre);
-        }
-
-        renderBooks(availableBooks);
+        renderResourcesByType('Livre', userLevel, 'availableBooks', 'noAvailableBooks');
 
         // Articles
-        const availableArticles = allResources.filter(r => r.type === 'Article' && r.niveau <= userLevel);
-        renderItems(availableArticles, 'availableArticles', 'noArticles');
+        renderResourcesByType('Article', userLevel, 'availableArticles', 'noArticles');
 
         // Films
-        const availableMovies = allResources.filter(r => r.type === 'FilmSérie' && r.niveau <= userLevel);
-        renderItems(availableMovies, 'availableMovies', 'noMovies');
+        renderResourcesByType('FilmSérie', userLevel, 'availableMovies', 'noMovies');
 
         // Podcasts
-        const availablePodcasts = allResources.filter(r => r.type === 'Podcast' && r.niveau <= userLevel);
-        renderItems(availablePodcasts, 'availablePodcasts', 'noPodcasts');
+        renderResourcesByType('Podcast', userLevel, 'availablePodcasts', 'noPodcasts');
 
         // Mentors
-        const availableMentors = allResources.filter(r => r.type === 'Mentor' && r.niveau <= userLevel);
-        renderItems(availableMentors, 'availableMentors', 'noMentors');
+        renderResourcesByType('Mentor', userLevel, 'availableMentors', 'noMentors');
 
         // Ressources verrouillées
         const locked = allResources.filter(r => r.niveau > userLevel);
@@ -665,39 +675,17 @@
         renderLockedResources(locked);
     }
 
-    // ==================== RENDER BOOKS ====================
-    function renderBooks(books) {
-        const grid = document.getElementById('availableBooks');
-        const empty = document.getElementById('noAvailableBooks');
-
-        if (books.length === 0) {
-            grid.style.display = 'none';
-            empty.style.display = 'block';
-        } else {
-            grid.style.display = 'grid';
-            empty.style.display = 'none';
-
-            grid.innerHTML = books.map((b, idx) => {
-                const itemId = `book-${b.id}`;
-                const isChecked = userData.checkedItems.has(itemId);
-                const galaxy = getGalaxyByLevel(b.niveau);
-                return `
-                    <div class="item-card ${isChecked ? 'checked' : ''}">
-                        <div class="checkbox-container">
-                            <input type="checkbox" class="checkbox-input" id="${itemId}" ${isChecked ? 'checked' : ''} onchange="toggleItem('${itemId}')">
-                            <label for="${itemId}" class="checkbox-custom"></label>
-                        </div>
-                        <div class="item-title">${b.titre || 'Sans titre'}</div>
-                        <div class="item-author">${b.auteur || 'Auteur inconnu'}</div>
-                        <div class="item-desc">${b.description || 'Aucune description'}</div>
-                        <div class="item-footer">
-                            <span class="badge" style="background: ${galaxy.color};">Niv. ${b.niveau}</span>
-                            <span>${b.domaine}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+    // ==================== RENDER BY TYPE ====================
+    function renderResourcesByType(type, userLevel, gridId, emptyId) {
+        let available = allResources.filter(r => r.type === type && r.niveau <= userLevel);
+        
+        // Appliquer le filtre de domaine
+        const filterDomain = activeFilters[type];
+        if (filterDomain !== 'all') {
+            available = available.filter(r => r.domaine === filterDomain);
         }
+
+        renderItems(available, gridId, emptyId);
     }
 
     // ==================== RENDER ITEMS ====================
@@ -714,7 +702,7 @@
 
             grid.innerHTML = items.map((item, idx) => {
                 const itemId = `item-${item.id}`;
-                const isChecked = userData.checkedItems.has(itemId);
+                const isChecked = userData.checkedItems && userData.checkedItems.has(itemId);
                 const galaxy = getGalaxyByLevel(item.niveau);
                 return `
                     <div class="item-card ${isChecked ? 'checked' : ''}">
@@ -760,12 +748,31 @@
         }).join('');
     }
 
-    // ==================== FILTER TYPE ====================
-    function filterBooks(domaine, type, event) {
-        event.target.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    // ==================== FILTER RESOURCES ====================
+    function filterResources(domaine, type, event) {
+        // Mettre à jour l'onglet actif
+        const tabs = event.target.parentElement;
+        tabs.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         event.target.classList.add('active');
-        filterGenre = domaine;
-        renderResources();
+        
+        // Sauvegarder le filtre actif pour ce type
+        activeFilters[type] = domaine;
+        
+        // Re-render uniquement la section concernée
+        const userLevel = apiUserLevel;
+        
+        const typeToGridMap = {
+            'Livre': { gridId: 'availableBooks', emptyId: 'noAvailableBooks' },
+            'Article': { gridId: 'availableArticles', emptyId: 'noArticles' },
+            'FilmSérie': { gridId: 'availableMovies', emptyId: 'noMovies' },
+            'Podcast': { gridId: 'availablePodcasts', emptyId: 'noPodcasts' },
+            'Mentor': { gridId: 'availableMentors', emptyId: 'noMentors' }
+        };
+        
+        const mapping = typeToGridMap[type];
+        if (mapping) {
+            renderResourcesByType(type, userLevel, mapping.gridId, mapping.emptyId);
+        }
     }
 
     // ==================== USER DATA ====================
