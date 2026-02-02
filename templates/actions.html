@@ -554,8 +554,8 @@
     // ✅ CORRIGÉ : Charge les ressources depuis l'API sécurisée
     async function loadResources() {
         try {
-            console.log('📡 Chargement des ressources depuis /gamification/api/resources/all/');
-            const response = await fetch('/gamification/api/resources/all/');
+            console.log('📡 Chargement des ressources depuis /api/resources/');
+            const response = await fetch('/api/resources/');
 
             if (!response.ok) {
                 throw new Error(`Erreur HTTP: ${response.status}`);
@@ -625,7 +625,7 @@
         
         // Sauvegarder sur le serveur
         try {
-            const response = await fetch('/gamification/api/user/toggle-resource', {
+            const response = await fetch('/api/user/toggle-resource', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
