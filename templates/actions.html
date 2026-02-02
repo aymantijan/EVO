@@ -56,6 +56,18 @@
     <!-- ARTICLES SCIENTIFIQUES -->
     <div class="card">
         <div class="section-title">📰 Articles Scientifiques</div>
+        <div class="tabs">
+            <div class="tab active" onclick="filterBooks('all', 'Article', event)">Tous</div>
+            <div class="tab" onclick="filterBooks('Management', 'Article', event)">📊 Management</div>
+            <div class="tab" onclick="filterBooks('Agriculture', 'Article', event)">🌾 Agriculture</div>
+            <div class="tab" onclick="filterBooks('Mathematiques', 'Article', event)">📐 Mathématiques</div>
+            <div class="tab" onclick="filterBooks('Economie', 'Article', event)">💹 Économie</div>
+            <div class="tab" onclick="filterBooks('Tech', 'Article', event)">💻 Tech</div>
+            <div class="tab" onclick="filterBooks('Finance', 'Article', event)">💰 Finance</div>
+            <div class="tab" onclick="filterBooks('Physique', 'Article', event)">⚛️ Physique</div>
+            <div class="tab" onclick="filterBooks('Chimie', 'Article', event)">🧪 Chimie</div>
+            <div class="tab" onclick="filterBooks('Mecanique', 'Article', event)">⚙️ Mécanique</div>
+        </div>
         <div id="availableArticles" class="items-grid"></div>
         <div id="noArticles" class="empty-state" style="display:none;">
             <div style="font-size: 36px; margin-bottom: 10px;">📰</div>
@@ -312,9 +324,8 @@
     }
 
     .item-card.checked {
-        background: linear-gradient(135deg, #10b98120 0%, #06b6d420 100%);
+        background: #d1fae5;
         border-color: var(--secondary);
-        box-shadow: 0 0 12px rgba(16, 185, 129, 0.25), inset 0 0 12px rgba(16, 185, 129, 0.1);
     }
 
     .item-card.locked {
@@ -511,6 +522,7 @@
     let apiUserLevel = 1;
     let filterGenre = 'all';
     let filterType = 'Livre';
+    let filterArticleGenre = 'all';
 
     // ==================== GALAXY SYSTEM ====================
     const GALAXIES = {
@@ -640,7 +652,12 @@
         renderBooks(availableBooks);
 
         // Articles
-        const availableArticles = allResources.filter(r => r.type === 'Article' && r.niveau <= userLevel);
+        let availableArticles = allResources.filter(r => r.type === 'Article' && r.niveau <= userLevel);
+        
+        if (filterArticleGenre !== 'all') {
+            availableArticles = availableArticles.filter(a => a.domaine === filterArticleGenre);
+        }
+        
         renderItems(availableArticles, 'availableArticles', 'noArticles');
 
         // Films
@@ -649,11 +666,11 @@
 
         // Podcasts
         const availablePodcasts = allResources.filter(r => r.type === 'Podcast' && r.niveau <= userLevel);
-        renderItems(availablePodcasts, 'availablePodcasts', 'noPodcasts');
+        renderItems(availablePodcasts, 'availablePodcasts', 'noPodcasts', false);
 
         // Mentors
         const availableMentors = allResources.filter(r => r.type === 'Mentor' && r.niveau <= userLevel);
-        renderItems(availableMentors, 'availableMentors', 'noMentors');
+        renderItems(availableMentors, 'availableMentors', 'noMentors', false);
 
         // Ressources verrouillées
         const locked = allResources.filter(r => r.niveau > userLevel);
@@ -706,7 +723,7 @@
     }
 
     // ==================== RENDER ITEMS ====================
-    function renderItems(items, gridId, emptyId) {
+    function renderItems(items, gridId, emptyId, showCheckbox = true) {
         const grid = document.getElementById(gridId);
         const empty = document.getElementById(emptyId);
 
@@ -721,12 +738,17 @@
                 const itemId = `item-${item.id}`;
                 const isChecked = userData.checkedItems.has(itemId);
                 const galaxy = getGalaxyByLevel(item.niveau);
+                
+                const checkboxHtml = showCheckbox ? `
+                    <div class="checkbox-container">
+                        <input type="checkbox" class="checkbox-input" id="${itemId}" ${isChecked ? 'checked' : ''} onchange="toggleItem('${itemId}')">
+                        <label for="${itemId}" class="checkbox-custom"></label>
+                    </div>
+                ` : '';
+                
                 return `
                     <div class="item-card ${isChecked ? 'checked' : ''}">
-                        <div class="checkbox-container">
-                            <input type="checkbox" class="checkbox-input" id="${itemId}" ${isChecked ? 'checked' : ''} onchange="toggleItem('${itemId}')">
-                            <label for="${itemId}" class="checkbox-custom"></label>
-                        </div>
+                        ${checkboxHtml}
                         <div class="item-title">${item.titre || 'Sans titre'}</div>
                         <div class="item-author">${item.auteur || 'Source inconnue'}</div>
                         <div class="item-desc">${item.description || 'Aucune description'}</div>
@@ -769,7 +791,13 @@
     function filterBooks(domaine, type, event) {
         event.target.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         event.target.classList.add('active');
-        filterGenre = domaine;
+        
+        if (type === 'Livre') {
+            filterGenre = domaine;
+        } else if (type === 'Article') {
+            filterArticleGenre = domaine;
+        }
+        
         renderResources();
     }
 
