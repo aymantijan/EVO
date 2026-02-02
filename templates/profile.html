@@ -1108,6 +1108,48 @@
         text-align: center;
     }
 
+    /* ===== NOUVEAUX STYLES POUR NIVEAUX DE TRAITS ===== */
+    .trait-item-level {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        gap: 8px;
+    }
+
+    .trait-level-badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .trait-level-next {
+        font-size: 0.7rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+    }
+
+    .trait-item.trait-negative {
+        border-left: 3px solid #ef4444;
+    }
+
+    .trait-item.trait-negative .trait-item-hp {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .trait-item.trait-negative .trait-item-bar-fill {
+        background: linear-gradient(90deg, #ef4444, #dc2626);
+    }
+
+    .trait-item.trait-negative .trait-level-badge {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+
     .empty-state {
         text-align: center;
         padding: 2rem;
@@ -1303,6 +1345,58 @@
         container.innerHTML = html;
     }
 
+    // ==================== CALCUL DU NIVEAU EXPONENTIEL (RAISON 50%) ====================
+    
+    /**
+     * Calcule le niveau d un trait basé sur ses HP avec une progression exponentielle de raison 50%
+     * 
+     * Formule : Pour atteindre le niveau n, il faut un total cumulé de HP
+     * HP_requis(n) = 100 * [(1.5^(n-1) - 1) / 0.5]
+     * 
+     * Progression :
+     * - Niveau 1: 0-100 HP
+     * - Niveau 2: 100-250 HP (besoin de +150 HP, soit 100*1.5)
+     * - Niveau 3: 250-475 HP (besoin de +225 HP, soit 150*1.5)
+     * - Niveau 4: 475-812.5 HP (besoin de +337.5 HP, soit 225*1.5)
+     * etc.
+     */
+    function calculateTraitLevel(totalHP) {
+        if (totalHP <= 0) return 1;
+        
+        const BASE_HP = 100;
+        const RATIO = 1.5;
+        
+        const level = Math.floor(Math.log((totalHP * (RATIO - 1) / BASE_HP) + 1) / Math.log(RATIO)) + 1;
+        
+        return Math.max(1, level);
+    }
+    
+    /**
+     * Calcule les HP nécessaires pour atteindre le prochain niveau
+     */
+    function getHPForNextLevel(currentLevel) {
+        const BASE_HP = 100;
+        const RATIO = 1.5;
+        
+        const hpRequired = BASE_HP * (Math.pow(RATIO, currentLevel) - 1) / (RATIO - 1);
+        
+        return Math.ceil(hpRequired);
+    }
+    
+    /**
+     * Calcule le pourcentage de progression vers le prochain niveau
+     */
+    function getProgressToNextLevel(totalHP, currentLevel) {
+        const currentLevelHP = getHPForNextLevel(currentLevel - 1);
+        const nextLevelHP = getHPForNextLevel(currentLevel);
+        const hpInCurrentLevel = totalHP - currentLevelHP;
+        const hpNeededForLevel = nextLevelHP - currentLevelHP;
+        
+        const percentage = (hpInCurrentLevel / hpNeededForLevel) * 100;
+        return Math.max(0, Math.min(100, percentage));
+    }
+
+
     // ==================== TRAITS COMPLETS (76 TRAITS) ====================
 
     const TRAIT_CATEGORIES_COMPLETE = {
@@ -1310,40 +1404,40 @@
             name: 'Traits Cognitifs',
             emoji: '🧠',
             traits: [
-                { name: 'Pensée Analytique', key: 'analyticalthinking' },
-                { name: 'Pensée Logique', key: 'logicalthinking' },
-                { name: 'Pensée Critique', key: 'criticalthinking' },
-                { name: 'Pensée Stratégique', key: 'strategicthinking' },
-                { name: 'Pensée Systémique', key: 'systemicthinking' },
-                { name: 'Pensée Abstraite', key: 'abstractthinking' },
-                { name: 'Pensée Intuitive', key: 'intuitivethinking' },
-                { name: 'Créativité Intellectuelle', key: 'intellectualcreativity' },
-                { name: 'Curiosité Intellectuelle', key: 'intellectualcuriosity' },
-                { name: 'Vision Long Terme', key: 'longtermvision' },
-                { name: 'Flexibilité Mentale', key: 'mentalflexibility' },
-                { name: 'Capacité d\'Apprentissage', key: 'learningcapacity' },
+                { name: 'Pense Analytique', key: 'analyticThinking' },
+                { name: 'Pense Logique', key: 'logicalThinking' },
+                { name: 'Pense Critique', key: 'criticalThinking' },
+                { name: 'Pense Stratégique', key: 'strategicThinking' },
+                { name: 'Pense Systémique', key: 'systemicThinking' },
+                { name: 'Pense Abstraite', key: 'abstractThinking' },
+                { name: 'Pense Intuitive', key: 'intuitiveThinking' },
+                { name: 'Créativité Intellectuelle', key: 'intellectualCreativity' },
+                { name: 'Curiosité Intellectuelle', key: 'intellectualCuriosity' },
+                { name: 'Vision Long Terme', key: 'longTermVision' },
+                { name: 'Flexibilité Mentale', key: 'mentalFlexibility' },
+                { name: 'Capacité d\'Apprentissage', key: 'learningCapacity' },
                 { name: 'Lucidité', key: 'lucidity' },
-                { name: 'Esprit de Synthèse', key: 'syntheticsense' },
-                { name: 'Rigidité Cognitive', key: 'cognitivrigidity', negative: true }
+                { name: 'Esprit de Synthèse', key: 'syntheticMind' },
+                { name: 'Rigidité Cognitive', key: 'cognitiveRigidity', negative: true }
             ]
         },
         emotional: {
             name: 'Traits Émotionnels',
             emoji: '💜',
             traits: [
-                { name: 'Stabilité Émotionnelle', key: 'emotionalstability' },
+                { name: 'Stabilité Émotionnelle', key: 'emotionalStability' },
                 { name: 'Résilience', key: 'resilience' },
                 { name: 'Sang-Froid', key: 'composure' },
-                { name: 'Sensibilité Émotionnelle', key: 'emotionalsensitivity' },
-                { name: 'Maîtrise de Soi', key: 'selfcontrol' },
-                { name: 'Tolérance au Stress', key: 'stresstolerance' },
-                { name: 'Vulnérabilité Émotionnelle', key: 'emotionalvulnerability' },
+                { name: 'Sensibilité Émotionnelle', key: 'emotionalSensitivity' },
+                { name: 'Maîtrise de Soi', key: 'selfMastery' },
+                { name: 'Tolérance au Stress', key: 'stressTolerance' },
+                { name: 'Vulnérabilité Émotionnelle', key: 'emotionalVulnerability' },
                 { name: 'Stoïcisme', key: 'stoicism' },
-                { name: 'Détachement Émotionnel', key: 'emotionaldetachment' },
-                { name: 'Instabilité Émotionnelle', key: 'emotionalinstability', negative: true },
+                { name: 'Détachement Émotionnel', key: 'emotionalDetachment' },
+                { name: 'Instabilité Émotionnelle', key: 'emotionalInstability', negative: true },
                 { name: 'Anxiété', key: 'anxiety', negative: true },
                 { name: 'Irritabilité', key: 'irritability', negative: true },
-                { name: 'Impulsivité Émotionnelle', key: 'emotionalimpulsivity', negative: true }
+                { name: 'Impulsivité Émotionnelle', key: 'emotionalImpulsivity', negative: true }
             ]
         },
         behavioral: {
@@ -1351,16 +1445,16 @@
             emoji: '⚡',
             traits: [
                 { name: 'Discipline', key: 'discipline' },
-                { name: 'Autocontrôle', key: 'selfcontrol' },
+                { name: 'Autocontrôle', key: 'selfMastery' },
                 { name: 'Persévérance', key: 'perseverance' },
                 { name: 'Rigueur', key: 'rigor' },
                 { name: 'Organisation', key: 'organization' },
                 { name: 'Fiabilité', key: 'reliability' },
-                { name: 'Sens du Devoir', key: 'dutyfulness' },
-                { name: 'Responsabilité', key: 'responsibility' },
+                { name: 'Sens du Devoir', key: 'senseOfDuty' },
+                { name: 'Responsabilité', key: 'accountability' },
                 { name: 'Prudence', key: 'prudence' },
-                { name: 'Gestion du Temps', key: 'timemanagement' },
-                { name: 'Capacité d\'Exécution', key: 'executioncapacity' }
+                { name: 'Gestion du Temps', key: 'timeManagement' },
+                { name: 'Capacité d\'Exécution', key: 'executionCapacity' }
             ]
         },
         social: {
@@ -1373,22 +1467,22 @@
                 { name: 'Influence', key: 'influence' },
                 { name: 'Diplomatie', key: 'diplomacy' },
                 { name: 'Coopération', key: 'cooperation' },
-                { name: 'Empathie Relationnelle', key: 'relationalempathy' },
+                { name: 'Empathie Relationnelle', key: 'relationalEmpathy' },
                 { name: 'Compétitivité', key: 'competitiveness' },
                 { name: 'Individualisme', key: 'individualism' },
-                { name: 'Dominance Sociale', key: 'socialdominance' },
-                { name: 'Dominance Inverse', key: 'inversesocialdominance' },
-                { name: 'Confiance Sociale', key: 'socialtrust' },
-                { name: 'Aliénation Sociale', key: 'socialalienation', negative: true },
-                { name: 'Soumission Excessive', key: 'excessivesubmission', negative: true },
-                { name: 'Passivité Sociale', key: 'socialpassivity', negative: true }
+                { name: 'Dominance Sociale', key: 'socialDominance' },
+                { name: 'Dominance Inverse', key: 'inverseSocialDominance' },
+                { name: 'Confiance Sociale', key: 'socialTrust' },
+                { name: 'Aliénation Sociale', key: 'socialAlienation', negative: true },
+                { name: 'Soumission Excessive', key: 'excessiveSubmission', negative: true },
+                { name: 'Passivité Sociale', key: 'socialPassivity', negative: true }
             ]
         },
         moral: {
             name: 'Traits Moraux',
             emoji: '⚖️',
             traits: [
-                { name: 'Intégrité Intellectuelle', key: 'intellectualintegrity' },
+                { name: 'Intégrité Intellectuelle', key: 'intellectualIntegrity' },
                 { name: 'Loyauté', key: 'loyalty' },
                 { name: 'Honneur', key: 'honor' }
             ]
@@ -1398,8 +1492,8 @@
             emoji: '📚',
             traits: [
                 { name: 'Apprentissage', key: 'learning' },
-                { name: 'Capacité d\'Apprentissage', key: 'learningability' },
-                { name: 'Expertise Reconnue', key: 'recognizedexpertise' },
+                { name: 'Capacité d\'Apprentissage', key: 'learningCapacity' },
+                { name: 'Expertise Reconnue', key: 'recognizedExpertise' },
                 { name: 'Polyvalence', key: 'versatility' }
             ]
         },
@@ -1417,27 +1511,27 @@
             name: 'Traits Existentiels',
             emoji: '✨',
             traits: [
-                { name: 'Individualité Forte', key: 'strongindividuality' },
-                { name: 'Conscience de Soi', key: 'selfawareness' },
-                { name: 'Croissance Personnelle', key: 'personalgrowth' },
-                { name: 'Sens & Purpose', key: 'senseofpurpose' }
+                { name: 'Individualité Forte', key: 'strongIndividuality' },
+                { name: 'Conscience de Soi', key: 'selfAwareness' },
+                { name: 'Croissance Personnelle', key: 'personalGrowth' },
+                { name: 'Sens & Purpose', key: 'senseOfPurpose' }
             ]
         },
         leadership: {
             name: 'Traits de Leadership',
             emoji: '👑',
             traits: [
-                { name: 'Leadership Naturel', key: 'naturalleadership' },
-                { name: 'Vision Stratégique', key: 'strategicvision' },
+                { name: 'Leadership Naturel', key: 'naturalLeadership' },
+                { name: 'Vision Stratégique', key: 'strategicVision' },
                 { name: 'Mentorat', key: 'mentoring' },
-                { name: 'Créativité Organisationnelle', key: 'organizationalcreativity' }
+                { name: 'Créativité Organisationnelle', key: 'organizationalCreativity' }
             ]
         },
         affective: {
             name: 'Traits Affectifs',
             emoji: '💝',
             traits: [
-                { name: 'Empathie Émotionnelle', key: 'emotionalempathy' },
+                { name: 'Empathie Émotionnelle', key: 'emotionalEmpathy' },
                 { name: 'Compassion', key: 'compassion' },
                 { name: 'Fierté', key: 'pride' }
             ]
@@ -1460,27 +1554,46 @@
             let traitsHTML = '';
 
             category.traits.forEach(trait => {
+                // ✅ RECHERCHE AMÉLIORÉE - Cherche par name, key, ou key en minuscules
                 let hp = 0;
                 if (traitsHP[trait.name] !== undefined) {
                     hp = parseInt(traitsHP[trait.name]) || 0;
                 } else if (traitsHP[trait.key] !== undefined) {
                     hp = parseInt(traitsHP[trait.key]) || 0;
+                } else {
+                    // Fallback: chercher en minuscules
+                    const lowerKey = trait.key.toLowerCase();
+                    const foundKey = Object.keys(traitsHP).find(k => k.toLowerCase() === lowerKey);
+                    if (foundKey) {
+                        hp = parseInt(traitsHP[foundKey]) || 0;
+                    }
                 }
 
-                const percentage = Math.min(Math.abs(hp) / 100 * 100, 100);
-                const hasHP = hp !== 0;
+                // ✅ CALCUL DU NIVEAU EXPONENTIEL
+                const absHP = Math.abs(hp);
+                const traitLevel = calculateTraitLevel(absHP);
+                const progressPercent = getProgressToNextLevel(absHP, traitLevel);
+                const nextLevelHP = getHPForNextLevel(traitLevel);
+                
+                // ✅ AFFICHER TOUS LES TRAITS - même ceux à 0 HP
+                const isDiscovered = hp !== 0;
+                const isNegative = trait.negative || hp < 0;
 
                 traitsHTML += `
-                    <div class="trait-item ${hasHP ? 'trait-active' : ''}">
+                    <div class="trait-item ${isDiscovered ? 'trait-active' : ''} ${isNegative ? 'trait-negative' : ''}">
                         <div class="trait-item-header">
                             <span class="trait-item-name">${trait.name}</span>
                             <span class="trait-item-hp">${hp >= 0 ? '+' : ''}${hp} HP</span>
                         </div>
+                        <div class="trait-item-level">
+                            <span class="trait-level-badge">Niveau ${traitLevel}</span>
+                            ${isDiscovered ? `<span class="trait-level-next">${absHP}/${nextLevelHP} HP</span>` : ''}
+                        </div>
                         <div class="trait-item-bar">
-                            <div class="trait-item-bar-fill" style="width: ${percentage}%"></div>
+                            <div class="trait-item-bar-fill" style="width: ${progressPercent}%"></div>
                         </div>
                         <div class="trait-status">
-                            ${hasHP ? percentage.toFixed(0) + '%' : 'Non découvert'}
+                            ${isDiscovered ? progressPercent.toFixed(0) + '% vers niveau ' + (traitLevel + 1) : 'Trait à 0 HP - Non actif'}
                         </div>
                     </div>
                 `;
@@ -1504,7 +1617,7 @@
         const traitsCount = document.getElementById('traits-count');
         if (traitsCount) traitsCount.textContent = totalTraits;
 
-        console.log(`✅ Total traits rendus: ${totalTraits}`);
+        console.log(`✅ Total traits rendus: ${totalTraits} (tous affichés, même ceux à 0 HP)`);
     }
 
     // ==================== ✅ LOAD PROFILE IMAGES FROM DATABASE ====================
@@ -1801,6 +1914,46 @@
     }
 
     // ==================== ✅ AVATAR & COVER - UPLOAD AVEC CSRF ====================
+    /* 
+    ==================== EXIGENCES BACKEND POUR LA PERSISTANCE DES IMAGES ====================
+    
+    Pour que les images de profil/couverture persistent entre les sessions, le backend DOIT:
+    
+    1. ENDPOINT /api/upload-profile-image/ (POST)
+       - Recevoir l'image via FormData (clé: 'image')
+       - Sauvegarder l'image dans un dossier PERMANENT (ex: /media/profiles/)
+       - Enregistrer le chemin de l'image en base de données
+       - Retourner JSON:
+         {
+             "success": true,
+             "image_url": "/media/profiles/user123_avatar.jpg"  // IMPORTANT: URL permanente
+         }
+    
+    2. ENDPOINT /api/upload-cover-image/ (POST)
+       - Recevoir l'image via FormData (clé: 'image')
+       - Sauvegarder l'image dans un dossier PERMANENT (ex: /media/covers/)
+       - Enregistrer le chemin de l'image en base de données
+       - Retourner JSON:
+         {
+             "success": true,
+             "image_url": "/media/covers/user123_cover.jpg"  // IMPORTANT: URL permanente
+         }
+    
+    3. ENDPOINT /api/profile/ (GET)
+       - Charger les données utilisateur
+       - Retourner JSON:
+         {
+             "profile_image_url": "/media/profiles/user123_avatar.jpg",  // null si pas d'image
+             "cover_image_url": "/media/covers/user123_cover.jpg"        // null si pas d'image
+         }
+    
+    IMPORTANT:
+    - NE PAS stocker les images dans /tmp/ ou autre dossier temporaire
+    - S'assurer que le serveur web (nginx/apache) sert correctement /media/
+    - Vérifier les permissions du dossier de stockage
+    - Les URLs doivent être accessibles publiquement
+    */
+    
 
     function uploadAvatar(event) {
         const file = event.target.files[0];
@@ -1876,6 +2029,21 @@
             if (data.success) {
                 console.log('✅ Image de profil sauvegardée');
                 showNotification('Image de profil sauvegardée', 'success');
+                
+                // ✅ SOLUTION AU PROBLÈME DE PERSISTANCE
+                // Option 1: Utiliser l'URL retournée par le serveur (si disponible)
+                if (data.image_url) {
+                    const avatarEl = document.getElementById('profile-avatar');
+                    if (avatarEl) {
+                        avatarEl.style.backgroundImage = `url(${data.image_url})`;
+                        avatarEl.innerHTML = '';
+                        console.log('✅ Image de profil mise à jour avec URL serveur:', data.image_url);
+                    }
+                } else {
+                    // Option 2: Recharger toutes les images depuis le serveur
+                    console.log('🔄 Rechargement des images depuis le serveur...');
+                    loadProfileImages();
+                }
             } else {
                 throw new Error(data.error || 'Erreur inconnue');
             }
@@ -1921,6 +2089,27 @@
             if (data.success) {
                 console.log('✅ Image de couverture sauvegardée');
                 showNotification('Image de couverture sauvegardée', 'success');
+                
+                // ✅ SOLUTION AU PROBLÈME DE PERSISTANCE
+                // Option 1: Utiliser l'URL retournée par le serveur (si disponible)
+                if (data.image_url) {
+                    const coverEl = document.getElementById('profile-cover');
+                    if (coverEl) {
+                        coverEl.innerHTML = `
+                            <img src="${data.image_url}"
+                                 alt="Couverture"
+                                 style="width: 100%; height: 100%; object-fit: cover; image-orientation: from-image;">
+                            <button class="btn-edit-cover" onclick="openCoverModal()" style="position: absolute; bottom: 20px; right: 20px; background: rgba(33, 128, 141, 1); color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); transition: all 0.3s; z-index: 10;">
+                                <i class="fas fa-camera"></i> Modifier Couverture
+                            </button>
+                        `;
+                        console.log('✅ Image de couverture mise à jour avec URL serveur:', data.image_url);
+                    }
+                } else {
+                    // Option 2: Recharger toutes les images depuis le serveur
+                    console.log('🔄 Rechargement des images depuis le serveur...');
+                    loadProfileImages();
+                }
             } else {
                 throw new Error(data.error || 'Erreur inconnue');
             }
