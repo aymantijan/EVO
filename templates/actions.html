@@ -179,17 +179,8 @@
     .header h1 {
         font-size: 36px;
         margin-bottom: 8px;
-        font-weight: 700;
-        color: white;
     }
 
-    .header > div:nth-child(2) {
-        font-size: 16px;
-        opacity: 0.9;
-        margin-bottom: 24px;
-    }
-
-    /* ========== GALAXY INFO ========== */
     .galaxy-info {
         display: grid;
         grid-template-columns: auto 1fr;
@@ -203,10 +194,8 @@
         align-items: center;
         gap: 12px;
         background: rgba(255, 255, 255, 0.15);
-        padding: 12px 16px;
+        padding: 12px 20px;
         border-radius: 12px;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .galaxy-emoji {
@@ -214,15 +203,13 @@
     }
 
     .galaxy-name {
-        font-size: 16px;
         font-weight: 600;
-        opacity: 0.95;
+        font-size: 16px;
     }
 
     .galaxy-level {
         font-size: 13px;
-        opacity: 0.85;
-        margin-top: 4px;
+        opacity: 0.9;
     }
 
     .progress-info {
@@ -232,11 +219,11 @@
     .overall-level {
         font-size: 14px;
         margin-bottom: 8px;
-        opacity: 0.9;
+        font-weight: 500;
     }
 
     .progress-bar {
-        height: 8px;
+        height: 12px;
         background: rgba(255, 255, 255, 0.2);
         border-radius: 10px;
         overflow: hidden;
@@ -244,23 +231,21 @@
 
     .progress-fill {
         height: 100%;
-        background: linear-gradient(90deg, #10b981, #06b6d4);
-        border-radius: 10px;
+        background: linear-gradient(90deg, #10b981, #f59e0b);
         transition: width 0.6s ease;
     }
 
-    /* ========== CARD ========== */
+    /* ========== CARDS ========== */
     .card {
         background: var(--bg-primary);
-        border-radius: 12px;
+        border-radius: 16px;
         padding: 32px;
         margin-bottom: 32px;
         box-shadow: var(--shadow);
-        border: 1px solid var(--border-color);
     }
 
     .section-title {
-        font-size: 22px;
+        font-size: 24px;
         font-weight: 700;
         margin-bottom: 24px;
         color: var(--text-primary);
@@ -271,81 +256,67 @@
         display: flex;
         gap: 12px;
         margin-bottom: 24px;
-        overflow-x: auto;
-        padding-bottom: 12px;
         flex-wrap: wrap;
     }
 
     .tab {
-        padding: 10px 16px;
+        padding: 10px 18px;
         background: var(--bg-tertiary);
-        border: 1px solid var(--border-color);
+        border: none;
         border-radius: 8px;
         cursor: pointer;
+        transition: all 0.2s;
         font-size: 14px;
         font-weight: 500;
-        transition: all 0.3s ease;
-        white-space: nowrap;
+        color: var(--text-secondary);
     }
 
     .tab:hover {
         background: var(--bg-secondary);
-        border-color: rgba(33, 128, 141, 1);
-        color: rgba(33, 128, 141, 1);
+        color: var(--text-primary);
     }
 
     .tab.active {
-        background: rgba(33, 128, 141, 1);
+        background: var(--primary);
         color: white;
-        border-color: rgba(33, 128, 141, 1);
     }
 
     /* ========== ITEMS GRID ========== */
     .items-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 12px;
+        gap: 16px;
     }
 
     .item-card {
-        background: var(--bg-tertiary);
+        background: var(--bg-secondary);
+        padding: 16px;
+        border-radius: 12px;
+        transition: all 0.2s;
         border: 2px solid transparent;
-        border-radius: 10px;
-        padding: 14px;
-        transition: all 0.3s ease;
         position: relative;
-        cursor: pointer;
     }
 
     .item-card:hover {
-        border-color: rgba(33, 128, 141, 1);
         transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(59, 130, 246, 0.15);
+        box-shadow: var(--shadow);
     }
 
     .item-card.checked {
-        background: #d1fae5;
-        border-color: var(--secondary);
+        border-color: var(--success);
+        background: #ecfdf5;
     }
 
     .item-card.locked {
         opacity: 0.6;
-        cursor: not-allowed;
+        background: var(--bg-tertiary);
     }
 
-    .item-card.locked:hover {
-        transform: none;
-        border-color: transparent;
-    }
-
-    /* ========== CHECKBOX ========== */
     .checkbox-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 24px;
-        height: 24px;
-        margin-bottom: 10px;
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 10;
     }
 
     .checkbox-input {
@@ -353,52 +324,54 @@
     }
 
     .checkbox-custom {
-        width: 20px;
-        height: 20px;
+        display: block;
+        width: 24px;
+        height: 24px;
         border: 2px solid var(--border-color);
-        border-radius: 5px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
+        border-radius: 6px;
         background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
     }
 
     .checkbox-input:checked + .checkbox-custom {
-        background: var(--secondary);
-        border-color: var(--secondary);
-        box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+        background: var(--success);
+        border-color: var(--success);
     }
 
     .checkbox-input:checked + .checkbox-custom::after {
         content: '✓';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         color: white;
+        font-size: 16px;
         font-weight: bold;
-        font-size: 12px;
     }
 
-    /* ========== ITEM CONTENT ========== */
     .item-title {
-        font-size: 14px;
         font-weight: 600;
+        font-size: 15px;
+        margin-bottom: 6px;
         color: var(--text-primary);
-        margin-bottom: 4px;
+        padding-right: 30px;
     }
 
     .item-author {
-        font-size: 12px;
+        font-size: 13px;
         color: var(--text-secondary);
-        margin-bottom: 8px;
+        margin-bottom: 10px;
     }
 
     .item-desc {
-        font-size: 12px;
-        color: var(--text-tertiary);
+        font-size: 13px;
+        color: var(--text-secondary);
         line-height: 1.4;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
         display: -webkit-box;
-        -webkit-line-clamp: 2;
+        -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
@@ -407,31 +380,26 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        font-size: 11px;
-        color: var(--text-secondary);
-        border-top: 1px solid var(--border-color);
-        padding-top: 8px;
+        font-size: 12px;
+        color: var(--text-tertiary);
     }
 
     .badge {
-        background: rgba(33, 128, 141, 1);
+        padding: 4px 10px;
+        border-radius: 6px;
         color: white;
-        padding: 3px 8px;
-        border-radius: 5px;
         font-weight: 600;
-        font-size: 10px;
+        font-size: 11px;
     }
 
-    /* ========== LOCK BADGE ========== */
     .lock-badge {
         position: absolute;
-        top: 8px;
-        right: 8px;
-        background: var(--danger);
+        top: 12px;
+        right: 12px;
+        padding: 6px 12px;
+        border-radius: 8px;
         color: white;
-        padding: 4px 8px;
-        border-radius: 5px;
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 600;
     }
 
@@ -442,17 +410,15 @@
         color: var(--text-secondary);
     }
 
-    /* ========== LOCKED INFO ========== */
+    /* ========== UNLOCK PROGRESS ========== */
     .locked-info {
-        background: var(--bg-secondary);
-        padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        border: 1px solid var(--border-color);
+        text-align: center;
+        margin-bottom: 24px;
     }
 
     .unlock-progress {
-        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
     }
 
     .unlock-bar {
@@ -516,10 +482,10 @@
 </style>
 
 <script>
-    const STORAGE_KEY = 'evolutionSystem';
+    // ✅ SUPPRESSION TOTALE DE LOCALSTORAGE
     let userData = null;
     let allResources = [];
-    let userLevel = 1; // ✅ CORRIGÉ : Variable pour stocker le niveau utilisateur
+    let userLevel = 1;
     let filterGenre = 'all';
     let filterType = 'Livre';
     let filterArticleGenre = 'all';
@@ -551,7 +517,6 @@
     }
 
     // ==================== LOAD RESOURCES FROM API ====================
-    // ✅ CORRIGÉ : Charge les ressources depuis l'API sécurisée
     async function loadResources() {
         try {
             console.log('📡 Chargement des ressources depuis /api/resources/');
@@ -565,34 +530,38 @@
             console.log('✅ Données reçues:', data);
 
             if (data.success) {
-                // ✅ CORRIGÉ : Récupérer le niveau utilisateur depuis l'API
+                // Récupérer le niveau utilisateur
                 userLevel = data.user.level || 1;
                 console.log('📊 Niveau utilisateur:', userLevel);
 
-                // ⭐ AJOUT : Synchroniser userData.level avec userLevel
-                userData.level = userLevel;
+                // Initialiser userData
+                userData = {
+                    name: data.user.name || 'Utilisateur',
+                    level: userLevel,
+                    checkedItems: new Set()
+                };
 
-                // ✅ CORRIGÉ : Récupérer toutes les ressources
+                // Récupérer toutes les ressources
                 allResources = data.resources || [];
                 console.log('📚 Ressources totales:', allResources.length);
 
-                // ✅ CORRIGÉ : Charger les ressources cochées
+                // ✅ CORRECTION : Charger les ressources cochées (snake_case)
                 if (data.checked_resources && Array.isArray(data.checked_resources)) {
                     userData.checkedItems = new Set(data.checked_resources.map(id => `item-${id}`));
-                    saveUserData(userData); // ← Maintenant userData.level est correct !
+                    console.log('✅ Ressources cochées chargées:', userData.checkedItems.size);
                 }
 
-                // ✅ Mettre à jour l'affichage du header
+                // Mettre à jour l'affichage du header
                 updateHeader();
-                    } else {
-                        console.error('❌ Erreur API:', data.error);
-                        alert('Erreur: ' + data.error);
-                    }
-                } catch (error) {
-                    console.error('❌ Erreur chargement ressources:', error);
-                    alert('Erreur: Impossible de charger les ressources.');
-                }
+            } else {
+                console.error('❌ Erreur API:', data.error);
+                alert('Erreur: ' + data.error);
             }
+        } catch (error) {
+            console.error('❌ Erreur chargement ressources:', error);
+            alert('Erreur: Impossible de charger les ressources.');
+        }
+    }
 
 
     // ==================== UPDATE HEADER ====================
@@ -611,23 +580,24 @@
 
     // ==================== TOGGLE ITEM ====================
     async function toggleItem(id) {
-        if (!userData) userData = getEmptyUserData();
+        if (!userData) {
+            console.error('userData non initialisé');
+            return;
+        }
         
         const isChecked = userData.checkedItems.has(id);
         
+        // Mettre à jour l'état local immédiatement pour un feedback instantané
         if (isChecked) {
             userData.checkedItems.delete(id);
         } else {
             userData.checkedItems.add(id);
         }
         
-        // Sauvegarder localement
-        saveUserData(userData);
-        
-        // ✅ CORRIGÉ : Extraire l'ID numérique de la ressource
+        // Extraire l'ID numérique de la ressource
         const resourceId = id.replace('item-', '').replace('book-', '');
         
-        // Sauvegarder sur le serveur
+        // Sauvegarder sur le serveur (source unique de vérité)
         try {
             const response = await fetch('/api/user/toggle-resource', {
                 method: 'POST',
@@ -641,11 +611,29 @@
                 })
             });
             
-            if (!response.ok) {
-                console.error('Erreur sauvegarde serveur');
+            const result = await response.json();
+            
+            if (!response.ok || !result.success) {
+                // Rollback en cas d'erreur
+                if (isChecked) {
+                    userData.checkedItems.add(id);
+                } else {
+                    userData.checkedItems.delete(id);
+                }
+                console.error('Erreur sauvegarde serveur:', result.error);
+                alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
+            } else {
+                console.log('✅ Ressource sauvegardée:', resourceId, !isChecked);
             }
         } catch (error) {
+            // Rollback en cas d'erreur réseau
+            if (isChecked) {
+                userData.checkedItems.add(id);
+            } else {
+                userData.checkedItems.delete(id);
+            }
             console.error('Erreur réseau:', error);
+            alert('Erreur de connexion. Veuillez réessayer.');
         }
     }
 
@@ -667,7 +655,10 @@
 
     // ==================== RENDER RESOURCES ====================
     async function renderResources() {
-        if (!userData) userData = getEmptyUserData();
+        if (!userData) {
+            console.error('userData non initialisé');
+            return;
+        }
 
         console.log('🎨 Rendu des ressources avec niveau:', userLevel);
 
@@ -687,15 +678,15 @@
             availableArticles = availableArticles.filter(a => a.domaine === filterArticleGenre);
         }
         
-        renderItems(availableArticles, 'availableArticles', 'noArticles');
+        renderItems(availableArticles, 'availableArticles', 'noArticles', true);
 
         // Films
-        const availableMovies = allResources.filter(r => r.type === 'FilmSérie' && r.niveau <= userLevel);
-        renderItems(availableMovies, 'availableMovies', 'noMovies');
+        const availableMovies = allResources.filter(r => r.type === 'Film/Série' && r.niveau <= userLevel);
+        renderItems(availableMovies, 'availableMovies', 'noMovies', true);
 
         // Podcasts
         const availablePodcasts = allResources.filter(r => r.type === 'Podcast' && r.niveau <= userLevel);
-        renderItems(availablePodcasts, 'availablePodcasts', 'noPodcasts', false);
+        renderItems(availablePodcasts, 'availablePodcasts', 'noPodcasts', true);
 
         // Mentors
         const availableMentors = allResources.filter(r => r.type === 'Mentor' && r.niveau <= userLevel);
@@ -830,38 +821,14 @@
         renderResources();
     }
 
-    // ==================== USER DATA ====================
-    function getEmptyUserData() {
-        return {
-            name: 'Utilisateur',
-            level: 1,
-            checkedItems: new Set()
-        };
-    }
-
-    function saveUserData(data) {
-        try {
-            const toSave = {
-                ...data,
-                checkedItems: Array.from(data.checkedItems)
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
-            return true;
-        } catch (e) {
-            console.error('Erreur save:', e);
-            return false;
-        }
-    }
-
     // ==================== INITIALIZE ====================
     async function initialize() {
-        console.log('🚀 Initialisation de la page Actions...');
-        userData = getEmptyUserData();
+        console.log('🚀 Initialisation de la page Actions (sans localStorage)...');
         
-        // ✅ CORRIGÉ : Charger les ressources (qui va aussi récupérer le niveau)
+        // Charger les ressources depuis le serveur
         await loadResources();
         
-        // Puis afficher les ressources
+        // Afficher les ressources
         await renderResources();
         
         console.log('✅ Page Actions chargée avec niveau:', userLevel);
