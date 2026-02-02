@@ -2112,4 +2112,90 @@ def delete_study_section(request, section_id):
     section.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_get_resources(request):
+    """Récupère toutes les ressources accessibles avec les cases cochées"""
+    try:
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        user_level = profile.level
+        
+        # Récupérer toutes les ressources actives
+        all_resources = Resource.objects.filter(is_active=True).order_by('niveau')
+        
+        # Récupérer les ressources cochées par l'utilisateur
+        checked_resources = CheckedResource.objects.filter(user=request.user).values_list('resource_id', flat=True)
+        checked_list = list(checked_resources)
+        
+        # Formatter les ressources
+        resources_list = []
+        for resource in all_resources:
+            resources_list.append({
+                'id': resource.id,
+                'titre': resource.titre,
+                'auteur': resource.auteur,
+                'type': resource.type,
+                'domaine': resource.domaine,
+                'description': resource.description,
+                'niveau': resource.niveau,
+                'url': resource.url,
+                'image': resource.image,
+            })
+        
+        return Response({
+            'success': True,
+            'resources': resources_list,
+            'user': {
+                'name': request.user.get_full_name() or request.user.username,
+                'level': user_level,
+                'checkedResources': checked_list  # ✅ AJOUT : Liste des IDs cochés
+            }
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return Response({'success': False, 'error': str(e)}, status=400)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def api_toggle_resource(request):
+    """Toggle une ressource cochée/décochée"""
+    try:
+        resource_id = request.data.get('resourceId')
+        checked = request.data.get('checked')
+        
+        if not resource_id:
+            return Response({
+                'success': False, 
+                'error': 'resourceId manquant'
+            }, status=400)
+        
+        if checked:
+            # Ajouter la ressource cochée
+            CheckedResource.objects.get_or_create(
+                user=request.user,
+                resource_id=resource_id
+            )
+        else:
+            # Retirer la ressource cochée
+            CheckedResource.objects.filter(
+                user=request.user,
+                resource_id=resource_id
+            ).delete()
+        
+        return Response({
+            'success': True,
+            'resourceId': resource_id,
+            'checked': checked
+        })
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return Response({
+            'success': False, 
+            'error': str(e)
+        }, status=400)
+
 # ==================== END OF FILE ====================

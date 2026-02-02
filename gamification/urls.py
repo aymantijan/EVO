@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import api_toggle_resource
 
 app_name = 'gamification'
 
@@ -113,4 +114,6 @@ urlpatterns = [
     path('api/study-tracker/sections/create/', views.create_study_section, name='api_create_study_section'),
     path('api/study-tracker/sections/<int:section_id>/', views.update_study_section, name='api_update_study_section'),
     path('api/study-tracker/sections/<int:section_id>/delete/', views.delete_study_section, name='api_delete_study_section'),
+    
+    path('api/user/toggle-resource', api_toggle_resource, name='api_toggle_resource'),
 ]

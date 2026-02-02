@@ -610,3 +610,17 @@ def save_user_profile(sender, instance, **kwargs):
     """Sauvegarde le profil quand le User est sauvegardé"""
     if hasattr(instance, 'profile'):
         instance.profile.save()
+        
+    
+class CheckedResource(models.Model):
+    """Ressources cochées par l'utilisateur"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='checked_resources')
+    resource_id = models.CharField(max_length=100)  # Ex: "book-123", "item-456"
+    checked_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('user', 'resource_id')
+        ordering = ['-checked_at']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.resource_id}"
