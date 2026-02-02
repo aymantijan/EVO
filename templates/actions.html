@@ -546,8 +546,8 @@
                 console.log('📚 Ressources totales:', allResources.length);
 
                 // ✅ CORRECTION : Charger les ressources cochées (snake_case)
-                if (data.checked_resources && Array.isArray(data.checked_resources)) {
-                    userData.checkedItems = new Set(data.checked_resources.map(id => `item-${id}`));
+                if (data.user.checked_resources && Array.isArray(data.user.checked_resources)) {
+                    userData.checkedItems = new Set(data.user.checked_resources.map(id => `item-${id}`));
                     console.log('✅ Ressources cochées chargées:', userData.checkedItems.size);
                 }
 
