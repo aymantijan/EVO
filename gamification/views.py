@@ -31,7 +31,7 @@ from .models import (
     UserProfile, Skill, UserSkill, Achievement, UserAchievement,
     Challenge, UserChallenge, StudySession, Action, PersonalityTrait,
     UserPersonalityTrait, ActivityEvaluation, EvaluationTraitLink,
-    ActivityArtifact, Resource,
+    ActivityArtifact, Resource, CheckedResource,
     StudySubject, StudyChapter, StudySection
 )
 
@@ -1703,43 +1703,6 @@ def get_dashboard_stats(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def api_get_resources(request):
-    """Récupère toutes les ressources accessibles"""
-    try:
-        profile, _ = UserProfile.objects.get_or_create(user=request.user)
-        user_level = profile.level
-
-        resources = Resource.objects.filter(is_active=True, niveau__lte=user_level).order_by('niveau')
-        grouped_resources = {}
-
-        for resource in resources:
-            resource_type = resource.get_type_display()
-            if resource_type not in grouped_resources:
-                grouped_resources[resource_type] = []
-
-            grouped_resources[resource_type].append({
-                'id': resource.id,
-                'titre': resource.titre,
-                'auteur': resource.auteur,
-                'type': resource.type,
-                'domaine': resource.domaine,
-                'description': resource.description,
-                'niveau': resource.niveau,
-                'url': resource.url,
-                'image': resource.image,
-            })
-
-        return Response({
-            'success': True,
-            'resources': grouped_resources,
-            'user_level': user_level,
-            'total_resources': len(resources)
-        })
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        return Response({'success': False, 'error': str(e)}, status=400)
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

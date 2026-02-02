@@ -178,26 +178,34 @@
 
     .header h1 {
         font-size: 36px;
-        font-weight: 700;
         margin-bottom: 8px;
+        font-weight: 700;
+        color: white;
     }
 
+    .header > div:nth-child(2) {
+        font-size: 16px;
+        opacity: 0.9;
+        margin-bottom: 24px;
+    }
+
+    /* ========== GALAXY INFO ========== */
     .galaxy-info {
-        margin-top: 24px;
-        display: flex;
-        gap: 24px;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 20px;
         align-items: center;
-        flex-wrap: wrap;
+        margin-top: 20px;
     }
 
     .galaxy-badge {
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(10px);
-        border-radius: 12px;
-        padding: 16px 20px;
         display: flex;
         align-items: center;
         gap: 12px;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 12px 16px;
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
@@ -208,49 +216,51 @@
     .galaxy-name {
         font-size: 16px;
         font-weight: 600;
+        opacity: 0.95;
     }
 
     .galaxy-level {
         font-size: 13px;
-        opacity: 0.9;
+        opacity: 0.85;
+        margin-top: 4px;
     }
 
     .progress-info {
         flex: 1;
-        min-width: 250px;
     }
 
     .overall-level {
         font-size: 14px;
         margin-bottom: 8px;
-        font-weight: 500;
+        opacity: 0.9;
     }
 
     .progress-bar {
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 50px;
         height: 8px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
         overflow: hidden;
     }
 
     .progress-fill {
-        background: linear-gradient(90deg, #fbbf24, #f59e0b);
         height: 100%;
-        border-radius: 50px;
-        transition: width 0.5s ease;
+        background: linear-gradient(90deg, #10b981, #06b6d4);
+        border-radius: 10px;
+        transition: width 0.6s ease;
     }
 
     /* ========== CARD ========== */
     .card {
         background: var(--bg-primary);
-        border-radius: 16px;
+        border-radius: 12px;
         padding: 32px;
         margin-bottom: 32px;
         box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
     }
 
     .section-title {
-        font-size: 24px;
+        font-size: 22px;
         font-weight: 700;
         margin-bottom: 24px;
         color: var(--text-primary);
@@ -259,199 +269,170 @@
     /* ========== TABS ========== */
     .tabs {
         display: flex;
-        gap: 8px;
+        gap: 12px;
         margin-bottom: 24px;
+        overflow-x: auto;
+        padding-bottom: 12px;
         flex-wrap: wrap;
     }
 
     .tab {
         padding: 10px 16px;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
         border-radius: 8px;
         cursor: pointer;
         font-size: 14px;
         font-weight: 500;
-        background: var(--bg-tertiary);
-        color: var(--text-secondary);
-        transition: all 0.2s;
-        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        white-space: nowrap;
     }
 
     .tab:hover {
         background: var(--bg-secondary);
-        transform: translateY(-1px);
+        border-color: rgba(33, 128, 141, 1);
+        color: rgba(33, 128, 141, 1);
     }
 
     .tab.active {
-        background: var(--primary);
+        background: rgba(33, 128, 141, 1);
         color: white;
-        border-color: var(--primary-dark);
+        border-color: rgba(33, 128, 141, 1);
     }
 
     /* ========== ITEMS GRID ========== */
     .items-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
     }
 
     .item-card {
-        background: var(--bg-secondary);
-        border-radius: 12px;
-        padding: 20px;
-        border: 2px solid var(--border-color);
-        transition: all 0.3s;
+        background: var(--bg-tertiary);
+        border: 2px solid transparent;
+        border-radius: 10px;
+        padding: 14px;
+        transition: all 0.3s ease;
         position: relative;
-        display: flex;
-        flex-direction: column;
+        cursor: pointer;
     }
 
     .item-card:hover {
-        border-color: var(--primary);
+        border-color: rgba(33, 128, 141, 1);
         transform: translateY(-2px);
-        box-shadow: var(--shadow-lg);
+        box-shadow: 0 6px 12px rgba(59, 130, 246, 0.15);
     }
 
     .item-card.checked {
-        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-        border-color: var(--success);
+        background: #d1fae5;
+        border-color: var(--secondary);
     }
 
     .item-card.locked {
         opacity: 0.6;
-        background: var(--bg-tertiary);
+        cursor: not-allowed;
     }
 
     .item-card.locked:hover {
         transform: none;
-        border-color: var(--border-color);
+        border-color: transparent;
     }
 
     /* ========== CHECKBOX ========== */
     .checkbox-container {
-        position: absolute;
-        top: 16px;
-        right: 16px;
-        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        margin-bottom: 10px;
     }
 
     .checkbox-input {
-        position: absolute;
-        opacity: 0;
-        cursor: pointer;
+        display: none;
     }
 
     .checkbox-custom {
-        width: 28px;
-        height: 28px;
-        background: white;
+        width: 20px;
+        height: 20px;
         border: 2px solid var(--border-color);
-        border-radius: 6px;
+        border-radius: 5px;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.2s;
-    }
-
-    .checkbox-custom::after {
-        content: '✓';
-        color: white;
-        font-size: 16px;
-        font-weight: bold;
-        opacity: 0;
-        transform: scale(0);
-        transition: all 0.2s;
+        transition: all 0.3s ease;
+        background: white;
     }
 
     .checkbox-input:checked + .checkbox-custom {
-        background: var(--success);
-        border-color: var(--success);
+        background: var(--secondary);
+        border-color: var(--secondary);
+        box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
     }
 
     .checkbox-input:checked + .checkbox-custom::after {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    .checkbox-custom:hover {
-        border-color: var(--primary);
+        content: '✓';
+        color: white;
+        font-weight: bold;
+        font-size: 12px;
     }
 
     /* ========== ITEM CONTENT ========== */
     .item-title {
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 600;
-        margin-bottom: 8px;
         color: var(--text-primary);
-        padding-right: 36px;
+        margin-bottom: 4px;
     }
 
     .item-author {
-        font-size: 13px;
+        font-size: 12px;
         color: var(--text-secondary);
-        margin-bottom: 12px;
+        margin-bottom: 8px;
     }
 
     .item-desc {
-        font-size: 14px;
-        color: var(--text-secondary);
-        line-height: 1.5;
-        margin-bottom: 16px;
-        flex: 1;
+        font-size: 12px;
+        color: var(--text-tertiary);
+        line-height: 1.4;
+        margin-bottom: 10px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 
     .item-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        font-size: 13px;
-        color: var(--text-tertiary);
-        margin-top: auto;
+        font-size: 11px;
+        color: var(--text-secondary);
+        border-top: 1px solid var(--border-color);
+        padding-top: 8px;
     }
 
     .badge {
-        padding: 4px 12px;
-        border-radius: 20px;
+        background: rgba(33, 128, 141, 1);
         color: white;
+        padding: 3px 8px;
+        border-radius: 5px;
         font-weight: 600;
-        font-size: 12px;
+        font-size: 10px;
     }
 
+    /* ========== LOCK BADGE ========== */
     .lock-badge {
         position: absolute;
-        top: 16px;
-        right: 16px;
-        padding: 6px 12px;
-        border-radius: 20px;
+        top: 8px;
+        right: 8px;
+        background: var(--danger);
         color: white;
+        padding: 4px 8px;
+        border-radius: 5px;
+        font-size: 11px;
         font-weight: 600;
-        font-size: 12px;
-    }
-
-    /* ========== LOCKED INFO ========== */
-    .locked-info {
-        background: var(--bg-secondary);
-        padding: 24px;
-        border-radius: 12px;
-        border: 2px solid var(--border-color);
-    }
-
-    .unlock-progress {
-        margin-top: 16px;
-    }
-
-    .unlock-bar {
-        background: var(--bg-tertiary);
-        border-radius: 50px;
-        height: 12px;
-        overflow: hidden;
-    }
-
-    .unlock-fill {
-        background: linear-gradient(90deg, var(--primary), var(--secondary));
-        height: 100%;
-        border-radius: 50px;
-        transition: width 0.5s ease;
     }
 
     /* ========== EMPTY STATE ========== */
@@ -461,166 +442,261 @@
         color: var(--text-secondary);
     }
 
+    /* ========== LOCKED INFO ========== */
+    .locked-info {
+        background: var(--bg-secondary);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid var(--border-color);
+    }
+
+    .unlock-progress {
+        width: 100%;
+    }
+
+    .unlock-bar {
+        height: 12px;
+        background: var(--bg-tertiary);
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+
+    .unlock-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--secondary), var(--accent));
+        transition: width 0.6s ease;
+    }
+
+    /* ========== RESPONSIVE ========== */
     @media (max-width: 768px) {
         .container {
-            padding: 20px 16px;
+            padding: 20px 12px;
         }
 
         .header {
             padding: 24px;
+            margin-bottom: 24px;
         }
 
         .header h1 {
-            font-size: 28px;
+            font-size: 24px;
+        }
+
+        .galaxy-info {
+            grid-template-columns: 1fr;
+            gap: 12px;
         }
 
         .card {
             padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 16px;
         }
 
         .items-grid {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
         }
 
-        .galaxy-info {
-            flex-direction: column;
-            gap: 16px;
+        .tabs {
+            gap: 8px;
         }
 
-        .galaxy-badge {
-            width: 100%;
+        .tab {
+            padding: 8px 12px;
+            font-size: 13px;
         }
     }
 </style>
 
 <script>
-    const STORAGE_KEY = 'userProgressData';
-    const API_BASE = '/api';
-    
+    const STORAGE_KEY = 'evolutionSystem';
     let userData = null;
     let allResources = [];
+    let apiUserLevel = 1;
     let filterGenre = 'all';
+    let filterType = 'Livre';
     let filterArticleGenre = 'all';
 
-    const galaxies = [
-        { min: 1, max: 100, name: 'Étoile du Matin', emoji: '🌟', color: '#fbbf24' },
-        { min: 101, max: 200, name: 'Nébuleuse Bleue', emoji: '🌀', color: '#3b82f6' },
-        { min: 201, max: 300, name: 'Constellation d\'Orion', emoji: '⭐', color: '#8b5cf6' },
-        { min: 301, max: 400, name: 'Amas des Pléiades', emoji: '✨', color: '#ec4899' },
-        { min: 401, max: 500, name: 'Géante Rouge', emoji: '🔴', color: '#ef4444' },
-        { min: 501, max: 600, name: 'Pulsar Cosmique', emoji: '💫', color: '#06b6d4' },
-        { min: 601, max: 700, name: 'Quasar Lumineux', emoji: '🌠', color: '#a855f7' },
-        { min: 701, max: 800, name: 'Supernova', emoji: '💥', color: '#f97316' },
-        { min: 801, max: 900, name: 'Trou Noir', emoji: '🕳️', color: '#000000' },
-        { min: 901, max: 1000, name: 'Univers Infini', emoji: '🌌', color: '#6366f1' }
-    ];
+    // ==================== GALAXY SYSTEM ====================
+    const GALAXIES = {
+        1: { name: '🌟 Étoile du Matin', emoji: '🌟', color: '#10b981', min: 1, max: 100 },
+        2: { name: '💫 Andromède', emoji: '💫', color: '#06b6d4', min: 101, max: 200 },
+        3: { name: '⭐ Voie Lactée', emoji: '⭐', color: '#f59e0b', min: 201, max: 300 },
+        4: { name: '🌌 Sombrero', emoji: '🌌', color: '#ec4899', min: 301, max: 400 },
+        5: { name: '🪐 Spirale du Cygne', emoji: '🪐', color: '#8b5cf6', min: 401, max: 500 },
+        6: { name: '🔴 Nébuleuse du Crabe', emoji: '🔴', color: '#ef4444', min: 501, max: 600 },
+        7: { name: '🔵 Galaxie d\'Orion', emoji: '🔵', color: '#3b82f6', min: 601, max: 700 },
+        8: { name: '💎 Trésor Cosmique', emoji: '💎', color: '#14b8a6', min: 701, max: 800 },
+        9: { name: '🌠 Paradis Stellaire', emoji: '🌠', color: '#f97316', min: 801, max: 900 },
+        10: { name: '👑 Univers Suprême', emoji: '👑', color: '#6366f1', min: 901, max: 1000 },
+    };
 
     function getGalaxyByLevel(level) {
-        return galaxies.find(g => level >= g.min && level <= g.max) || galaxies[0];
+        for (let i = 1; i <= 10; i++) {
+            const g = GALAXIES[i];
+            if (level >= g.min && level <= g.max) return g;
+        }
+        return GALAXIES[1];
+    }
+
+    function getLevelInGalaxy(level) {
+        return ((level - 1) % 100) + 1;
+    }
+
+    // ==================== GET PROFILE DATA ====================
+    async function getProfileData() {
+        try {
+            const response = await fetch('/api/profile/');
+            if (!response.ok) throw new Error(`Erreur profil: ${response.status}`);
+            const data = await response.json();
+            return {
+                level: data.level || 1,
+                total_xp: data.experience_points || 0
+            };
+        } catch (e) {
+            console.error('Erreur profil:', e);
+            return { level: 1, total_xp: 0 };
+        }
+    }
+
+    // ==================== LOAD RESOURCES FROM DB ====================
+    // ==================== LOAD RESOURCES FROM DB ====================
+    async function loadResources() {
+        try {
+            console.log('📡 Chargement des ressources depuis /api/resources/');
+            const response = await fetch('/api/resources/');
+
+            console.log('🔍 Réponse HTTP:', response.status, response.statusText);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ Réponse d\'erreur:', errorText);
+                throw new Error(`Erreur API: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('✅ JSON reçu:', data);
+
+            if (data.success) {
+                // Stocke le niveau réel retourné par l'API
+                apiUserLevel = data.user_level || 1;
+
+                // Aplatit les ressources déverrouillées (tous les types)
+                allResources = [];
+                Object.keys(data.resources).forEach(type => {
+                    if (Array.isArray(data.resources[type])) {
+                        allResources = allResources.concat(data.resources[type]);
+                    }
+                });
+
+                // ✅ NOUVEAU : Charger les ressources cochées depuis le serveur
+                if (data.user && data.user.checkedResources && Array.isArray(data.user.checkedResources)) {
+                    userData.checkedItems = new Set(data.user.checkedResources);
+                    // Sauvegarder aussi en local pour la cohérence
+                    saveUserData(userData);
+                }
+
+                console.log('✅ Ressources déverrouillées:', allResources.length, '| Niveau utilisateur:', apiUserLevel);
+            } else {
+                console.error('❌ Erreur API:', data.error);
+                alert('Erreur: ' + data.error);
+            }
+        } catch (error) {
+            console.error('❌ Erreur chargement ressources:', error);
+            alert('Erreur: Impossible de charger les ressources. Vérifiez que Django est en cours d\'exécution.');
+        }
+    }
+
+    // ==================== UPDATE HEADER ====================
+    async function updateHeader() {
+        const data = await getProfileData();
+        const level = data.level || 1;
+        const galaxy = getGalaxyByLevel(level);
+        const levelInGalaxy = getLevelInGalaxy(level);
+
+        document.getElementById('globalLevel').textContent = level;
+        document.getElementById('headerLevel').textContent = levelInGalaxy;
+        document.getElementById('progressBar').style.width = (level / 1000) * 100 + '%';
+
+        const badge = document.getElementById('galaxyBadge');
+        badge.querySelector('.galaxy-emoji').textContent = galaxy.emoji;
+        badge.querySelector('.galaxy-name').textContent = galaxy.name;
     }
 
     // ==================== TOGGLE ITEM ====================
-    async function toggleItem(itemId) {
-        if (!userData) return;
+    // ==================== TOGGLE ITEM ====================
+    async function toggleItem(id) {
+        if (!userData) userData = getEmptyUserData();
         
-        const isChecked = userData.checkedItems.has(itemId);
+        const isChecked = userData.checkedItems.has(id);
         
         if (isChecked) {
-            userData.checkedItems.delete(itemId);
+            userData.checkedItems.delete(id);
         } else {
-            userData.checkedItems.add(itemId);
+            userData.checkedItems.add(id);
         }
         
         // Sauvegarder localement d'abord (pour la réactivité)
         saveUserData(userData);
-        renderResources();
         
         // Puis sauvegarder sur le serveur
         try {
-            const response = await fetch(`${API_BASE}/user/toggle-resource`, {
+            const response = await fetch('/api/user/toggle-resource', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    resourceId: itemId,
+                    resourceId: id,
                     checked: !isChecked
                 })
             });
             
             if (!response.ok) {
                 console.error('Erreur sauvegarde serveur');
-                // En cas d'erreur, on pourrait annuler le changement local
-                // Mais on garde le changement local pour l'instant
             }
         } catch (error) {
             console.error('Erreur réseau:', error);
-            // Le changement reste en local même si le serveur n'est pas accessible
-        }
-    }
-
-    // ==================== LOAD RESOURCES ====================
-    async function loadResources() {
-        try {
-            const response = await fetch(`${API_BASE}/resources`);
-            if (!response.ok) throw new Error('Erreur réseau');
-            const data = await response.json();
-            allResources = data.resources || [];
-            
-            if (data.user) {
-                userData.name = data.user.name || 'Utilisateur';
-                userData.level = data.user.level || 1;
-                
-                // Charger les ressources cochées depuis le serveur
-                if (data.user.checkedResources && Array.isArray(data.user.checkedResources)) {
-                    userData.checkedItems = new Set(data.user.checkedResources);
-                    // Sauvegarder aussi en local pour la cohérence
-                    saveUserData(userData);
-                }
-            }
-            
-            return true;
-        } catch (error) {
-            console.error('Erreur chargement ressources:', error);
-            allResources = [];
-            return false;
         }
     }
 
     // ==================== RENDER RESOURCES ====================
     async function renderResources() {
-        if (!userData) return;
+        await updateHeader();
+        // Utilise le niveau déjà récupéré depuis /api/resources/ (user_level)
+        const userLevel = apiUserLevel;
 
-        const userLevel = userData.level;
-        const galaxy = getGalaxyByLevel(userLevel);
-        
-        // Update header
-        document.querySelector('.galaxy-name').textContent = galaxy.name;
-        document.querySelector('.galaxy-emoji').textContent = galaxy.emoji;
-        document.getElementById('galaxyBadge').style.background = `linear-gradient(135deg, ${galaxy.color}dd, ${galaxy.color})`;
-        document.getElementById('headerLevel').textContent = userLevel;
-        document.getElementById('globalLevel').textContent = userLevel;
-        
-        const progressPercentage = (userLevel / 1000) * 100;
-        document.getElementById('progressBar').style.width = progressPercentage + '%';
+        if (!userData) userData = getEmptyUserData();
 
         // Livres
         let availableBooks = allResources.filter(r => r.type === 'Livre' && r.niveau <= userLevel);
+        let lockedBooks = allResources.filter(r => r.type === 'Livre' && r.niveau > userLevel);
+
         if (filterGenre !== 'all') {
-            availableBooks = availableBooks.filter(r => r.domaine === filterGenre);
+            availableBooks = availableBooks.filter(b => b.domaine === filterGenre);
         }
+
         renderBooks(availableBooks);
 
         // Articles
         let availableArticles = allResources.filter(r => r.type === 'Article' && r.niveau <= userLevel);
+        
         if (filterArticleGenre !== 'all') {
-            availableArticles = availableArticles.filter(r => r.domaine === filterArticleGenre);
+            availableArticles = availableArticles.filter(a => a.domaine === filterArticleGenre);
         }
-        renderItems(availableArticles, 'availableArticles', 'noArticles', true);
+        
+        renderItems(availableArticles, 'availableArticles', 'noArticles');
 
         // Films
-        const availableMovies = allResources.filter(r => r.type === 'Film' && r.niveau <= userLevel);
-        renderItems(availableMovies, 'availableMovies', 'noMovies', false);
+        const availableMovies = allResources.filter(r => r.type === 'FilmSérie' && r.niveau <= userLevel);
+        renderItems(availableMovies, 'availableMovies', 'noMovies');
 
         // Podcasts
         const availablePodcasts = allResources.filter(r => r.type === 'Podcast' && r.niveau <= userLevel);
@@ -768,23 +844,6 @@
         };
     }
 
-    function loadUserData() {
-        try {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (!stored) return getEmptyUserData();
-            
-            const parsed = JSON.parse(stored);
-            return {
-                name: parsed.name || 'Utilisateur',
-                level: parsed.level || 1,
-                checkedItems: new Set(parsed.checkedItems || [])
-            };
-        } catch (e) {
-            console.error('Erreur chargement données:', e);
-            return getEmptyUserData();
-        }
-    }
-
     function saveUserData(data) {
         try {
             const toSave = {
@@ -802,7 +861,7 @@
     // ==================== INITIALIZE ====================
     async function initialize() {
         console.log('🚀 Initialisation de la page Actions...');
-        userData = loadUserData();  // ✅ CORRECTION ICI - Charger les données existantes
+        userData = getEmptyUserData();
         await loadResources();
         await renderResources();
         console.log('✅ Page Actions chargée!');
