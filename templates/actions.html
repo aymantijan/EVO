@@ -566,7 +566,7 @@
 
             if (data.success) {
                 // ✅ CORRIGÉ : Récupérer le niveau utilisateur depuis l'API
-                userLevel = data.user_level || 1;
+                userLevel = data.user.level || 1;
                 console.log('📊 Niveau utilisateur:', userLevel);
 
                 // ⭐ AJOUT : Synchroniser userData.level avec userLevel
