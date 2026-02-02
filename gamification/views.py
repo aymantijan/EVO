@@ -47,7 +47,6 @@ from .serializers import (
 
 load_dotenv()
 
-
 # ==================== HELPER FUNCTIONS ====================
 
 def calculate_level_from_xp(total_xp):
@@ -2125,7 +2124,7 @@ def api_get_resources(request):
             'user': {
                 'name': request.user.get_full_name() or request.user.username,
                 'level': user_level,
-                'checkedResources': checked_list  # ✅ AJOUT : Liste des IDs cochés
+                'checked_resources': checked_list  
             }
         })
     except Exception as e:
