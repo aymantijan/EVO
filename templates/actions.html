@@ -569,6 +569,9 @@
                 userLevel = data.user_level || 1;
                 console.log('📊 Niveau utilisateur:', userLevel);
 
+                // ⭐ AJOUT : Synchroniser userData.level avec userLevel
+                userData.level = userLevel;
+
                 // ✅ CORRIGÉ : Récupérer toutes les ressources
                 allResources = data.resources || [];
                 console.log('📚 Ressources totales:', allResources.length);
@@ -576,20 +579,21 @@
                 // ✅ CORRIGÉ : Charger les ressources cochées
                 if (data.checked_resources && Array.isArray(data.checked_resources)) {
                     userData.checkedItems = new Set(data.checked_resources.map(id => `item-${id}`));
-                    saveUserData(userData);
+                    saveUserData(userData); // ← Maintenant userData.level est correct !
                 }
 
                 // ✅ Mettre à jour l'affichage du header
                 updateHeader();
-            } else {
-                console.error('❌ Erreur API:', data.error);
-                alert('Erreur: ' + data.error);
+                    } else {
+                        console.error('❌ Erreur API:', data.error);
+                        alert('Erreur: ' + data.error);
+                    }
+                } catch (error) {
+                    console.error('❌ Erreur chargement ressources:', error);
+                    alert('Erreur: Impossible de charger les ressources.');
+                }
             }
-        } catch (error) {
-            console.error('❌ Erreur chargement ressources:', error);
-            alert('Erreur: Impossible de charger les ressources.');
-        }
-    }
+
 
     // ==================== UPDATE HEADER ====================
     function updateHeader() {
