@@ -519,7 +519,7 @@
     const STORAGE_KEY = 'evolutionSystem';
     let userData = null;
     let allResources = [];
-    let apiUserLevel = 1;
+    let userLevel = 1; // ✅ CORRIGÉ : Variable pour stocker le niveau utilisateur
     let filterGenre = 'all';
     let filterType = 'Livre';
     let filterArticleGenre = 'all';
@@ -550,87 +550,61 @@
         return ((level - 1) % 100) + 1;
     }
 
-    // ==================== GET PROFILE DATA ====================
-    async function getProfileData() {
-        try {
-            const response = await fetch('/api/profile/');
-            if (!response.ok) throw new Error(`Erreur profil: ${response.status}`);
-            const data = await response.json();
-            return {
-                level: data.level || 1,
-                total_xp: data.experience_points || 0
-            };
-        } catch (e) {
-            console.error('Erreur profil:', e);
-            return { level: 1, total_xp: 0 };
-        }
-    }
-
-    // ==================== LOAD RESOURCES FROM DB ====================
-    // ==================== LOAD RESOURCES FROM DB ====================
+    // ==================== LOAD RESOURCES FROM API ====================
+    // ✅ CORRIGÉ : Charge les ressources depuis l'API sécurisée
     async function loadResources() {
         try {
-            console.log('📡 Chargement des ressources depuis /api/resources/');
-            const response = await fetch('/api/resources/');
-
-            console.log('🔍 Réponse HTTP:', response.status, response.statusText);
+            console.log('📡 Chargement des ressources depuis /gamification/api/resources/all/');
+            const response = await fetch('/gamification/api/resources/all/');
 
             if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ Réponse d\'erreur:', errorText);
-                throw new Error(`Erreur API: ${response.status}`);
+                throw new Error(`Erreur HTTP: ${response.status}`);
             }
 
             const data = await response.json();
-            console.log('✅ JSON reçu:', data);
+            console.log('✅ Données reçues:', data);
 
             if (data.success) {
-                // Stocke le niveau réel retourné par l'API
-                apiUserLevel = data.user_level || 1;
+                // ✅ CORRIGÉ : Récupérer le niveau utilisateur depuis l'API
+                userLevel = data.user_level || 1;
+                console.log('📊 Niveau utilisateur:', userLevel);
 
-                // Aplatit les ressources déverrouillées (tous les types)
-                allResources = [];
-                Object.keys(data.resources).forEach(type => {
-                    if (Array.isArray(data.resources[type])) {
-                        allResources = allResources.concat(data.resources[type]);
-                    }
-                });
+                // ✅ CORRIGÉ : Récupérer toutes les ressources
+                allResources = data.resources || [];
+                console.log('📚 Ressources totales:', allResources.length);
 
-                // ✅ NOUVEAU : Charger les ressources cochées depuis le serveur
-                if (data.user && data.user.checkedResources && Array.isArray(data.user.checkedResources)) {
-                    userData.checkedItems = new Set(data.user.checkedResources);
-                    // Sauvegarder aussi en local pour la cohérence
+                // ✅ CORRIGÉ : Charger les ressources cochées
+                if (data.checked_resources && Array.isArray(data.checked_resources)) {
+                    userData.checkedItems = new Set(data.checked_resources.map(id => `item-${id}`));
                     saveUserData(userData);
                 }
 
-                console.log('✅ Ressources déverrouillées:', allResources.length, '| Niveau utilisateur:', apiUserLevel);
+                // ✅ Mettre à jour l'affichage du header
+                updateHeader();
             } else {
                 console.error('❌ Erreur API:', data.error);
                 alert('Erreur: ' + data.error);
             }
         } catch (error) {
             console.error('❌ Erreur chargement ressources:', error);
-            alert('Erreur: Impossible de charger les ressources. Vérifiez que Django est en cours d\'exécution.');
+            alert('Erreur: Impossible de charger les ressources.');
         }
     }
 
     // ==================== UPDATE HEADER ====================
-    async function updateHeader() {
-        const data = await getProfileData();
-        const level = data.level || 1;
-        const galaxy = getGalaxyByLevel(level);
-        const levelInGalaxy = getLevelInGalaxy(level);
+    function updateHeader() {
+        const galaxy = getGalaxyByLevel(userLevel);
+        const levelInGalaxy = getLevelInGalaxy(userLevel);
 
-        document.getElementById('globalLevel').textContent = level;
+        document.getElementById('globalLevel').textContent = userLevel;
         document.getElementById('headerLevel').textContent = levelInGalaxy;
-        document.getElementById('progressBar').style.width = (level / 1000) * 100 + '%';
+        document.getElementById('progressBar').style.width = (userLevel / 1000) * 100 + '%';
 
         const badge = document.getElementById('galaxyBadge');
         badge.querySelector('.galaxy-emoji').textContent = galaxy.emoji;
         badge.querySelector('.galaxy-name').textContent = galaxy.name;
     }
 
-    // ==================== TOGGLE ITEM ====================
     // ==================== TOGGLE ITEM ====================
     async function toggleItem(id) {
         if (!userData) userData = getEmptyUserData();
@@ -643,18 +617,22 @@
             userData.checkedItems.add(id);
         }
         
-        // Sauvegarder localement d'abord (pour la réactivité)
+        // Sauvegarder localement
         saveUserData(userData);
         
-        // Puis sauvegarder sur le serveur
+        // ✅ CORRIGÉ : Extraire l'ID numérique de la ressource
+        const resourceId = id.replace('item-', '').replace('book-', '');
+        
+        // Sauvegarder sur le serveur
         try {
-            const response = await fetch('/api/user/toggle-resource', {
+            const response = await fetch('/gamification/api/user/toggle-resource', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
                 },
                 body: JSON.stringify({
-                    resourceId: id,
+                    resourceId: resourceId,
                     checked: !isChecked
                 })
             });
@@ -667,18 +645,31 @@
         }
     }
 
+    // ==================== GET CSRF TOKEN ====================
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     // ==================== RENDER RESOURCES ====================
     async function renderResources() {
-        await updateHeader();
-        // Utilise le niveau déjà récupéré depuis /api/resources/ (user_level)
-        const userLevel = apiUserLevel;
-
         if (!userData) userData = getEmptyUserData();
+
+        console.log('🎨 Rendu des ressources avec niveau:', userLevel);
 
         // Livres
         let availableBooks = allResources.filter(r => r.type === 'Livre' && r.niveau <= userLevel);
-        let lockedBooks = allResources.filter(r => r.type === 'Livre' && r.niveau > userLevel);
-
+        
         if (filterGenre !== 'all') {
             availableBooks = availableBooks.filter(b => b.domaine === filterGenre);
         }
@@ -734,7 +725,7 @@
             empty.style.display = 'none';
 
             grid.innerHTML = books.map((b, idx) => {
-                const itemId = `book-${b.id}`;
+                const itemId = `item-${b.id}`;
                 const isChecked = userData.checkedItems.has(itemId);
                 const galaxy = getGalaxyByLevel(b.niveau);
                 return `
@@ -862,9 +853,14 @@
     async function initialize() {
         console.log('🚀 Initialisation de la page Actions...');
         userData = getEmptyUserData();
+        
+        // ✅ CORRIGÉ : Charger les ressources (qui va aussi récupérer le niveau)
         await loadResources();
+        
+        // Puis afficher les ressources
         await renderResources();
-        console.log('✅ Page Actions chargée!');
+        
+        console.log('✅ Page Actions chargée avec niveau:', userLevel);
     }
 
     if (document.readyState === 'loading') {

@@ -1706,12 +1706,24 @@ def get_dashboard_stats(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # ✅ CORRIGÉ : Authentification obligatoire
 def api_get_all_resources(request):
-    """Récupère TOUTES les ressources actives (sans filtre de niveau).
-    Le client utilise cet endpoint pour gérer séparement verrouillées / déverrouillées."""
+    """✅ CORRIGÉ : Récupère TOUTES les ressources actives avec le niveau utilisateur
+    et les ressources cochées."""
     try:
+        # ✅ Récupérer le profil utilisateur
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        user_level = profile.level
+        
+        # ✅ Récupérer toutes les ressources actives
         resources = Resource.objects.filter(is_active=True).order_by('niveau')
+        
+        # ✅ Récupérer les ressources cochées par l'utilisateur
+        checked_resources = CheckedResource.objects.filter(user=request.user).values_list('resource_id', flat=True)
+        checked_list = list(checked_resources)
 
+        # ✅ Formatter les ressources
         data = [
             {
                 'id': r.id,
@@ -1723,6 +1735,7 @@ def api_get_all_resources(request):
                 'niveau': r.niveau,
                 'url': r.url,
                 'image': r.image,
+                'is_unlocked': r.niveau <= user_level  # ✅ Info si débloqué
             }
             for r in resources
         ]
@@ -1730,13 +1743,14 @@ def api_get_all_resources(request):
         return Response({
             'success': True,
             'resources': data,
+            'user_level': user_level,  # ✅ CORRIGÉ : Niveau utilisateur inclus
+            'checked_resources': checked_list,  # ✅ CORRIGÉ : Ressources cochées
             'total_resources': len(data)
         })
     except Exception as e:
         import traceback
         traceback.print_exc()
         return Response({'success': False, 'error': str(e)}, status=400)
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
