@@ -8,7 +8,7 @@
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% staticfiles 'css/mobile-fixes.css' %}">
+    <link rel="stylesheet" href="{% static 'css/mobile-fixes.css' %}?v=2">
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -606,7 +606,7 @@
             }
         };
     </script>
-    <script src="{% staticstaticfiles 'js/mobile-menu.js' %}"></script>
+    <script src="{% static 'js/mobile-menu.js' %}?v=2"></script>
 
     {% block extra_js %}{% endblock %}
 </body>
