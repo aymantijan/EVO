@@ -1622,11 +1622,13 @@
 
     // ==================== ✅ LOAD PROFILE IMAGES FROM DATABASE ====================
 
+    // ==================== ✅ FONCTION CORRIGÉE - CHARGE LES IMAGES AU DÉMARRAGE ====================
     async function loadProfileImages() {
         try {
             console.log('📸 Chargement des images de profil...');
 
-            const response = await fetch('/api/profile/', {
+            // ✅ UTILISER LE NOUVEAU ENDPOINT DÉDIÉ AUX IMAGES
+            const response = await fetch('/api/get-profile-images/', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1641,30 +1643,45 @@
             }
 
             const data = await response.json();
-            console.log('✅ Données profil reçues:', data);
+            console.log('✅ Données images reçues:', data);
 
-            // ✅ CHARGER L'IMAGE DE PROFIL
-            if (data.profile_image_url) {
+            // ✅ CHARGER L'IMAGE DE PROFIL (AVATAR)
+            if (data.avatar_url) {
                 const profileAvatar = document.getElementById('profile-avatar');
                 if (profileAvatar) {
-                    profileAvatar.style.backgroundImage = `url(${data.profile_image_url})`;
-                    profileAvatar.innerHTML = '';
-                    console.log('✅ Image de profil chargée');
+                    profileAvatar.style.backgroundImage = `url(${data.avatar_url})`;
+                    profileAvatar.style.backgroundSize = 'cover';
+                    profileAvatar.style.backgroundPosition = 'center';
+                    profileAvatar.innerHTML = ''; // Enlever l'icône par défaut
+                    console.log('✅ Avatar chargé:', data.avatar_url);
                 }
+            } else {
+                console.log('ℹ️ Pas d\'avatar enregistré');
             }
 
             // ✅ CHARGER L'IMAGE DE COUVERTURE
-            if (data.cover_image_url) {
+            if (data.cover_url) {
                 const profileCover = document.getElementById('profile-cover');
                 if (profileCover) {
                     profileCover.innerHTML = `
-                        <img src="${data.cover_image_url}"
+                        <img src="${data.cover_url}"
                              alt="Couverture"
                              style="width: 100%; height: 100%; object-fit: cover; image-orientation: from-image;">
-                        <button class="cover-btn" onclick="openCoverModal()" s>📸 Modifier la Couverture</button>
+                        <button class="btn-edit-cover" onclick="openCoverModal()" 
+                                style="position: absolute; bottom: 20px; right: 20px; 
+                                       background: rgba(33, 128, 141, 1); color: white; 
+                                       border: none; padding: 10px 16px; border-radius: 6px; 
+                                       cursor: pointer; font-weight: bold; display: flex; 
+                                       align-items: center; gap: 8px; 
+                                       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); 
+                                       transition: all 0.3s; z-index: 10;">
+                            <i class="fas fa-camera"></i> Modifier Couverture
+                        </button>
                     `;
-                    console.log('✅ Image de couverture chargée avec orientation correcte');
+                    console.log('✅ Couverture chargée:', data.cover_url);
                 }
+            } else {
+                console.log('ℹ️ Pas d\'image de couverture enregistrée');
             }
 
         } catch (error) {

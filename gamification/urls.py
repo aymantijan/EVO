@@ -19,10 +19,13 @@ urlpatterns = [
     path('settings/', views.SettingsView.as_view(), name='settings'),
     path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
 
-    # ==================== API - UPLOAD IMAGES (✅ NOUVEAUX) ====================
+    # ==================== API - UPLOAD IMAGES ====================
 
     path('api/upload-profile-image/', views.api_upload_profile_image, name='api_upload_profile_image'),
     path('api/upload-cover-image/', views.api_upload_cover_image, name='api_upload_cover_image'),
+    
+    # ✅ NOUVELLE ROUTE AJOUTÉE - Pour charger les images au démarrage
+    path('api/get-profile-images/', views.api_get_profile_images, name='api_get_profile_images'),
 
     # ==================== API - GET DATA (SOURCE UNIQUE DE VÉRITÉ) ====================
 

@@ -2,7 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # ==================== USER PROFILE ====================
 
@@ -15,8 +16,19 @@ class UserProfile(models.Model):
     badges_count = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 
     # ✅ AJOUTER LES 3 JSONFIELD
-    profile_image = models.ImageField(upload_to='profiles/images/', null=True, blank=True)
-    cover_image = models.ImageField(upload_to='profiles/covers/', null=True, blank=True)
+    profile_image = models.ImageField(
+        upload_to='profile_images/',  # Dossier où les images seront stockées
+        null=True,                     # Permet de ne pas avoir d'image
+        blank=True,                    # Permet de laisser vide dans les formulaires
+        verbose_name="Photo de profil"
+    )
+    
+    cover_image = models.ImageField(
+        upload_to='cover_images/',     # Dossier séparé pour les couvertures
+        null=True,
+        blank=True,
+        verbose_name="Image de couverture"
+    )
     acquired_skills = models.JSONField(default=list, blank=True)
     discovered_categories = models.JSONField(default=list, blank=True)
     explored_domains = models.JSONField(default=list, blank=True)
@@ -62,6 +74,32 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - Level {self.level} ({self.galaxy_name})"
+    
+    def get_avatar_url(self):
+        """Retourne l'URL de l'avatar ou None"""
+        if self.profile_image:
+            return self.profile_image.url
+        return None
+    
+    def get_cover_url(self):
+        """Retourne l'URL de la couverture ou None"""
+        if self.cover_image:
+            return self.cover_image.url
+        return None
+    
+    def delete_old_images(self):
+        """Supprime les anciennes images avant d'en uploader de nouvelles"""
+        if self.profile_image:
+            try:
+                self.profile_image.delete(save=False)
+            except Exception as e:
+                print(f"Erreur suppression avatar: {e}")
+        
+        if self.cover_image:
+            try:
+                self.cover_image.delete(save=False)
+            except Exception as e:
+                print(f"Erreur suppression couverture: {e}")
 
 
 # ==================== SKILL ====================
@@ -559,3 +597,16 @@ class StudySection(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.chapter.title} > {self.title} ({self.progress}%)"
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    """Crée automatiquement un UserProfile quand un User est créé"""
+    if created:
+        UserProfile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    """Sauvegarde le profil quand le User est sauvegardé"""
+    if hasattr(instance, 'profile'):
+        instance.profile.save()

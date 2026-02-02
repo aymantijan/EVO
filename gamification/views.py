@@ -343,10 +343,55 @@ def update_profile(request):
 
 # ==================== API ENDPOINTS - UPLOAD IMAGES ====================
 
+@require_http_methods(['GET'])
+@login_required
+def api_get_profile_images(request):
+    """
+    ✅ NOUVELLE FONCTION - Récupère les URLs des images de profil et de couverture
+    Cette fonction résout le problème de persistance des images
+    """
+    try:
+        user = request.user
+        profile, created = UserProfile.objects.get_or_create(user=user)
+        
+        avatar_url = None
+        cover_url = None
+        
+        # Vérifier si l'image de profil existe
+        if profile.profile_image and hasattr(profile.profile_image, 'url'):
+            try:
+                avatar_url = request.build_absolute_uri(profile.profile_image.url)
+            except Exception as e:
+                print(f"❌ Erreur lors de la récupération de l'avatar: {e}")
+        
+        # Vérifier si l'image de couverture existe
+        if profile.cover_image and hasattr(profile.cover_image, 'url'):
+            try:
+                cover_url = request.build_absolute_uri(profile.cover_image.url)
+            except Exception as e:
+                print(f"❌ Erreur lors de la récupération de la couverture: {e}")
+        
+        print(f"✅ Images chargées - Avatar: {avatar_url}, Cover: {cover_url}")
+        
+        return JsonResponse({
+            'success': True,
+            'avatar_url': avatar_url,
+            'cover_url': cover_url,
+            'user': user.username
+        })
+    
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
 @require_http_methods(['POST'])
 @login_required
 def api_upload_profile_image(request):
-    """✅ Upload l'image de profil"""
+    """✅ Upload l'image de profil (VERSION AMÉLIORÉE)"""
     try:
         user = request.user
         profile, created = UserProfile.objects.get_or_create(user=user)
@@ -356,37 +401,48 @@ def api_upload_profile_image(request):
 
         image_file = request.FILES['image']
 
+        # Validation du type
         allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
         if image_file.content_type not in allowed_types:
             return JsonResponse({'success': False, 'error': 'Type non autorisé'}, status=400)
 
+        # Validation de la taille (5MB max)
         if image_file.size > 5 * 1024 * 1024:
             return JsonResponse({'success': False, 'error': 'Image trop grande (max 5MB)'}, status=400)
 
+        # Supprimer l'ancienne image si elle existe
         if profile.profile_image:
-            profile.profile_image.delete()
+            try:
+                profile.profile_image.delete(save=False)
+            except Exception as e:
+                print(f"⚠️ Impossible de supprimer l'ancienne image: {e}")
 
+        # Sauvegarder la nouvelle image
         profile.profile_image = image_file
         profile.save()
 
+        # Construire l'URL absolue
         image_url = request.build_absolute_uri(profile.profile_image.url)
+        
+        print(f"✅ Image de profil uploadée: {image_url}")
 
         return JsonResponse({
             'success': True,
-            'message': 'Image uploadée',
+            'message': 'Image de profil sauvegardée avec succès',
             'image_url': image_url,
             'timestamp': timezone.now().isoformat()
         })
+        
     except Exception as e:
         import traceback
         traceback.print_exc()
-        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
 @require_http_methods(['POST'])
 @login_required
 def api_upload_cover_image(request):
-    """✅ Upload l'image de couverture"""
+    """✅ Upload l'image de couverture (VERSION AMÉLIORÉE)"""
     try:
         user = request.user
         profile, created = UserProfile.objects.get_or_create(user=user)
@@ -396,32 +452,42 @@ def api_upload_cover_image(request):
 
         image_file = request.FILES['image']
 
+        # Validation du type
         allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
         if image_file.content_type not in allowed_types:
             return JsonResponse({'success': False, 'error': 'Type non autorisé'}, status=400)
 
+        # Validation de la taille (10MB max)
         if image_file.size > 10 * 1024 * 1024:
             return JsonResponse({'success': False, 'error': 'Image trop grande (max 10MB)'}, status=400)
 
+        # Supprimer l'ancienne image si elle existe
         if profile.cover_image:
-            profile.cover_image.delete()
+            try:
+                profile.cover_image.delete(save=False)
+            except Exception as e:
+                print(f"⚠️ Impossible de supprimer l'ancienne image: {e}")
 
+        # Sauvegarder la nouvelle image
         profile.cover_image = image_file
         profile.save()
 
+        # Construire l'URL absolue
         image_url = request.build_absolute_uri(profile.cover_image.url)
+        
+        print(f"✅ Image de couverture uploadée: {image_url}")
 
         return JsonResponse({
             'success': True,
-            'message': 'Image uploadée',
+            'message': 'Image de couverture sauvegardée avec succès',
             'image_url': image_url,
             'timestamp': timezone.now().isoformat()
         })
+        
     except Exception as e:
         import traceback
         traceback.print_exc()
-        return JsonResponse({'success': False, 'error': str(e)}, status=400)
-
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 # ==================== API ENDPOINTS - GET USER DATA ====================
 
