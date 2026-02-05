@@ -1485,10 +1485,23 @@ def get_leaderboard(request):
         for idx, profile in enumerate(leaderboard, 1):
             profile_image_url = None
             if profile.profile_image:
-                profile_image_url = request.build_absolute_uri(profile.profile_image.url)
+                try:
+                    profile_image_url = request.build_absolute_uri(profile.profile_image.url)
+                except Exception as e:
+                    print(f'⚠️ Erreur image pour {profile.user.username}: {e}')
+                    profile_image_url = None
 
             # ✅ CALCULER LES HP DEPUIS LES TRAITS (déjà chargés en mémoire)
-            total_hp = sum([trait.hp for trait in profile.user.userpersonalitytrait_set.all()])
+            total_hp = 0
+            try:
+                traits = profile.user.userpersonalitytrait_set.all()
+                for trait in traits:
+                    # Vérifier que l'attribut hp existe et n'est pas None
+                    if hasattr(trait, 'hp') and trait.hp is not None:
+                        total_hp += int(trait.hp)
+            except Exception as e:
+                print(f'⚠️ Erreur HP pour {profile.user.username}: {e}')
+                total_hp = 0
 
             data.append({
                 'rank': idx,
@@ -1497,7 +1510,7 @@ def get_leaderboard(request):
                 'level': profile.level,
                 'experience_points': profile.experience_points,
                 'total_points': profile.total_points,
-                'total_hp': total_hp,  # ✅ NOUVEAU : HP totaux
+                'total_hp': total_hp,  # ✅ HP totaux
                 'badges_count': profile.badges_count,
                 'profile_image_url': profile_image_url
             })
@@ -1507,6 +1520,7 @@ def get_leaderboard(request):
     except Exception as e:
         import traceback
         traceback.print_exc()
+        print(f'❌ ERREUR LEADERBOARD: {str(e)}')
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -1517,7 +1531,9 @@ def get_leaderboard_weekly(request):
         one_week_ago = timezone.now() - timedelta(days=7)
         weekly_data = []
 
-        profiles = UserProfile.objects.all()
+        profiles = UserProfile.objects.select_related('user').prefetch_related(
+            'user__userpersonalitytrait_set'
+        ).all()
 
         for profile in profiles:
             weekly_points = Action.objects.filter(
@@ -1527,19 +1543,26 @@ def get_leaderboard_weekly(request):
 
             profile_image_url = None
             if profile.profile_image:
-                profile_image_url = request.build_absolute_uri(profile.profile_image.url)
+                try:
+                    profile_image_url = request.build_absolute_uri(profile.profile_image.url)
+                except Exception:
+                    profile_image_url = None
 
             # ✅ CALCULER LES HP DEPUIS LES TRAITS
             total_hp = 0
-            user_traits = UserPersonalityTrait.objects.filter(user=profile.user)
-            for user_trait in user_traits:
-                total_hp += user_trait.hp
+            try:
+                traits = profile.user.userpersonalitytrait_set.all()
+                for trait in traits:
+                    if hasattr(trait, 'hp') and trait.hp is not None:
+                        total_hp += int(trait.hp)
+            except Exception:
+                total_hp = 0
 
             weekly_data.append({
                 'user_id': profile.user.id,
                 'username': profile.user.username,
                 'weekly_points': weekly_points,
-                'total_hp': total_hp,  # ✅ NOUVEAU
+                'total_hp': total_hp,
                 'profile_image_url': profile_image_url
             })
 
@@ -1550,6 +1573,7 @@ def get_leaderboard_weekly(request):
     except Exception as e:
         import traceback
         traceback.print_exc()
+        print(f'❌ ERREUR LEADERBOARD WEEKLY: {str(e)}')
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -1560,7 +1584,9 @@ def get_leaderboard_monthly(request):
         one_month_ago = timezone.now() - timedelta(days=30)
         monthly_data = []
 
-        profiles = UserProfile.objects.all()
+        profiles = UserProfile.objects.select_related('user').prefetch_related(
+            'user__userpersonalitytrait_set'
+        ).all()
 
         for profile in profiles:
             monthly_points = Action.objects.filter(
@@ -1570,19 +1596,26 @@ def get_leaderboard_monthly(request):
 
             profile_image_url = None
             if profile.profile_image:
-                profile_image_url = request.build_absolute_uri(profile.profile_image.url)
+                try:
+                    profile_image_url = request.build_absolute_uri(profile.profile_image.url)
+                except Exception:
+                    profile_image_url = None
 
             # ✅ CALCULER LES HP DEPUIS LES TRAITS
             total_hp = 0
-            user_traits = UserPersonalityTrait.objects.filter(user=profile.user)
-            for user_trait in user_traits:
-                total_hp += user_trait.hp
+            try:
+                traits = profile.user.userpersonalitytrait_set.all()
+                for trait in traits:
+                    if hasattr(trait, 'hp') and trait.hp is not None:
+                        total_hp += int(trait.hp)
+            except Exception:
+                total_hp = 0
 
             monthly_data.append({
                 'user_id': profile.user.id,
                 'username': profile.user.username,
                 'monthly_points': monthly_points,
-                'total_hp': total_hp,  # ✅ NOUVEAU
+                'total_hp': total_hp,
                 'profile_image_url': profile_image_url
             })
 
@@ -1593,6 +1626,7 @@ def get_leaderboard_monthly(request):
     except Exception as e:
         import traceback
         traceback.print_exc()
+        print(f'❌ ERREUR LEADERBOARD MONTHLY: {str(e)}')
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
