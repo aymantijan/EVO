@@ -1038,6 +1038,51 @@
     let currentTab = 'global';
     let currentSortBy = 'xp'; // Tri par défaut
 
+    // ==================== FONCTIONS DE TRI ====================
+    function changeSortType(sortType) {
+        console.log('🔄 Changement de tri:', sortType);
+        currentSortBy = sortType;
+        
+        // Mettre à jour les boutons actifs
+        document.querySelectorAll('.sort-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.sort === sortType) {
+                btn.classList.add('active');
+            }
+        });
+        
+        // Mettre à jour le titre du tableau
+        const tableTitle = document.getElementById('table-title');
+        const primaryHeader = document.getElementById('primary-stat-header');
+        const secondaryHeader = document.getElementById('secondary-stat-header');
+        
+        if (sortType === 'hp') {
+            if (tableTitle) tableTitle.textContent = 'Classement par HP';
+            if (primaryHeader) primaryHeader.textContent = 'HP';
+            if (secondaryHeader) secondaryHeader.textContent = 'XP';
+        } else {
+            if (tableTitle) tableTitle.textContent = 'Classement par XP';
+            if (primaryHeader) primaryHeader.textContent = 'XP';
+            if (secondaryHeader) secondaryHeader.textContent = 'HP';
+        }
+        
+        // Appliquer le tri
+        applyCurrentSort();
+        currentPage = 1;
+        renderLeaderboard();
+        renderStats();
+    }
+    
+    function applyCurrentSort() {
+        if (currentSortBy === 'hp') {
+            // Trier par HP (descendant)
+            filteredPlayers.sort((a, b) => (b.hp || 0) - (a.hp || 0));
+        } else {
+            // Trier par XP (descendant)
+            filteredPlayers.sort((a, b) => b.total_xp - a.total_xp);
+        }
+    }
+
     // ==================== GALAXIES ====================
     const GALAXIES = {
         1: { name: 'Étoile du Matin', color: '#10b981', min: 1, max: 100 },
@@ -1400,12 +1445,16 @@ const MOROCCAN_LEGENDS = [
 
             // Ajouter les légendes
             allLegends.forEach(legend => {
+                const legendLevel = calculateLevelFromXp(legend.xp);
+                const estimatedHP = estimateLegendHP(legendLevel);
+                
                 combinedList.push({
                     id: 'legend_' + legend.name,
                     username: legend.name,
                     total_xp: legend.xp,
-                    level: calculateLevelFromXp(legend.xp),
-                    galaxy: getGalaxyByLevel(calculateLevelFromXp(legend.xp)),
+                    level: legendLevel,
+                    galaxy: getGalaxyByLevel(legendLevel),
+                    hp: estimatedHP,
                     isLegend: true,
                     description: legend.description,
                     profile_image_url: legend.avatar,
@@ -1438,6 +1487,7 @@ const MOROCCAN_LEGENDS = [
             filteredPlayers = [...allPlayers];
         }
 
+        applyCurrentSort();
         renderLeaderboard();
         renderYourRank();
         renderStats();
@@ -1459,12 +1509,20 @@ const MOROCCAN_LEGENDS = [
             if (!response.ok) throw new Error('Erreur API');
 
             const data = await response.json();
+            
+            // Calculer les HP depuis traitsHP
+            let totalHP = 0;
+            if (data.traitsHP && typeof data.traitsHP === 'object') {
+                totalHP = Object.values(data.traitsHP).reduce((sum, hp) => sum + (parseInt(hp) || 0), 0);
+            }
+            
             return {
                 user_id: data.user?.id || 1,
                 username: data.user?.username || 'Utilisateur',
                 level: calculateLevelFromXp(data.totalXP || 0),
                 total_xp: data.totalXP || 0,
                 traitsHP: data.traitsHP || {},
+                hp: totalHP,
                 id: data.user?.id || 1,
                 profile_image_url: data.profile_image_url || null
             };
@@ -1505,10 +1563,23 @@ const MOROCCAN_LEGENDS = [
 
     // ==================== DATA MAPPING ====================
 
+    // Fonction pour estimer les HP des légendes basés sur leur niveau
+    function estimateLegendHP(level) {
+        // Formule : HP estimé = niveau * 250 (valeur moyenne progressive)
+        // Les légendes de haut niveau ont des HP élevés
+        return Math.floor(level * 250);
+    }
+
     function mapPlayerData(player) {
         const totalXp = player.experience_points || player.total_points || player.total_xp || 0;
         const level = calculateLevelFromXp(totalXp);
         const galaxy = getGalaxyByLevel(level);
+
+        // Calculer les HP depuis traitsHP (comme dans profile.html)
+        let totalHP = 0;
+        if (player.traitsHP && typeof player.traitsHP === 'object') {
+            totalHP = Object.values(player.traitsHP).reduce((sum, hp) => sum + (parseInt(hp) || 0), 0);
+        }
 
         return {
             id: player.user_id || player.id || 0,
@@ -1517,8 +1588,10 @@ const MOROCCAN_LEGENDS = [
             level: level,
             galaxy: galaxy,
             rank: player.rank || 0,
+            hp: totalHP,
             isLegend: false,
-            profile_image_url: player.profile_image_url || null
+            profile_image_url: player.profile_image_url || null,
+            traitsHP: player.traitsHP || {}
         };
     }
 
@@ -1559,6 +1632,7 @@ const MOROCCAN_LEGENDS = [
 
         document.getElementById('your-rank-username').textContent = currentUser.username;
         document.getElementById('your-rank-xp').textContent = Math.floor(currentUser.total_xp).toLocaleString('fr-FR');
+        document.getElementById('your-rank-hp').textContent = Math.floor(currentUser.hp || 0).toLocaleString('fr-FR');
         document.getElementById('your-rank-level').textContent = currentUser.level;
 
         const galaxyElement = document.getElementById('your-rank-galaxy');
