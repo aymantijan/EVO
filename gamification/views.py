@@ -1472,6 +1472,7 @@ def get_domain_progress(request, domain):
 # ==================== API ENDPOINTS - LEADERBOARD ====================
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_leaderboard(request):
     """✅ Récupère le classement global AVEC les photos ET les HP (OPTIMISÉ)"""
     try:
@@ -1525,6 +1526,7 @@ def get_leaderboard(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_leaderboard_weekly(request):
     """✅ Récupère le classement hebdomadaire AVEC HP"""
     try:
@@ -1578,6 +1580,7 @@ def get_leaderboard_weekly(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_leaderboard_monthly(request):
     """✅ Récupère le classement mensuel AVEC HP"""
     try:
@@ -1631,6 +1634,7 @@ def get_leaderboard_monthly(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_leaderboard_simple(request):
     """Récupère le top 10 du classement AVEC HP"""
     leaderboard = UserProfile.objects.all().order_by('-experience_points')[:10]
