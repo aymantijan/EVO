@@ -1534,7 +1534,7 @@ const MOROCCAN_LEGENDS = [
 
     async function getLeaderboardData(type = 'global') {
         try {
-            let endpoint = '/api/get-user-data/';
+            let endpoint = '/api/leaderboard/';
             if (type === 'weekly') {
                 endpoint = '/api/leaderboard-weekly/';
             } else if (type === 'monthly') {
@@ -1575,10 +1575,21 @@ const MOROCCAN_LEGENDS = [
         const level = calculateLevelFromXp(totalXp);
         const galaxy = getGalaxyByLevel(level);
 
-        // Calculer les HP depuis traitsHP (comme dans profile.html)
+        // Calculer les HP depuis traitsHP OU utiliser total_hp de l'API
         let totalHP = 0;
-        if (player.traitsHP && typeof player.traitsHP === 'object') {
+        
+        // Priorité 1 : Utiliser total_hp si fourni par l'API backend
+        if (player.total_hp !== undefined) {
+            totalHP = parseInt(player.total_hp) || 0;
+        }
+        // Priorité 2 : Calculer depuis traitsHP si disponible
+        else if (player.traitsHP && typeof player.traitsHP === 'object') {
             totalHP = Object.values(player.traitsHP).reduce((sum, hp) => sum + (parseInt(hp) || 0), 0);
+        }
+        // Priorité 3 : Estimer basé sur le niveau (temporaire)
+        else {
+            totalHP = estimateLegendHP(level);
+            console.log(`⚠️ HP estimés pour ${player.username}: ${totalHP} (niveau ${level})`);
         }
 
         return {

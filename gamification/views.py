@@ -1473,15 +1473,22 @@ def get_domain_progress(request, domain):
 
 @api_view(['GET'])
 def get_leaderboard(request):
-    """✅ Récupère le classement global AVEC les photos"""
+    """✅ Récupère le classement global AVEC les photos ET les HP (OPTIMISÉ)"""
     try:
-        leaderboard = UserProfile.objects.all().order_by('-experience_points')[:50]
+        # ✅ OPTIMISATION : Utiliser select_related et prefetch_related pour éviter N+1
+        leaderboard = UserProfile.objects.select_related('user').prefetch_related(
+            'user__userpersonalitytrait_set'
+        ).all().order_by('-experience_points')[:50]
+        
         data = []
 
         for idx, profile in enumerate(leaderboard, 1):
             profile_image_url = None
             if profile.profile_image:
                 profile_image_url = request.build_absolute_uri(profile.profile_image.url)
+
+            # ✅ CALCULER LES HP DEPUIS LES TRAITS (déjà chargés en mémoire)
+            total_hp = sum([trait.hp for trait in profile.user.userpersonalitytrait_set.all()])
 
             data.append({
                 'rank': idx,
@@ -1490,11 +1497,12 @@ def get_leaderboard(request):
                 'level': profile.level,
                 'experience_points': profile.experience_points,
                 'total_points': profile.total_points,
+                'total_hp': total_hp,  # ✅ NOUVEAU : HP totaux
                 'badges_count': profile.badges_count,
                 'profile_image_url': profile_image_url
             })
 
-        print(f'✅ Leaderboard chargé: {len(data)} joueurs')
+        print(f'✅ Leaderboard chargé: {len(data)} joueurs avec HP')
         return Response(data)
     except Exception as e:
         import traceback
@@ -1504,7 +1512,7 @@ def get_leaderboard(request):
 
 @api_view(['GET'])
 def get_leaderboard_weekly(request):
-    """✅ Récupère le classement hebdomadaire"""
+    """✅ Récupère le classement hebdomadaire AVEC HP"""
     try:
         one_week_ago = timezone.now() - timedelta(days=7)
         weekly_data = []
@@ -1521,10 +1529,17 @@ def get_leaderboard_weekly(request):
             if profile.profile_image:
                 profile_image_url = request.build_absolute_uri(profile.profile_image.url)
 
+            # ✅ CALCULER LES HP DEPUIS LES TRAITS
+            total_hp = 0
+            user_traits = UserPersonalityTrait.objects.filter(user=profile.user)
+            for user_trait in user_traits:
+                total_hp += user_trait.hp
+
             weekly_data.append({
                 'user_id': profile.user.id,
                 'username': profile.user.username,
                 'weekly_points': weekly_points,
+                'total_hp': total_hp,  # ✅ NOUVEAU
                 'profile_image_url': profile_image_url
             })
 
@@ -1540,7 +1555,7 @@ def get_leaderboard_weekly(request):
 
 @api_view(['GET'])
 def get_leaderboard_monthly(request):
-    """✅ Récupère le classement mensuel"""
+    """✅ Récupère le classement mensuel AVEC HP"""
     try:
         one_month_ago = timezone.now() - timedelta(days=30)
         monthly_data = []
@@ -1557,10 +1572,17 @@ def get_leaderboard_monthly(request):
             if profile.profile_image:
                 profile_image_url = request.build_absolute_uri(profile.profile_image.url)
 
+            # ✅ CALCULER LES HP DEPUIS LES TRAITS
+            total_hp = 0
+            user_traits = UserPersonalityTrait.objects.filter(user=profile.user)
+            for user_trait in user_traits:
+                total_hp += user_trait.hp
+
             monthly_data.append({
                 'user_id': profile.user.id,
                 'username': profile.user.username,
                 'monthly_points': monthly_points,
+                'total_hp': total_hp,  # ✅ NOUVEAU
                 'profile_image_url': profile_image_url
             })
 
@@ -1576,9 +1598,20 @@ def get_leaderboard_monthly(request):
 
 @api_view(['GET'])
 def get_leaderboard_simple(request):
-    """Récupère le top 10 du classement"""
+    """Récupère le top 10 du classement AVEC HP"""
     leaderboard = UserProfile.objects.all().order_by('-experience_points')[:10]
-    data = [{'username': p.user.username, 'level': p.level, 'points': p.experience_points} for p in leaderboard]
+    data = []
+    
+    for p in leaderboard:
+        # Calculer les HP
+        total_hp = sum([trait.hp for trait in UserPersonalityTrait.objects.filter(user=p.user)])
+        data.append({
+            'username': p.user.username,
+            'level': p.level,
+            'points': p.experience_points,
+            'total_hp': total_hp
+        })
+    
     return Response(data)
 
 
