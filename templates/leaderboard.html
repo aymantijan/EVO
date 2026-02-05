@@ -1627,8 +1627,11 @@ const MOROCCAN_LEGENDS = [
                     <td class="xp-col">
                         <div class="xp-value">${Math.floor(player.total_xp).toLocaleString('fr-FR')}</div>
                     </td>
+                    <td class="hp-col">
+                        <div class="hp-value">${Math.floor(player.hp || 0).toLocaleString('fr-FR')}</div>
+                    </td>
                     <td class="action-col">
-                        <button class="btn-view-profile ${isLegend ? 'legend' : ''}" onclick="openProfileModal('${player.username.replace(/'/g, "\\'")}', ${player.level}, ${Math.floor(player.total_xp)}, '${player.galaxy.name}', '${(player.description || '').replace(/'/g, "\\'")}')" style="white-space: nowrap;">
+                        <button class="btn-view-profile ${isLegend ? 'legend' : ''}" onclick="openProfileModal('${player.username.replace(/'/g, "\\'")}', ${player.level}, ${Math.floor(player.total_xp)}, '${player.galaxy.name}', '${(player.description || '').replace(/'/g, "\\'").replace(/\n/g, ' ')}', ${Math.floor(player.hp || 0)})" style="white-space: nowrap;">
                             Voir
                         </button>
                     </td>
