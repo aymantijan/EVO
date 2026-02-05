@@ -1534,7 +1534,7 @@ const MOROCCAN_LEGENDS = [
 
     async function getLeaderboardData(type = 'global') {
         try {
-            let endpoint = '/api/leaderboard/';
+            let endpoint = '/api/get-user-data/';
             if (type === 'weekly') {
                 endpoint = '/api/leaderboard-weekly/';
             } else if (type === 'monthly') {
