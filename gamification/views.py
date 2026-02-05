@@ -1477,9 +1477,7 @@ def get_leaderboard(request):
     """✅ Récupère le classement global AVEC les photos ET les HP (OPTIMISÉ)"""
     try:
         # ✅ OPTIMISATION : Utiliser select_related et prefetch_related pour éviter N+1
-        leaderboard = UserProfile.objects.select_related('user').prefetch_related(
-            'user__userpersonalitytrait_set'
-        ).all().order_by('-experience_points')[:50]
+        leaderboard = UserProfile.objects.select_related('user').all().order_by('-experience_points')[:50]
         
         data = []
 
@@ -1495,7 +1493,7 @@ def get_leaderboard(request):
             # ✅ CALCULER LES HP DEPUIS LES TRAITS (déjà chargés en mémoire)
             total_hp = 0
             try:
-                traits = profile.user.userpersonalitytrait_set.all()
+                traits = UserPersonalityTrait.objects.filter(user=profile.user)
                 for trait in traits:
                     # Vérifier que l'attribut hp existe et n'est pas None
                     if hasattr(trait, 'hp') and trait.hp is not None:
@@ -1533,9 +1531,7 @@ def get_leaderboard_weekly(request):
         one_week_ago = timezone.now() - timedelta(days=7)
         weekly_data = []
 
-        profiles = UserProfile.objects.select_related('user').prefetch_related(
-            'user__userpersonalitytrait_set'
-        ).all()
+        profiles = UserProfile.objects.select_related('user').all()
 
         for profile in profiles:
             weekly_points = Action.objects.filter(
@@ -1553,7 +1549,7 @@ def get_leaderboard_weekly(request):
             # ✅ CALCULER LES HP DEPUIS LES TRAITS
             total_hp = 0
             try:
-                traits = profile.user.userpersonalitytrait_set.all()
+                traits = UserPersonalityTrait.objects.filter(user=profile.user)
                 for trait in traits:
                     if hasattr(trait, 'hp') and trait.hp is not None:
                         total_hp += int(trait.hp)
@@ -1587,9 +1583,7 @@ def get_leaderboard_monthly(request):
         one_month_ago = timezone.now() - timedelta(days=30)
         monthly_data = []
 
-        profiles = UserProfile.objects.select_related('user').prefetch_related(
-            'user__userpersonalitytrait_set'
-        ).all()
+        profiles = UserProfile.objects.select_related('user').all()
 
         for profile in profiles:
             monthly_points = Action.objects.filter(
@@ -1607,7 +1601,7 @@ def get_leaderboard_monthly(request):
             # ✅ CALCULER LES HP DEPUIS LES TRAITS
             total_hp = 0
             try:
-                traits = profile.user.userpersonalitytrait_set.all()
+                traits = UserPersonalityTrait.objects.filter(user=profile.user)
                 for trait in traits:
                     if hasattr(trait, 'hp') and trait.hp is not None:
                         total_hp += int(trait.hp)
