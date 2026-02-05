@@ -28,6 +28,18 @@
             <input type="text" id="search-input" placeholder="Chercher un joueur...">
             <span class="search-icon">R</span>
         </div>
+        
+        <!-- BOUTONS DE TRI -->
+        <div class="sort-buttons">
+            <button class="sort-btn active" data-sort="xp">
+                <span class="sort-icon">⚡</span>
+                <span class="sort-text">Classement XP</span>
+            </button>
+            <button class="sort-btn" data-sort="hp">
+                <span class="sort-icon">❤️</span>
+                <span class="sort-text">Classement HP</span>
+            </button>
+        </div>
     </div>
 
     <!-- YOUR RANK -->
@@ -52,6 +64,10 @@
                 <div class="your-rank-stat">
                     <span class="stat-label">XP</span>
                     <span class="stat-value" id="your-rank-xp">0</span>
+                </div>
+                <div class="your-rank-stat">
+                    <span class="stat-label">HP</span>
+                    <span class="stat-value" id="your-rank-hp">0</span>
                 </div>
             </div>
             <div class="your-rank-right">
@@ -81,6 +97,13 @@
             </div>
         </div>
         <div class="stat-card">
+            <div class="stat-card-icon">❤️</div>
+            <div class="stat-card-content">
+                <div class="stat-card-label">HP Moyen</div>
+                <div class="stat-card-value" id="avg-hp">0</div>
+            </div>
+        </div>
+        <div class="stat-card">
             <div class="stat-card-icon">L</div>
             <div class="stat-card-content">
                 <div class="stat-card-label">Niveau Moyen</div>
@@ -98,7 +121,7 @@
 
     <!-- LEADERBOARD TABLE -->
     <div class="leaderboard-table-section">
-        <h2 class="section-title" id="table-title">Classement</h2>
+        <h2 class="section-title" id="table-title">Classement par XP</h2>
         <div class="leaderboard-table-wrapper">
             <table class="leaderboard-table">
                 <thead>
@@ -107,7 +130,8 @@
                         <th class="player-col">Joueur</th>
                         <th class="level-col">Niveau</th>
                         <th class="galaxy-col">Galaxie</th>
-                        <th class="xp-col">XP</th>
+                        <th class="xp-col"><span id="primary-stat-header">XP</span></th>
+                        <th class="hp-col"><span id="secondary-stat-header">HP</span></th>
                         <th class="action-col">Action</th>
                     </tr>
                 </thead>
@@ -233,6 +257,7 @@
     display: flex;
     margin-bottom: 30px;
     gap: 15px;
+    flex-wrap: wrap;
 }
 
 .search-box {
@@ -265,6 +290,45 @@
     font-size: 1.1rem;
     opacity: 0.6;
     font-weight: bold;
+}
+
+/* ==================== BOUTONS DE TRI ==================== */
+.sort-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.sort-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sort-btn:hover {
+    color: var(--color-primary);
+}
+
+.sort-btn.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+}
+
+.sort-icon {
+    font-size: 1.2rem;
+}
+
+.sort-text {
+    font-weight: 600;
 }
 
 /* ==================== YOUR RANK ====================*/
@@ -621,7 +685,7 @@
     font-size: 0.9rem;
 }
 
-.xp-col {
+.xp-col, .hp-col {
     width: 120px;
     text-align: right;
 }
@@ -629,6 +693,12 @@
 .xp-value {
     font-weight: 600;
     color: var(--color-primary);
+    font-size: 1.1rem;
+}
+
+.hp-value {
+    font-weight: 600;
+    color: #E74C3C;
     font-size: 1.1rem;
 }
 
@@ -806,7 +876,7 @@
 
 .modal-stats-section {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 20px;
     margin-bottom: 30px;
 }
@@ -901,8 +971,19 @@
     .rank-col,
     .level-col,
     .xp-col,
+    .hp-col,
     .action-col {
         width: auto;
+    }
+    
+    .sort-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .sort-btn {
+        flex: 1;
+        min-width: 120px;
     }
 
     .modal-stats-section {
@@ -955,6 +1036,7 @@
     let filteredPlayers = [];
     let currentUser = null;
     let currentTab = 'global';
+    let currentSortBy = 'xp'; // Tri par défaut
 
     // ==================== GALAXIES ====================
     const GALAXIES = {
@@ -1569,6 +1651,7 @@ const MOROCCAN_LEGENDS = [
         if (filteredPlayers.length === 0) {
             document.getElementById('total-players').textContent = '0';
             document.getElementById('avg-xp').textContent = '0';
+            document.getElementById('avg-hp').textContent = '0';
             document.getElementById('avg-level').textContent = 'Lvl 0';
             document.getElementById('avg-galaxy').textContent = 'N/A';
             return;
@@ -1576,11 +1659,13 @@ const MOROCCAN_LEGENDS = [
 
         const totalPlayers = filteredPlayers.length;
         const avgXp = Math.floor(filteredPlayers.reduce((sum, p) => sum + p.total_xp, 0) / totalPlayers);
+        const avgHp = Math.floor(filteredPlayers.reduce((sum, p) => sum + (p.hp || 0), 0) / totalPlayers);
         const avgLevel = Math.floor(filteredPlayers.reduce((sum, p) => sum + p.level, 0) / totalPlayers);
         const topGalaxy = getGalaxyByLevel(avgLevel);
 
         document.getElementById('total-players').textContent = totalPlayers.toLocaleString('fr-FR');
         document.getElementById('avg-xp').textContent = avgXp.toLocaleString('fr-FR');
+        document.getElementById('avg-hp').textContent = avgHp.toLocaleString('fr-FR');
         document.getElementById('avg-level').textContent = 'Lvl ' + avgLevel;
 
         const galaxyElement = document.getElementById('avg-galaxy');
@@ -1592,13 +1677,14 @@ const MOROCCAN_LEGENDS = [
 
     // ==================== MODAL ====================
 
-    function openProfileModal(username, level, xp, galaxyName, description) {
+    function openProfileModal(username, level, xp, galaxyName, description, hp = 0) {
         const modal = document.getElementById('profile-modal-overlay');
         const galaxy = getGalaxyByLevel(level);
 
         document.getElementById('modal-username').textContent = username;
         document.getElementById('modal-level').textContent = 'Lvl ' + level;
         document.getElementById('modal-xp').textContent = xp.toLocaleString('fr-FR');
+        document.getElementById('modal-hp').textContent = hp.toLocaleString('fr-FR');
         document.getElementById('modal-galaxy').textContent = galaxy.name;
         document.getElementById('modal-galaxy').style.color = galaxy.color;
 
@@ -1641,12 +1727,12 @@ const MOROCCAN_LEGENDS = [
         const query = e.target.value.toLowerCase();
 
         if (currentTab === 'legends') {
-            filteredPlayers = filteredPlayers.sort((a, b) => b.total_xp - a.total_xp)
-                .filter(p => p.username.toLowerCase().includes(query));
+            filteredPlayers = allLegends.filter(p => p.username.toLowerCase().includes(query));
         } else {
             filteredPlayers = allPlayers.filter(p => p.username.toLowerCase().includes(query));
         }
-
+        
+        applyCurrentSort();
         currentPage = 1;
         renderLeaderboard();
     });
@@ -1655,6 +1741,14 @@ const MOROCCAN_LEGENDS = [
         btn.addEventListener('click', function() {
             const tabType = this.dataset.tab || 'global';
             loadLeaderboardTab(tabType);
+        });
+    });
+
+    // Event listeners pour les boutons de tri
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const sortType = this.dataset.sort;
+            changeSortType(sortType);
         });
     });
 
