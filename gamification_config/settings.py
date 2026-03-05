@@ -21,7 +21,12 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-your-secret-key-chang
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+# ✅ CHANGE 1: explicit hosts instead of wildcard
+ALLOWED_HOSTS = [
+    'yourusername.pythonanywhere.com',
+    'localhost',
+    '127.0.0.1',
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -31,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     'cloudinary_storage',
     'cloudinary',
 
@@ -80,11 +85,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gamification_config.wsgi.application'
 
-# Database
+# ✅ CHANGE 2: ssl_require=True for Railway PostgreSQL
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3'),
-        conn_max_age=600
+        default=os.environ.get('DATABASE_URL', f'sqlite:///{BASE_DIR}/db.sqlite3'),
+        conn_max_age=600,
+        ssl_require=True
     )
 }
 
@@ -117,7 +123,7 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-# Media files (User uploads)
+# Media files (User uploads) — handled by Cloudinary
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -176,7 +182,7 @@ CORS_ALLOWED_ORIGINS = config(
 
 CORS_ALLOW_CREDENTIALS = True
 
-# CSRF Configuration
+# ✅ CHANGE 3: added PythonAnywhere to CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
@@ -184,8 +190,11 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:3000',
     'https://evpe.up.railway.app',
     'https://*.railway.app',
+    'https://yourusername.pythonanywhere.com',
 ]
-CSRF_COOKIE_SECURE = True
+
+# ✅ CHANGE 4: dynamic instead of always True (breaks local dev)
+CSRF_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_HTTPONLY = False
 
 # Logging configuration
@@ -242,18 +251,16 @@ LOGGING = {
 LOGS_DIR = BASE_DIR / 'logs'
 LOGS_DIR.mkdir(exist_ok=True)
 
-# Security settings for production
+# ✅ CHANGE 5: fixed production security block for PythonAnywhere
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    SECURE_SSL_REDIRECT = False  # PythonAnywhere handles SSL at proxy level
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_SECURITY_POLICY = {
-        'default-src': ("'self'",),
-        'script-src': ("'self'", "'unsafe-inline'", "cdn.jsdelivr.net", "cdnjs.cloudflare.com"),
-        'style-src': ("'self'", "'unsafe-inline'", "cdnjs.cloudflare.com"),
-        'img-src': ("'self'", "data:", "https:"),
-    }
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    # NOTE: SECURE_CONTENT_SECURITY_POLICY removed — not a native Django setting,
+    # use django-csp package if needed
 
 # Cache configuration
 CACHES = {
@@ -263,7 +270,7 @@ CACHES = {
     }
 }
 
-# Email configuration (for production)
+# Email configuration
 EMAIL_BACKEND = config(
     'EMAIL_BACKEND',
     default='django.core.mail.backends.console.EmailBackend'
@@ -368,12 +375,12 @@ GAMIFICATION_SETTINGS = {
 
 # ====== STUDY TRACKER SETTINGS ======
 STUDY_TRACKER_SETTINGS = {
-    'PROGRESS_PER_SECTION': 2,  # 2% per section (50 sections = 100%)
+    'PROGRESS_PER_SECTION': 2,
     'SECTIONS_PER_CHAPTER': 50,
     'STREAK_BONUS_XP': 10,
 }
 
-# ====== XP REWARDS (Same for all 1000 levels) ======
+# ====== XP REWARDS ======
 XP_REWARDS = {
     'study_session_15min': 10,
     'study_session_30min': 25,
@@ -393,78 +400,74 @@ XP_REWARDS = {
 }
 
 # ====== LEVEL THRESHOLDS (1000 LEVELS) ======
-# Progression exponentielle: chaque niveau nécessite plus d'XP
-# Formule: XP requis = 100 * ln(level + 1) * 10
+# Progression exponentielle: XP requis = 100 * ln(level + 1) * 10
 LEVEL_THRESHOLDS = [
     int(100 * math.log(i + 1) * 10) if i > 0 else 0
-    for i in range(1001)  # 0 to 1000 levels
+    for i in range(1001)
 ]
 
-# Alternative: Simple linear progression (100 XP per level)
-# LEVEL_THRESHOLDS = [i * 100 for i in range(1001)]
-
-# ====== HP SYSTEM (PERSONALITY TRAITS) ======
+# ====== HP SYSTEM ======
 HP_SETTINGS = {
     'INITIAL_HP': 0,
     'MAX_HP': 100,
     'MIN_HP': 0,
     'HP_PER_TRAIT_LEVEL': 10,
-    'HP_DECAY_PER_DAY': 1,  # 1 HP lost per day without activity
+    'HP_DECAY_PER_DAY': 1,
 }
 
 # ====== PERSONALITY TRAIT CATEGORIES ======
 PERSONALITY_TRAIT_CATEGORIES = {
-    'cognitive': {'name': 'Cognitif', 'color': '#3b82f6', 'icon': '🧠'},
-    'emotional': {'name': 'Émotionnel', 'color': '#f59e0b', 'icon': '💖'},
-    'behavioral': {'name': 'Comportemental', 'color': '#10b981', 'icon': '⚙️'},
-    'social': {'name': 'Social', 'color': '#ec4899', 'icon': '👥'},
-    'moral': {'name': 'Moral/Éthique', 'color': '#6366f1', 'icon': '⚖️'},
-    'dark': {'name': 'Traits Sombres', 'color': '#6b7280', 'icon': '🌑'},
-    'motivational': {'name': 'Motivationnel', 'color': '#06b6d4', 'icon': '🔥'},
-    'existential': {'name': 'Existentiel', 'color': '#8b5cf6', 'icon': '🌌'},
-    'leadership': {'name': 'Leadership', 'color': '#059669', 'icon': '👑'},
-    'affective': {'name': 'Affectif', 'color': '#dc2626', 'icon': '❤️'},
+    'cognitive':    {'name': 'Cognitif',         'color': '#3b82f6', 'icon': '🧠'},
+    'emotional':    {'name': 'Émotionnel',        'color': '#f59e0b', 'icon': '💖'},
+    'behavioral':   {'name': 'Comportemental',    'color': '#10b981', 'icon': '⚙️'},
+    'social':       {'name': 'Social',            'color': '#ec4899', 'icon': '👥'},
+    'moral':        {'name': 'Moral/Éthique',     'color': '#6366f1', 'icon': '⚖️'},
+    'dark':         {'name': 'Traits Sombres',    'color': '#6b7280', 'icon': '🌑'},
+    'motivational': {'name': 'Motivationnel',     'color': '#06b6d4', 'icon': '🔥'},
+    'existential':  {'name': 'Existentiel',       'color': '#8b5cf6', 'icon': '🌌'},
+    'leadership':   {'name': 'Leadership',        'color': '#059669', 'icon': '👑'},
+    'affective':    {'name': 'Affectif',          'color': '#dc2626', 'icon': '❤️'},
 }
 
 # ====== RESOURCE TYPES & DOMAINS ======
 RESOURCE_TYPES = {
-    'Livre': {'icon': '📚', 'color': '#8b5cf6'},
-    'Article': {'icon': '📰', 'color': '#3b82f6'},
+    'Livre':     {'icon': '📚', 'color': '#8b5cf6'},
+    'Article':   {'icon': '📰', 'color': '#3b82f6'},
     'FilmSérie': {'icon': '🎬', 'color': '#f59e0b'},
-    'Mentor': {'icon': '👨‍🏫', 'color': '#ec4899'},
-    'Podcast': {'icon': '🎙️', 'color': '#10b981'},
+    'Mentor':    {'icon': '👨‍🏫', 'color': '#ec4899'},
+    'Podcast':   {'icon': '🎙️', 'color': '#10b981'},
 }
 
 RESOURCE_DOMAINS = {
-    'Finance': {'icon': '💰', 'color': '#059669'},
-    'Business': {'icon': '💼', 'color': '#2563eb'},
-    'Mindset': {'icon': '🧠', 'color': '#dc2626'},
-    'Tech': {'icon': '💻', 'color': '#7c3aed'},
+    'Finance':         {'icon': '💰', 'color': '#059669'},
+    'Business':        {'icon': '💼', 'color': '#2563eb'},
+    'Mindset':         {'icon': '🧠', 'color': '#dc2626'},
+    'Tech':            {'icon': '💻', 'color': '#7c3aed'},
     'Entrepreneuriat': {'icon': '🚀', 'color': '#ea580c'},
-    'Philosophie': {'icon': '🤔', 'color': '#6366f1'},
-    'Physique': {'icon': '⚛️', 'color': '#3b82f6'},
-    'Chimie': {'icon': '🧪', 'color': '#8b5cf6'},
-    'Agriculture': {'icon': '🌾', 'color': '#10b981'},
-    'Romans': {'icon': '📖', 'color': '#ec4899'},
-    'Autre': {'icon': '📂', 'color': '#6b7280'},
+    'Philosophie':     {'icon': '🤔', 'color': '#6366f1'},
+    'Physique':        {'icon': '⚛️', 'color': '#3b82f6'},
+    'Chimie':          {'icon': '🧪', 'color': '#8b5cf6'},
+    'Agriculture':     {'icon': '🌾', 'color': '#10b981'},
+    'Romans':          {'icon': '📖', 'color': '#ec4899'},
+    'Autre':           {'icon': '📂', 'color': '#6b7280'},
 }
 
 # ====== ACHIEVEMENT SYSTEM ======
 ACHIEVEMENT_CATEGORIES = {
-    'combat': {'name': 'Combat', 'icon': '⚔️', 'color': '#ef4444'},
+    'combat':      {'name': 'Combat',      'icon': '⚔️', 'color': '#ef4444'},
     'exploration': {'name': 'Exploration', 'icon': '🗺️', 'color': '#f59e0b'},
-    'social': {'name': 'Social', 'icon': '👥', 'color': '#ec4899'},
-    'learning': {'name': 'Learning', 'icon': '📚', 'color': '#3b82f6'},
-    'challenge': {'name': 'Challenge', 'icon': '🏆', 'color': '#10b981'},
+    'social':      {'name': 'Social',      'icon': '👥', 'color': '#ec4899'},
+    'learning':    {'name': 'Learning',    'icon': '📚', 'color': '#3b82f6'},
+    'challenge':   {'name': 'Challenge',   'icon': '🏆', 'color': '#10b981'},
 }
 
 # ====== SKILL SYSTEM ======
 SKILL_CATEGORIES = {
-    'technical': {'name': 'Technique', 'icon': '💻', 'color': '#7c3aed'},
-    'soft': {'name': 'Soft Skills', 'icon': '🤝', 'color': '#ec4899'},
-    'academic': {'name': 'Académique', 'icon': '📚', 'color': '#3b82f6'},
-    'business': {'name': 'Business', 'icon': '💼', 'color': '#2563eb'},
-    'personal': {'name': 'Personnel', 'icon': '✨', 'color': '#f59e0b'},
+    'technical': {'name': 'Technique',   'icon': '💻', 'color': '#7c3aed'},
+    'soft':      {'name': 'Soft Skills', 'icon': '🤝', 'color': '#ec4899'},
+    'academic':  {'name': 'Académique',  'icon': '📚', 'color': '#3b82f6'},
+    'business':  {'name': 'Business',    'icon': '💼', 'color': '#2563eb'},
+    'personal':  {'name': 'Personnel',   'icon': '✨', 'color': '#f59e0b'},
 }
 
 # WhiteNoise configuration
@@ -492,16 +495,13 @@ API_SETTINGS = {
     'RATE_LIMIT': '1000/hour',
 }
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
+# ====== CLOUDINARY ======
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'default-cloud-name'),
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', ''),
     'API_KEY': os.getenv('CLOUDINARY_API_KEY', ''),
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', '')
 }
 
-# Configurer Cloudinary
 cloudinary.config(
     cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],
     api_key=CLOUDINARY_STORAGE['API_KEY'],
@@ -509,5 +509,4 @@ cloudinary.config(
     secure=True
 )
 
-# ✅ REMPLACER le stockage par défaut par Cloudinary
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
